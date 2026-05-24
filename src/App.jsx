@@ -611,6 +611,215 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
   );
 }
 
+// ── Admin Dashboard ────────────────────────────────────────────────────────────
+function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemoveReview,onVerifyJudge}) {
+  const [tab,setTab]=useState("overview");
+  const [allUsers,setAllUsers]=useState([]);
+  const [loadingUsers,setLoadingUsers]=useState(true);
+  const [claimQueue,setClaimQueue]=useState([]);
+
+  useEffect(()=>{
+    // Load all users from Firestore
+    (async()=>{
+      try {
+        const {db} = await import("./firebase");
+        const {collection,getDocs} = await import("firebase/firestore");
+        const snap = await getDocs(collection(db,"users"));
+        const users = snap.docs.map(d=>({id:d.id,...d.data()}));
+        setAllUsers(users);
+      } catch(e){ console.error(e); }
+      setLoadingUsers(false);
+    })();
+    // Find judges with pending claims (verified=false but claimedBy set)
+    const pending = judges.filter(j=>j.claimedBy&&!j.verified);
+    setClaimQueue(pending);
+  },[judges]);
+
+  async function changeRole(uid,newRole){
+    try {
+      const {db} = await import("./firebase");
+      const {doc,updateDoc} = await import("firebase/firestore");
+      await updateDoc(doc(db,"users",uid),{role:newRole});
+      setAllUsers(prev=>prev.map(u=>u.id===uid?{...u,role:newRole}:u));
+    } catch(e){ alert("Failed to update role"); }
+  }
+
+  async function suspendUser(uid,suspended){
+    try {
+      const {db} = await import("./firebase");
+      const {doc,updateDoc} = await import("firebase/firestore");
+      await updateDoc(doc(db,"users",uid),{suspended});
+      setAllUsers(prev=>prev.map(u=>u.id===uid?{...u,suspended}:u));
+    } catch(e){ alert("Failed to update user"); }
+  }
+
+  const statCards = [
+    {label:"Total Judges",value:judges.length,color:T.accent},
+    {label:"Total Reviews",value:reviews.length,color:T.green},
+    {label:"Total Users",value:allUsers.length,color:"#9334e6"},
+    {label:"Pending Claims",value:claimQueue.length,color:T.amber},
+    {label:"Bookings",value:bookings.length,color:"#e52592"},
+    {label:"Verified Judges",value:judges.filter(j=>j.verified).length,color:T.green},
+  ];
+
+  const tabs = [
+    {key:"overview",label:"Overview"},
+    {key:"users",label:`Users (${allUsers.length})`},
+    {key:"claims",label:`Claims (${claimQueue.length})`},
+    {key:"reviews",label:`Reviews (${reviews.length})`},
+  ];
+
+  return (
+    <div style={{minHeight:"100vh",background:T.surface}}>
+      {/* Top bar */}
+      <div style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"space-between",height:56,position:"sticky",top:0,zIndex:100}}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <button onClick={onBack} style={{background:"none",border:"none",cursor:"pointer",color:T.textSub,fontSize:14,fontWeight:500,padding:"6px 10px",borderRadius:100,fontFamily:"inherit"}}
+            onMouseEnter={e=>e.currentTarget.style.background=T.surface} onMouseLeave={e=>e.currentTarget.style.background="none"}>← Back</button>
+          <span style={{fontSize:15,fontWeight:500,color:T.text}}>Admin Dashboard</span>
+        </div>
+        <span style={{fontSize:12,color:T.textHint}}>Signed in as {user.email}</span>
+      </div>
+
+      <div style={{maxWidth:1100,margin:"0 auto",padding:"28px 20px"}}>
+        {/* Tabs */}
+        <div style={{display:"flex",gap:4,marginBottom:24,background:T.bg,padding:4,borderRadius:T.r,border:`1px solid ${T.border}`,width:"fit-content"}}>
+          {tabs.map(t=>(
+            <button key={t.key} onClick={()=>setTab(t.key)}
+              style={{padding:"7px 16px",borderRadius:8,border:"none",background:tab===t.key?T.accent:"transparent",color:tab===t.key?"#fff":T.textSub,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit",transition:"all .15s"}}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Overview */}
+        {tab==="overview"&&(
+          <>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:12,marginBottom:28}}>
+              {statCards.map(s=>(
+                <div key={s.label} style={{background:T.bg,borderRadius:T.r,padding:"18px 20px",border:`1px solid ${T.border}`,boxShadow:T.shadow}}>
+                  <div style={{fontSize:28,fontWeight:600,color:s.color,marginBottom:4}}>{s.value}</div>
+                  <div style={{fontSize:12,color:T.textHint}}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{background:T.bg,borderRadius:T.r,padding:"20px",border:`1px solid ${T.border}`,marginBottom:20}}>
+              <p style={{margin:"0 0 14px",fontSize:13,fontWeight:600,color:T.textSub,textTransform:"uppercase",letterSpacing:0.8}}>Recent reviews</p>
+              {reviews.slice(-5).reverse().map(r=>{
+                const j=judges.find(j=>j.judgeId===r.judgeId)||judges.find(j=>j.id===r.judgeId);
+                return(
+                  <div key={r.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 0",borderBottom:`1px solid ${T.border}`}}>
+                    <div>
+                      <p style={{margin:0,fontSize:14,color:T.text,fontWeight:500}}>{r.userName} → {j?.name||"Unknown judge"}</p>
+                      <p style={{margin:0,fontSize:12,color:T.textHint}}>{r.breed} · {r.show} · {r.date}</p>
+                    </div>
+                    <div style={{display:"flex",alignItems:"center",gap:8}}>
+                      <span style={{fontSize:13,color:T.amber}}>★ {r.overall}</span>
+                      <button onClick={()=>onRemoveReview(r.id)} style={{padding:"4px 10px",borderRadius:100,border:`1px solid ${T.red}`,background:"none",color:T.red,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>Remove</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {/* Users */}
+        {tab==="users"&&(
+          <div style={{background:T.bg,borderRadius:T.r,border:`1px solid ${T.border}`,overflow:"hidden"}}>
+            <div style={{padding:"16px 20px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span style={{fontSize:14,fontWeight:500,color:T.text}}>All users</span>
+              <span style={{fontSize:12,color:T.textHint}}>{allUsers.length} total</span>
+            </div>
+            {loadingUsers ? (
+              <div style={{padding:40,textAlign:"center",color:T.textHint,fontSize:13}}>Loading users…</div>
+            ) : (
+              allUsers.map((u,i)=>(
+                <div key={u.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 20px",borderBottom:i<allUsers.length-1?`1px solid ${T.border}`:"none",flexWrap:"wrap"}}>
+                  {u.photo
+                    ? <img src={u.photo} style={{width:32,height:32,borderRadius:"50%",objectFit:"cover",flexShrink:0}} alt=""/>
+                    : <Avatar label={initials(u.name||"?")} size={32}/>}
+                  <div style={{flex:1,minWidth:0}}>
+                    <p style={{margin:0,fontSize:14,fontWeight:500,color:u.suspended?"#9aa0a6":T.text}}>{u.name}{u.suspended&&" (suspended)"}</p>
+                    <p style={{margin:0,fontSize:12,color:T.textHint,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{u.email}</p>
+                  </div>
+                  <select value={u.role||"exhibitor"} onChange={e=>changeRole(u.id,e.target.value)}
+                    style={{padding:"5px 10px",borderRadius:100,border:`1px solid ${T.border}`,background:T.surface,fontSize:12,color:T.text,cursor:"pointer",outline:"none"}}>
+                    {["exhibitor","organizer","judge","admin"].map(r=><option key={r} value={r}>{r}</option>)}
+                  </select>
+                  <button onClick={()=>suspendUser(u.id,!u.suspended)}
+                    style={{padding:"5px 12px",borderRadius:100,border:`1px solid ${u.suspended?T.green:T.red}`,background:"none",color:u.suspended?T.green:T.red,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>
+                    {u.suspended?"Unsuspend":"Suspend"}
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* Claims queue */}
+        {tab==="claims"&&(
+          <div style={{background:T.bg,borderRadius:T.r,border:`1px solid ${T.border}`,overflow:"hidden"}}>
+            <div style={{padding:"16px 20px",borderBottom:`1px solid ${T.border}`}}>
+              <span style={{fontSize:14,fontWeight:500,color:T.text}}>Judge profile claims awaiting verification</span>
+            </div>
+            {claimQueue.length===0?(
+              <div style={{padding:48,textAlign:"center",color:T.textHint,fontSize:13}}>No pending claims</div>
+            ):claimQueue.map((j,i)=>(
+              <div key={j.id} style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",borderBottom:i<claimQueue.length-1?`1px solid ${T.border}`:"none",flexWrap:"wrap"}}>
+                <Avatar label={j.photo} size={40}/>
+                <div style={{flex:1,minWidth:0}}>
+                  <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>{j.flag} {j.name}</p>
+                  <p style={{margin:0,fontSize:12,color:T.textHint}}>{j.country} · {j.orgs.map(o=>o.id).join(", ")}</p>
+                  <p style={{margin:"3px 0 0",fontSize:12,color:T.accent}}>Claimed by: {j.claimedBy}</p>
+                </div>
+                <div style={{display:"flex",gap:8"}}>
+                  <button onClick={()=>onVerifyJudge(j.id,true)}
+                    style={{padding:"7px 16px",borderRadius:100,border:"none",background:T.green,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
+                    ✓ Approve
+                  </button>
+                  <button onClick={()=>onVerifyJudge(j.id,false)}
+                    style={{padding:"7px 16px",borderRadius:100,border:`1px solid ${T.red}`,background:"none",color:T.red,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
+                    ✗ Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Reviews moderation */}
+        {tab==="reviews"&&(
+          <div style={{background:T.bg,borderRadius:T.r,border:`1px solid ${T.border}`,overflow:"hidden"}}>
+            <div style={{padding:"16px 20px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between"}}>
+              <span style={{fontSize:14,fontWeight:500,color:T.text}}>All reviews</span>
+              <span style={{fontSize:12,color:T.textHint}}>{reviews.length} total</span>
+            </div>
+            {reviews.slice().reverse().map((r,i)=>{
+              const j=judges.find(jj=>jj.id===r.judgeId);
+              return(
+                <div key={r.id} style={{padding:"14px 20px",borderBottom:i<reviews.length-1?`1px solid ${T.border}`:"none"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
+                    <div>
+                      <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>{r.userName} → {j?.name||"Unknown"}</p>
+                      <p style={{margin:0,fontSize:12,color:T.textHint}}>{r.breed} · {r.show} · {r.date} · ★ {r.overall}</p>
+                    </div>
+                    <button onClick={()=>onRemoveReview(r.id)}
+                      style={{padding:"5px 12px",borderRadius:100,border:`1px solid ${T.red}`,background:"none",color:T.red,fontSize:12,cursor:"pointer",fontFamily:"inherit",flexShrink:0}}>
+                      Remove
+                    </button>
+                  </div>
+                  <p style={{margin:0,fontSize:13,color:T.textSub,lineHeight:1.6}}>{r.text.slice(0,200)}{r.text.length>200?"…":""}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main App ───────────────────────────────────────────────────────────────────
 export default function App() {
   const [judges,setJudges]=useState([]); const [reviews,setReviews]=useState([]);
@@ -711,6 +920,7 @@ export default function App() {
                 <span style={{fontSize:13,color:T.textSub,fontWeight:500}}>{user.name.split(" ")[0]}</span>
               </div>
               <Btn onClick={logout} variant="outlined" small>Sign out</Btn>
+              {user.role==="admin"&&<Btn onClick={()=>setView("admin")} variant="tonal" small>⚙ Admin</Btn>}
             </>
           ):(
             <Btn onClick={()=>setModal("auth")}>Sign in</Btn>
@@ -718,7 +928,21 @@ export default function App() {
         </div>
       </nav>
 
-      {view==="judge"&&selectedJudge ? (
+      {view==="admin"&&user?.role==="admin"?(
+        <AdminDashboard
+          judges={judges} reviews={reviews} bookings={bookings} user={user}
+          onBack={()=>setView("list")}
+          onRemoveReview={async(rid)=>{
+            if(!window.confirm("Remove this review?")) return;
+            const u=reviews.filter(r=>r.id!==rid);
+            await saveReviews(u);
+          }}
+          onVerifyJudge={async(jid,approve)=>{
+            const u=judges.map(j=>j.id===jid?{...j,verified:approve,claimedBy:approve?j.claimedBy:null}:j);
+            await saveJudges(u);
+          }}
+        />
+      ):view==="judge"&&selectedJudge ? (
         <JudgePage judge={selectedJudge} reviews={reviews} user={user}
           onBack={()=>{setView("list");setSelectedJudge(null);}}
           onReview={()=>{if(!user){setModal("auth");}else{setModal("review");}}}
