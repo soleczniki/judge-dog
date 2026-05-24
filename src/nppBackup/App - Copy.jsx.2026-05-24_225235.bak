@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { signInWithGoogle, firebaseSignOut, onAuthChange } from "./firebase";
 
 const ORGS = {
   FCI:  { name: "Fédération Cynologique Internationale", short: "FCI",  color: "#1a73e8" },
@@ -170,35 +169,67 @@ const Modal = ({onClose,children,title,subtitle,wide}) => (
 
 // ── Auth Modal ─────────────────────────────────────────────────────────────────
 function AuthModal({onClose,onAuth}) {
-  const [loading,setLoading]=useState(false);
+  const [mode,setMode]=useState("login");
+  const [role,setRole]=useState("exhibitor");
+  const [name,setName]=useState(""); const [email,setEmail]=useState(""); const [pw,setPw]=useState("");
   const [err,setErr]=useState("");
 
-  async function handleGoogle() {
-    setLoading(true); setErr("");
-    try {
-      const user = await signInWithGoogle();
-      onAuth(user); onClose();
-    } catch(e) {
-      setErr("Sign-in failed. Please try again.");
+  async function submit() {
+    setErr("");
+    const users = await sGet(K.users,{});
+    if (mode==="register") {
+      if (!name.trim()||!email.trim()||!pw.trim()) { setErr("All fields are required."); return; }
+      if (users[email]) { setErr("An account with this email already exists."); return; }
+      const user={id:uid(),name:name.trim(),email:email.trim(),pw,role};
+      users[email]=user; await sSet(K.users,users); await sSet(K.session,user); onAuth(user);
+    } else {
+      if (!email.trim()||!pw.trim()) { setErr("Email and password required."); return; }
+      const user=users[email];
+      if (!user||user.pw!==pw) { setErr("Incorrect email or password."); return; }
+      await sSet(K.session,user); onAuth(user);
     }
-    setLoading(false);
   }
 
+  const SocialBtn = ({children,icon}) => (
+    <button style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,width:"100%",padding:"11px 16px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:14,fontWeight:500,color:T.text,cursor:"pointer",marginBottom:10,fontFamily:"inherit",transition:"background .15s"}}
+      onMouseEnter={e=>e.currentTarget.style.background=T.surface}
+      onMouseLeave={e=>e.currentTarget.style.background=T.bg}>
+      <span style={{fontSize:17,lineHeight:1}}>{icon}</span>{children}
+    </button>
+  );
+
   return (
-    <Modal onClose={onClose} title="Sign in to judge.dog" subtitle="Rate judges, write reviews, book talent">
-      <button onClick={handleGoogle} disabled={loading}
-        style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,width:"100%",padding:"12px 16px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:14,fontWeight:500,color:T.text,cursor:loading?"not-allowed":"pointer",marginBottom:10,fontFamily:"inherit",transition:"background .15s",opacity:loading?0.6:1}}
-        onMouseEnter={e=>!loading&&(e.currentTarget.style.background=T.surface)}
-        onMouseLeave={e=>(e.currentTarget.style.background=T.bg)}>
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.5 0 20-7.6 20-21 0-1.4-.1-2.7-.5-4z"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15 16.1 19.2 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3c-7.7 0-14.3 4.6-17.7 11.7z"/><path fill="#FBBC05" d="M24 45c5.5 0 10.5-1.9 14.4-5l-6.7-5.5C29.6 36 26.9 37 24 37c-6 0-10.6-3.1-11.8-7.4l-7 5.4C8 41.2 15.4 45 24 45z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.8 2.4-2.4 4.4-4.4 5.8l6.7 5.5C42.3 36.2 45 30.6 45 24c0-1.4-.1-2.7-.5-4z"/></svg>
-        {loading ? "Signing in…" : "Continue with Google"}
-      </button>
-      <div style={{display:"flex",alignItems:"center",gap:10,margin:"8px 0 14px"}}>
-        <div style={{flex:1,height:1,background:T.border}}/><span style={{fontSize:12,color:T.textHint}}>Facebook coming soon</span><div style={{flex:1,height:1,background:T.border}}/>
+    <Modal onClose={onClose} title={mode==="login"?"Sign in":"Create account"} subtitle={mode==="login"?"to continue to judge.dog":"Join the judge.dog community"}>
+      <SocialBtn icon="🔵">Continue with Google</SocialBtn>
+      <SocialBtn icon="📘">Continue with Facebook</SocialBtn>
+      <div style={{display:"flex",alignItems:"center",gap:10,margin:"8px 0 16px"}}>
+        <div style={{flex:1,height:1,background:T.border}}/><span style={{fontSize:12,color:T.textHint,fontWeight:500}}>or</span><div style={{flex:1,height:1,background:T.border}}/>
       </div>
+      {mode==="register"&&(
+        <>
+          <Field label="Full name" value={name} onChange={e=>setName(e.target.value)} style={{marginBottom:12}}/>
+          <div style={{marginBottom:12}}>
+            <p style={{margin:"0 0 6px",fontSize:12,fontWeight:500,color:T.textSub}}>I am a…</p>
+            <div style={{display:"flex",gap:6}}>
+              {[["exhibitor","Exhibitor"],["organizer","Organiser"],["judge","Judge"]].map(([v,l])=>(
+                <button key={v} onClick={()=>setRole(v)}
+                  style={{flex:1,padding:"8px 4px",borderRadius:100,border:`1.5px solid ${role===v?T.accent:T.border}`,background:role===v?T.accentLight:T.bg,color:role===v?T.accent:T.textSub,fontSize:12,fontWeight:500,cursor:"pointer",fontFamily:"inherit",transition:"all .15s"}}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+      <Field label="Email" type="email" value={email} onChange={e=>setEmail(e.target.value)} style={{marginBottom:12}}/>
+      <Field label="Password" type="password" value={pw} onChange={e=>setPw(e.target.value)} style={{marginBottom:16}}/>
       {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
-      <p style={{margin:"16px 0 0",fontSize:12,color:T.textHint,textAlign:"center",lineHeight:1.6}}>
-        By signing in you agree to our terms. Your role defaults to <strong>Exhibitor</strong>.
+      <Btn fullWidth onClick={submit}>{mode==="login"?"Sign in":"Create account"}</Btn>
+      <p style={{textAlign:"center",margin:"16px 0 0",fontSize:13,color:T.textSub}}>
+        {mode==="login"?"No account? ":"Already have an account? "}
+        <span style={{color:T.accent,cursor:"pointer",fontWeight:500}} onClick={()=>{setMode(mode==="login"?"register":"login");setErr("");}}>
+          {mode==="login"?"Sign up":"Sign in"}
+        </span>
       </p>
     </Modal>
   );
@@ -622,15 +653,13 @@ export default function App() {
   useEffect(()=>{
     (async()=>{
       const sj=await sGet(K.judges,null); const sr=await sGet(K.reviews,null);
-      const sb=await sGet(K.bookings,null);
+      const sb=await sGet(K.bookings,null); const ss=await sGet(K.session,null);
       if(!sj){await sSet(K.judges,SEED_JUDGES);setJudges(SEED_JUDGES);}else setJudges(sj);
       if(!sr){await sSet(K.reviews,SEED_REVIEWS);setReviews(SEED_REVIEWS);}else setReviews(sr);
       if(!sb){await sSet(K.bookings,[]);setBookings([]);}else setBookings(sb);
+      if(ss) setUser(ss);
       setLoading(false);
     })();
-    // Listen to Firebase auth state
-    const unsub = onAuthChange(u=>setUser(u));
-    return ()=>unsub();
   },[]);
 
   const saveJudges=async jj=>{setJudges(jj);await sSet(K.judges,jj);};
@@ -655,7 +684,7 @@ export default function App() {
     await saveReviews(u);
   },[reviews]);
 
-  const logout=async()=>{await firebaseSignOut();setUser(null);};
+  const logout=async()=>{setUser(null);await sSet(K.session,null);};
 
   const filtered=judges.filter(j=>{
     const q=search.toLowerCase();
@@ -705,9 +734,7 @@ export default function App() {
           {user?(
             <>
               <div style={{display:"flex",alignItems:"center",gap:8,padding:"5px 12px 5px 6px",borderRadius:100,background:T.surface,border:`1px solid ${T.border}`}}>
-                {user.photo
-                  ? <img src={user.photo} style={{width:26,height:26,borderRadius:"50%",objectFit:"cover"}} alt=""/>
-                  : <Avatar label={initials(user.name)} size={26}/>}
+                <Avatar label={initials(user.name)} size={26}/>
                 <span style={{fontSize:13,color:T.textSub,fontWeight:500}}>{user.name.split(" ")[0]}</span>
               </div>
               <Btn onClick={logout} variant="outlined" small>Sign out</Btn>
