@@ -773,7 +773,7 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
                   <p style={{margin:0,fontSize:12,color:T.textHint}}>{j.country} · {j.orgs.map(o=>o.id).join(", ")}</p>
                   <p style={{margin:"3px 0 0",fontSize:12,color:T.accent}}>Claimed by: {j.claimedBy}</p>
                 </div>
-                <div style={{display:"flex",gap:8"}}>
+                <div style={{display:"flex",gap:8}}>
                   <button onClick={()=>onVerifyJudge(j.id,true)}
                     style={{padding:"7px 16px",borderRadius:100,border:"none",background:T.green,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
                     ✓ Approve
