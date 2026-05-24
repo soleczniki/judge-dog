@@ -439,9 +439,9 @@ function JudgeCard({judge,reviews,onClick}) {
 
   return (
     <div onClick={onClick} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-      style={{background:T.bg,borderRadius:T.r,padding:"18px",border:`1px solid ${hov?T.accent:T.border}`,cursor:"pointer",transition:"box-shadow .2s, border-color .2s",boxShadow:hov?T.shadowMd:T.shadow}}>
+      style={{background:T.bg,borderRadius:T.r,padding:"18px",border:`1px solid ${hov?T.accent:T.border}`,cursor:"pointer",transition:"box-shadow .2s, border-color .2s",boxShadow:hov?T.shadowMd:T.shadow,overflow:"hidden"}}>
       <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:12}}>
-        <div style={{position:"relative"}}>
+        <div style={{position:"relative",flexShrink:0}}>
           <Avatar label={judge.photo} size={44}/>
           {judge.verified&&<div style={{position:"absolute",bottom:-2,right:-2,width:15,height:15,background:T.green,borderRadius:"50%",border:`2px solid ${T.bg}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#fff"}}>✓</div>}
         </div>
