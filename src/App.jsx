@@ -830,19 +830,42 @@ export default function App() {
 
   useEffect(()=>{
     (async()=>{
-      const sj=await sGet(K.judges,null); const sr=await sGet(K.reviews,null);
+      // Load judges from Firestore
+      try {
+        const {db} = await import("./firebase");
+        const {collection, getDocs} = await import("firebase/firestore");
+        const snap = await getDocs(collection(db,"judges"));
+        const firestoreJudges = snap.docs.map(d=>({...d.data(),id:d.id}));
+        setJudges(firestoreJudges);
+      } catch(e) {
+        console.error("Failed to load judges from Firestore:", e);
+        // Fallback to local storage
+        const sj = await sGet(K.judges,SEED_JUDGES);
+        setJudges(sj);
+      }
+
+      // Load reviews and bookings from local storage
+      const sr=await sGet(K.reviews,null);
       const sb=await sGet(K.bookings,null);
-      if(!sj){await sSet(K.judges,SEED_JUDGES);setJudges(SEED_JUDGES);}else setJudges(sj);
       if(!sr){await sSet(K.reviews,SEED_REVIEWS);setReviews(SEED_REVIEWS);}else setReviews(sr);
       if(!sb){await sSet(K.bookings,[]);setBookings([]);}else setBookings(sb);
       setLoading(false);
     })();
-    // Listen to Firebase auth state
     const unsub = onAuthChange(u=>setUser(u));
     return ()=>unsub();
   },[]);
 
-  const saveJudges=async jj=>{setJudges(jj);await sSet(K.judges,jj);};
+  const saveJudges=async jj=>{
+    setJudges(jj);
+    // Also update in Firestore
+    try {
+      const {db} = await import("./firebase");
+      const {doc,setDoc} = await import("firebase/firestore");
+      for(const j of jj) {
+        await setDoc(doc(db,"judges",j.id),j);
+      }
+    } catch(e){ console.error("Failed to save judges:", e); }
+  };
   const saveReviews=async rr=>{setReviews(rr);await sSet(K.reviews,rr);};
   const saveBookings=async bb=>{setBookings(bb);await sSet(K.bookings,bb);};
   const addReview=useCallback(async r=>{const u=[...reviews,r];await saveReviews(u);},[reviews]);

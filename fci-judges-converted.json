@@ -1,0 +1,252 @@
+[
+  {
+    "id": "fci_DK5",
+    "name": "D. Aagaard",
+    "country": "Denmark",
+    "flag": "🇩🇰",
+    "breeds": [],
+    "group": "Conformation / Shows",
+    "licensed": null,
+    "orgs": [
+      {
+        "org": "FCI",
+        "id": "DK5"
+      }
+    ],
+    "verified": false,
+    "claimedBy": null,
+    "bio": "",
+    "social": {},
+    "photo": "DA",
+    "kennelClub": "Dansk Kennel Klub (DENMARK)",
+    "discipline": "Shows",
+    "status": "Active",
+    "source": "FCI",
+    "lastUpdated": "2026-05-24T20:38:21.236Z"
+  },
+  {
+    "id": "fci_NO306",
+    "name": "G. Aagesen",
+    "country": "Norway",
+    "flag": "🇳🇴",
+    "breeds": [],
+    "group": "Working / Utility",
+    "licensed": null,
+    "orgs": [
+      {
+        "org": "FCI",
+        "id": "NO306"
+      }
+    ],
+    "verified": false,
+    "claimedBy": null,
+    "bio": "",
+    "social": {},
+    "photo": "GA",
+    "kennelClub": "Norsk Kennel Klub (NORWAY)",
+    "discipline": "Utility Dogs",
+    "status": "Active",
+    "source": "FCI",
+    "lastUpdated": "2026-05-24T20:38:21.236Z"
+  },
+  {
+    "id": "fci_FI323",
+    "name": "M. Aaltonen",
+    "country": "Finland",
+    "flag": "🇫🇮",
+    "breeds": [],
+    "group": "Agility",
+    "licensed": null,
+    "orgs": [
+      {
+        "org": "FCI",
+        "id": "FI323"
+      }
+    ],
+    "verified": false,
+    "claimedBy": null,
+    "bio": "",
+    "social": {},
+    "photo": "MA",
+    "kennelClub": "Suomen Kennelliitto - Finska Kennelklubben (FINLAND)",
+    "discipline": "Agility",
+    "status": "Active",
+    "source": "FCI",
+    "lastUpdated": "2026-05-24T20:38:21.236Z"
+  },
+  {
+    "id": "fci_FI8",
+    "name": "P. Aaltonen",
+    "country": "Finland",
+    "flag": "🇫🇮",
+    "breeds": [],
+    "group": "Conformation / Shows",
+    "licensed": null,
+    "orgs": [
+      {
+        "org": "FCI",
+        "id": "FI8"
+      }
+    ],
+    "verified": false,
+    "claimedBy": null,
+    "bio": "",
+    "social": {},
+    "photo": "PA",
+    "kennelClub": "Suomen Kennelliitto - Finska Kennelklubben (FINLAND)",
+    "discipline": "Shows",
+    "status": "Active",
+    "source": "FCI",
+    "lastUpdated": "2026-05-24T20:38:21.236Z"
+  },
+  {
+    "id": "fci_NO288",
+    "name": "J. Aas",
+    "country": "Norway",
+    "flag": "🇳🇴",
+    "breeds": [],
+    "group": "Agility",
+    "licensed": null,
+    "orgs": [
+      {
+        "org": "FCI",
+        "id": "NO288"
+      }
+    ],
+    "verified": false,
+    "claimedBy": null,
+    "bio": "",
+    "social": {},
+    "photo": "JA",
+    "kennelClub": "Norsk Kennel Klub (NORWAY)",
+    "discipline": "Agility",
+    "status": "Active",
+    "source": "FCI",
+    "lastUpdated": "2026-05-24T20:38:21.236Z"
+  },
+  {
+    "id": "fci_FR1",
+    "name": "B. Abadie",
+    "country": "France",
+    "flag": "🇫🇷",
+    "breeds": [],
+    "group": "Conformation / Shows",
+    "licensed": null,
+    "orgs": [
+      {
+        "org": "FCI",
+        "id": "FR1"
+      }
+    ],
+    "verified": false,
+    "claimedBy": null,
+    "bio": "",
+    "social": {},
+    "photo": "BA",
+    "kennelClub": "Société Centrale Canine pour l'Amélioration des Races de Chiens en France (FRANCE)",
+    "discipline": "Shows",
+    "status": "Active",
+    "source": "FCI",
+    "lastUpdated": "2026-05-24T20:38:21.236Z"
+  },
+  {
+    "id": "fci_FR538",
+    "name": "B. Abat",
+    "country": "France",
+    "flag": "🇫🇷",
+    "breeds": [],
+    "group": "Conformation / Shows",
+    "licensed": null,
+    "orgs": [
+      {
+        "org": "FCI",
+        "id": "FR538"
+      }
+    ],
+    "verified": false,
+    "claimedBy": null,
+    "bio": "",
+    "social": {},
+    "photo": "BA",
+    "kennelClub": "Société Centrale Canine pour l'Amélioration des Races de Chiens en France (FRANCE)",
+    "discipline": "Shows",
+    "status": "Active",
+    "source": "FCI",
+    "lastUpdated": "2026-05-24T20:38:21.236Z"
+  },
+  {
+    "id": "fci_IT514",
+    "name": "F. Abati",
+    "country": "Italy",
+    "flag": "🇮🇹",
+    "breeds": [],
+    "group": "Spaniels",
+    "licensed": null,
+    "orgs": [
+      {
+        "org": "FCI",
+        "id": "IT514"
+      }
+    ],
+    "verified": false,
+    "claimedBy": null,
+    "bio": "",
+    "social": {},
+    "photo": "FA",
+    "kennelClub": "Ente Nazionale della Cinofilia Italiana (ITALY)",
+    "discipline": "Spaniels",
+    "status": "Active",
+    "source": "FCI",
+    "lastUpdated": "2026-05-24T20:38:21.236Z"
+  },
+  {
+    "id": "fci_IT514",
+    "name": "F. Abati",
+    "country": "Italy",
+    "flag": "🇮🇹",
+    "breeds": [],
+    "group": "Retrievers",
+    "licensed": null,
+    "orgs": [
+      {
+        "org": "FCI",
+        "id": "IT514"
+      }
+    ],
+    "verified": false,
+    "claimedBy": null,
+    "bio": "",
+    "social": {},
+    "photo": "FA",
+    "kennelClub": "Ente Nazionale della Cinofilia Italiana (ITALY)",
+    "discipline": "Retrievers",
+    "status": "Active",
+    "source": "FCI",
+    "lastUpdated": "2026-05-24T20:38:21.236Z"
+  },
+  {
+    "id": "fci_AR2",
+    "name": "M. Abbenda",
+    "country": "Argentina",
+    "flag": "🇦🇷",
+    "breeds": [],
+    "group": "Conformation / Shows",
+    "licensed": null,
+    "orgs": [
+      {
+        "org": "FCI",
+        "id": "AR2"
+      }
+    ],
+    "verified": false,
+    "claimedBy": null,
+    "bio": "",
+    "social": {},
+    "photo": "MA",
+    "kennelClub": "Federación Cinológica Argentina (ARGENTINA)",
+    "discipline": "Shows",
+    "status": "Active",
+    "source": "FCI",
+    "lastUpdated": "2026-05-24T20:38:21.236Z"
+  }
+]
