@@ -58,49 +58,18 @@ function parseDate(str) {
   return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
 }
 
+const LOWERCASE_PARTICLES = new Set(["de","van","von","del","der","la","le","di","da","dos","das"]);
 function toTitleCase(str) {
   if (!str) return "";
   return str.trim().split(/\s+/).map(w => {
     const l = w.toLowerCase();
-    if (["de","van","von","del","der","la","le","di","da","dos","das"].includes(l)) return l;
-    return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    if (LOWERCASE_PARTICLES.has(l)) return l;
+    return w.split("-").map(part => {
+      const pl = part.toLowerCase();
+      if (LOWERCASE_PARTICLES.has(pl)) return pl;
+      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+    }).join("-");
   }).join(" ");
-}
-
-async function expandBreedSections(page) {
-  // Click expand controls for breed groups inside the Authorisations section only.
-  // Scoping to ContentPlaceHolder1_AutorisationsControl prevents clicking
-  // site-wide navigation links that would cause a full page navigation.
-  const clicked = await page.evaluate(() => {
-    const root = document.getElementById("ContentPlaceHolder1_AutorisationsControl")
-               || document.getElementById("ContentPlaceHolder1_UpdatePanel1")
-               || document.body;
-
-    let n = 0;
-    const seen = new Set();
-    const selectors = [
-      '[data-toggle="collapse"]',
-      '.panel-heading a',
-      '.panel-title a',
-      'a[id*="Expand"]',
-      'a[id*="Group"]',
-      'a[id*="LinkButton"]',
-    ];
-    for (const sel of selectors) {
-      root.querySelectorAll(sel).forEach(el => {
-        if (!seen.has(el)) {
-          seen.add(el);
-          try { el.click(); n++; } catch(e) {}
-        }
-      });
-    }
-    return n;
-  });
-
-  if (clicked > 0) {
-    await sleep(2500);
-  }
-  return clicked;
 }
 
 async function scrapeJudge(page, id) {
@@ -110,9 +79,6 @@ async function scrapeJudge(page, id) {
       { waitUntil: "networkidle2", timeout: 25000 }
     );
     if (!resp || resp.status() === 404) return null;
-
-    // Try to expand breed sections before reading
-    await expandBreedSections(page);
 
     const data = await page.evaluate(() => {
       const h3pink = document.querySelector("h3.pink");

@@ -649,6 +649,7 @@ function JudgeCard({judge,reviews,onClick}) {
       <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:8}}>
         {judge.orgs.map(o=><OrgPill key={o.org} org={o.org}/>)}
         <Chip small>{disciplineLabel}</Chip>
+        {judge.bisJudge&&<Chip bg="#fff8e1" color="#f57f17" small>★ BIS</Chip>}
       </div>
       <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:12}}>
         {breedSummary()}
@@ -717,6 +718,12 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
                 </div>
               ))}
             </div>
+            {/* BIS */}
+            {judge.bisJudge&&(
+              <div style={{marginBottom:8}}>
+                <Chip bg="#fff8e1" color="#f57f17" small>★ BIS Judge</Chip>
+              </div>
+            )}
             {/* Languages */}
             {judge.fciLanguages?.length>0&&(
               <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>

@@ -63,12 +63,17 @@ function parseDate(str) {
   return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
 }
 
+const LOWERCASE_PARTICLES = new Set(["de","van","von","del","der","la","le","di","da","dos","das"]);
 function toTitleCase(str) {
   if (!str) return "";
   return str.trim().split(/\s+/).map(w => {
     const l = w.toLowerCase();
-    if (["de","van","von","del","der","la","le","di","da","dos","das"].includes(l)) return l;
-    return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    if (LOWERCASE_PARTICLES.has(l)) return l;
+    return w.split("-").map(part => {
+      const pl = part.toLowerCase();
+      if (LOWERCASE_PARTICLES.has(pl)) return pl;
+      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+    }).join("-");
   }).join(" ");
 }
 
