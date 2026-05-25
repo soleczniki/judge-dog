@@ -291,9 +291,15 @@ const Field = ({label,value,onChange,type="text",multiline,rows=4,placeholder,st
 );
 
 // ── Modal ──────────────────────────────────────────────────────────────────────
-const Modal = ({onClose,children,title,subtitle,wide}) => (
+const Modal = ({onClose,children,title,subtitle,wide,confirmClose}) => {
+  const handleBackdrop = e => {
+    if (e.target !== e.currentTarget) return;
+    if (confirmClose && !window.confirm("You have unsaved changes. Leave without saving?")) return;
+    onClose();
+  };
+  return (
   <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.38)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(1px)"}}
-    onClick={e=>e.target===e.currentTarget&&onClose()}>
+    onClick={handleBackdrop}>
     <div style={{background:T.bg,borderRadius:T.rlg,width:"100%",maxWidth:wide?640:440,maxHeight:"92vh",overflowY:"auto",boxShadow:T.shadowLg,position:"relative"}}>
       <div style={{padding:"24px 24px 0",display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:20}}>
         <div>
@@ -305,7 +311,8 @@ const Modal = ({onClose,children,title,subtitle,wide}) => (
       <div style={{padding:"0 24px 24px"}}>{children}</div>
     </div>
   </div>
-);
+  );
+};
 
 // ── Auth Modal ─────────────────────────────────────────────────────────────────
 function AuthModal({onClose,onAuth}) {
@@ -535,8 +542,11 @@ function ContactModal({judge,user,onClose}) {
 }
 
 // ── Edit Profile Modal ─────────────────────────────────────────────────────────
+const withTimeout=(promise,ms,msg)=>Promise.race([promise,new Promise((_,rej)=>setTimeout(()=>rej(new Error(msg)),ms))]);
+
 function EditProfileModal({judge,onClose,onSave}) {
   const [saving,setSaving]=useState(false);
+  const [dirty,setDirty]=useState(false);
   const [photoFile,setPhotoFile]=useState(null);
   const [photoPreview,setPhotoPreview]=useState(judge.profilePhoto||null);
   const [headline,setHeadline]=useState(judge.headline||"");
@@ -551,18 +561,23 @@ function EditProfileModal({judge,onClose,onSave}) {
   const [galleryBusy,setGalleryBusy]=useState(false);
   const [uploadErr,setUploadErr]=useState("");
 
-  const addHL=()=>{ if(!newHL.trim()) return; setHighlights(h=>[...h,newHL.trim()]); setNewHL(""); };
+  const mark=fn=>(...args)=>{fn(...args);setDirty(true);};
+  const addHL=()=>{ if(!newHL.trim()) return; setHighlights(h=>[...h,newHL.trim()]); setNewHL(""); setDirty(true); };
 
   const handleGalleryAdd=async e=>{
     const files=Array.from(e.target.files); if(!files.length) return;
     setGalleryBusy(true); setUploadErr("");
     try {
       const {uploadPhoto}=await import("./firebase");
-      const urls=await Promise.all(files.map((f,i)=>uploadPhoto(judge.id,f,`gallery-${i}`)));
+      const urls=await Promise.all(files.map((f,i)=>
+        withTimeout(uploadPhoto(judge.id,f,`gallery-${i}`),20000,
+          "Upload timed out — make sure Firebase Storage is enabled and rules allow writes.")
+      ));
       setGallery(g=>[...g,...urls].slice(0,8));
+      setDirty(true);
     } catch(err){
       console.error("Gallery upload failed:", err);
-      setUploadErr(err?.message||"Upload failed — check Firebase Storage rules.");
+      setUploadErr(err?.message||"Upload failed — check Firebase Storage is enabled.");
     }
     setGalleryBusy(false);
     e.target.value="";
@@ -589,21 +604,21 @@ function EditProfileModal({judge,onClose,onSave}) {
   };
 
   return (
-    <Modal onClose={onClose} title="Edit profile" subtitle="Changes are visible on your public profile" wide>
+    <Modal onClose={onClose} title="Edit profile" subtitle="Changes are visible on your public profile" wide confirmClose={dirty&&!saving}>
       {/* Photo */}
       <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Profile photo</p>
       <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:22}}>
         <Avatar label={judge.photo} photoUrl={photoPreview} size={72}/>
         <label style={{cursor:"pointer",padding:"8px 18px",borderRadius:100,border:`1px solid ${T.border}`,background:T.surface,fontSize:13,fontWeight:500,color:T.text,fontFamily:"inherit"}}>
           Upload photo
-          <input type="file" accept="image/*" style={{display:"none"}} onChange={e=>{const f=e.target.files[0];if(f){setPhotoFile(f);setPhotoPreview(URL.createObjectURL(f));}}}/>
+          <input type="file" accept="image/*" style={{display:"none"}} onChange={e=>{const f=e.target.files[0];if(f){setPhotoFile(f);setPhotoPreview(URL.createObjectURL(f));setDirty(true);}}}/>
         </label>
       </div>
 
       {/* About */}
       <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>About you</p>
-      <Field label="Headline" value={headline} onChange={e=>setHeadline(e.target.value)} placeholder="e.g. FCI All-Breed Judge · 30 years experience" style={{marginBottom:10}}/>
-      <Field label="Bio" multiline rows={4} value={bio} onChange={e=>setBio(e.target.value)} placeholder="Your background, philosophy, what you look for…" style={{marginBottom:22}}/>
+      <Field label="Headline" value={headline} onChange={mark(e=>setHeadline(e.target.value))} placeholder="e.g. FCI All-Breed Judge · 30 years experience" style={{marginBottom:10}}/>
+      <Field label="Bio" multiline rows={4} value={bio} onChange={mark(e=>setBio(e.target.value))} placeholder="Your background, philosophy, what you look for…" style={{marginBottom:22}}/>
 
       {/* Highlights */}
       <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Career highlights</p>
@@ -611,7 +626,7 @@ function EditProfileModal({judge,onClose,onSave}) {
         {highlights.map((h,i)=>(
           <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
             <span style={{flex:1,fontSize:13,color:T.text,padding:"7px 12px",background:T.surface,borderRadius:T.rsm,border:`1px solid ${T.border}`}}>{h}</span>
-            <button onClick={()=>setHighlights(hh=>hh.filter((_,j)=>j!==i))}
+            <button onClick={()=>{setHighlights(hh=>hh.filter((_,j)=>j!==i));setDirty(true);}}
               style={{background:"none",border:"none",cursor:"pointer",color:T.textHint,fontSize:18,padding:"2px 6px",borderRadius:6,lineHeight:1,fontFamily:"inherit"}}>×</button>
           </div>
         ))}
@@ -629,10 +644,10 @@ function EditProfileModal({judge,onClose,onSave}) {
       {/* Social */}
       <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Social & web</p>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:22}}>
-        <Field label="Instagram" value={ig} onChange={e=>setIg(e.target.value)} placeholder="@handle"/>
-        <Field label="Website" value={web} onChange={e=>setWeb(e.target.value)} placeholder="https://"/>
-        <Field label="Facebook" value={fb} onChange={e=>setFb(e.target.value)} placeholder="Page or username"/>
-        <Field label="LinkedIn" value={li} onChange={e=>setLi(e.target.value)} placeholder="Username"/>
+        <Field label="Instagram" value={ig} onChange={mark(e=>setIg(e.target.value))} placeholder="@handle"/>
+        <Field label="Website" value={web} onChange={mark(e=>setWeb(e.target.value))} placeholder="https://"/>
+        <Field label="Facebook" value={fb} onChange={mark(e=>setFb(e.target.value))} placeholder="Page or username"/>
+        <Field label="LinkedIn" value={li} onChange={mark(e=>setLi(e.target.value))} placeholder="Username"/>
       </div>
 
       {/* Gallery */}
@@ -641,7 +656,7 @@ function EditProfileModal({judge,onClose,onSave}) {
         {gallery.map((url,i)=>(
           <div key={i} style={{position:"relative",aspectRatio:"1",borderRadius:T.rsm,overflow:"hidden"}}>
             <img src={url} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-            <button onClick={()=>setGallery(g=>g.filter((_,j)=>j!==i))}
+            <button onClick={()=>{setGallery(g=>g.filter((_,j)=>j!==i));setDirty(true);}}
               style={{position:"absolute",top:4,right:4,background:"rgba(0,0,0,.6)",border:"none",borderRadius:"50%",width:22,height:22,color:"#fff",cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>×</button>
           </div>
         ))}
