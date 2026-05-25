@@ -29,6 +29,7 @@ await db.doc(`judges/${JUDGE_ID}`).set({
   social:       {},
   verified:     true,
   claimedBy:    USER_EMAIL,
+  hidden:       true,
   allBreedJudge:false,
   bisJudge:     false,
   suspensions:  [],

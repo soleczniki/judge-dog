@@ -1544,10 +1544,11 @@ export default function App() {
 
   const filtered=useMemo(()=>{
     const q=search.toLowerCase().trim();
-    if(!q) return judges;
+    const visible=judges.filter(j=>!j.hidden);
+    if(!q) return visible;
     // Check once if the query matches any known breed globally (for all-breed judges)
     const isKnownBreedQuery=Object.values(FCI_GROUP_BREEDS).some(arr=>arr.some(b=>b.toLowerCase().includes(q)));
-    return judges.filter(j=>{
+    return visible.filter(j=>{
       const nameMatch=j.name.toLowerCase().includes(q);
       const countryMatch=(j.country||"").toLowerCase().includes(q);
       const breedMatch=!nameMatch&&!countryMatch&&(
