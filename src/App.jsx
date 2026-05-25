@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from "react-router-dom";
 import { signInWithGoogle, firebaseSignOut, onAuthChange } from "./firebase";
 import { FCI_GROUP_NAMES, FCI_GROUP_BREEDS } from "../fci-groups.js";
@@ -1195,25 +1195,28 @@ export default function App() {
 
   const logout=async()=>{await firebaseSignOut();setUser(null);};
 
-  const filtered=judges.filter(j=>{
+  const filtered=useMemo(()=>{
     const q=search.toLowerCase().trim();
-    if(!q) return true;
-    const nameMatch=j.name.toLowerCase().includes(q);
-    const countryMatch=(j.country||"").toLowerCase().includes(q);
-    // Only match breeds/all-breed when the query doesn't look like a name or country
-    const breedMatch=!countryMatch&&!nameMatch&&(
-      (j.breeds||[]).some(b=>b.toLowerCase().includes(q))||j.allBreedJudge
-    );
-    const mQ=nameMatch||countryMatch||breedMatch||(j.group||"").toLowerCase().includes(q);
-    const mO=orgFilter==="all"||j.orgs.some(o=>o.org===orgFilter);
-    return mQ&&mO;
-  }).sort((a,b)=>{
-    if(sort==="name") return a.name.localeCompare(b.name);
-    const ra=reviews.filter(r=>r.judgeId===a.id),rb=reviews.filter(r=>r.judgeId===b.id);
-    if(sort==="rating") return avg(rb.map(r=>r.overall||0))-avg(ra.map(r=>r.overall||0));
-    if(sort==="reviews") return rb.length-ra.length;
-    return 0;
-  });
+    if(!q) return judges;
+    // Check once if the query matches any known breed globally (for all-breed judges)
+    const isKnownBreedQuery=Object.values(FCI_GROUP_BREEDS).some(arr=>arr.some(b=>b.toLowerCase().includes(q)));
+    return judges.filter(j=>{
+      const nameMatch=j.name.toLowerCase().includes(q);
+      const countryMatch=(j.country||"").toLowerCase().includes(q);
+      const breedMatch=!nameMatch&&!countryMatch&&(
+        (j.breeds||[]).some(b=>b.toLowerCase().includes(q))||(j.allBreedJudge&&isKnownBreedQuery)
+      );
+      const mQ=nameMatch||countryMatch||breedMatch||(j.group||"").toLowerCase().includes(q);
+      const mO=orgFilter==="all"||j.orgs.some(o=>o.org===orgFilter);
+      return mQ&&mO;
+    }).sort((a,b)=>{
+      if(sort==="name") return a.name.localeCompare(b.name);
+      const ra=reviews.filter(r=>r.judgeId===a.id),rb=reviews.filter(r=>r.judgeId===b.id);
+      if(sort==="rating") return avg(rb.map(r=>r.overall||0))-avg(ra.map(r=>r.overall||0));
+      if(sort==="reviews") return rb.length-ra.length;
+      return 0;
+    });
+  },[judges,reviews,search,orgFilter,sort]);
 
   if(loading) return <div style={{minHeight:"100vh",background:T.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:T.textHint}}>Loading…</div>;
 
