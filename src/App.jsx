@@ -553,6 +553,7 @@ function EditProfileModal({judge,onClose,onSave}) {
   const [bio,setBio]=useState(judge.bio||"");
   const [highlights,setHighlights]=useState(judge.highlights||[]);
   const [newHL,setNewHL]=useState("");
+  const [disciplines,setDisciplines]=useState(judge.disciplines||[]);
   const [ig,setIg]=useState(judge.social?.instagram||"");
   const [fb,setFb]=useState(judge.social?.facebook||"");
   const [li,setLi]=useState(judge.social?.linkedin||"");
@@ -592,7 +593,7 @@ function EditProfileModal({judge,onClose,onSave}) {
         const {uploadPhoto}=await import("./firebase");
         profilePhoto=await uploadPhoto(judge.id,photoFile,"profile");
       }
-      await onSave({...judge,profilePhoto,headline,bio,highlights,galleryPhotos:gallery,
+      await onSave({...judge,profilePhoto,headline,bio,highlights,disciplines,galleryPhotos:gallery,
         social:{instagram:ig,facebook:fb,linkedin:li,website:web}});
       onClose();
     } catch(err){
@@ -619,6 +620,22 @@ function EditProfileModal({judge,onClose,onSave}) {
       <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>About you</p>
       <Field label="Headline" value={headline} onChange={mark(e=>setHeadline(e.target.value))} placeholder="e.g. FCI All-Breed Judge · 30 years experience" style={{marginBottom:10}}/>
       <Field label="Bio" multiline rows={4} value={bio} onChange={mark(e=>setBio(e.target.value))} placeholder="Your background, philosophy, what you look for…" style={{marginBottom:22}}/>
+
+      {/* Disciplines */}
+      <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Disciplines</p>
+      <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:22}}>
+        {["Conformation","Obedience","Agility","Rally","Tracking","Herding","Field Trials","Hunt Tests","Lure Coursing","Earthdog","Scent Work","Dock Diving"].map(d=>{
+          const on=disciplines.includes(d);
+          return (
+            <button key={d} onClick={()=>{setDisciplines(dd=>on?dd.filter(x=>x!==d):[...dd,d]);setDirty(true);}}
+              style={{padding:"6px 14px",borderRadius:100,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit",transition:"all .15s",
+                background:on?T.accent:T.surface, color:on?"#fff":T.textSub,
+                border:`1.5px solid ${on?T.accent:T.border}`}}>
+              {d}
+            </button>
+          );
+        })}
+      </div>
 
       {/* Highlights */}
       <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Career highlights</p>
