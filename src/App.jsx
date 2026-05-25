@@ -1177,7 +1177,9 @@ export default function App() {
 
   const filtered=judges.filter(j=>{
     const q=search.toLowerCase();
-    const mQ=!q||j.name.toLowerCase().includes(q)||(j.country||"").toLowerCase().includes(q)||(j.breeds||[]).some(b=>b.toLowerCase().includes(q))||(j.group||"").toLowerCase().includes(q);
+    const nameOrCountry=j.name.toLowerCase().includes(q)||(j.country||"").toLowerCase().includes(q);
+    const breedMatch=(j.breeds||[]).some(b=>b.toLowerCase().includes(q))||(j.allBreedJudge&&!nameOrCountry);
+    const mQ=!q||nameOrCountry||breedMatch||(j.group||"").toLowerCase().includes(q);
     const mO=orgFilter==="all"||j.orgs.some(o=>o.org===orgFilter);
     return mQ&&mO;
   }).sort((a,b)=>{
