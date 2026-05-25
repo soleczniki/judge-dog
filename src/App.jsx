@@ -568,8 +568,9 @@ function EditProfileModal({judge,onClose,onSave}) {
     e.target.value="";
   };
 
+  const [saveErr,setSaveErr]=useState("");
   const save=async()=>{
-    setSaving(true);
+    setSaving(true); setSaveErr("");
     try {
       let profilePhoto=judge.profilePhoto||null;
       if(photoFile){
@@ -579,8 +580,12 @@ function EditProfileModal({judge,onClose,onSave}) {
       await onSave({...judge,profilePhoto,headline,bio,highlights,galleryPhotos:gallery,
         social:{instagram:ig,facebook:fb,linkedin:li,website:web}});
       onClose();
-    } catch(err){console.error(err);}
-    setSaving(false);
+    } catch(err){
+      console.error("Save failed:", err);
+      setSaveErr(err?.message||"Save failed — please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -650,6 +655,7 @@ function EditProfileModal({judge,onClose,onSave}) {
       <p style={{fontSize:12,color:T.textHint,margin:"0 0 6px"}}>Show photos, ringside moments, awards</p>
       {uploadErr&&<div style={{fontSize:12,color:T.red,background:T.redLight,padding:"8px 12px",borderRadius:T.rsm,marginBottom:16}}>{uploadErr}</div>}
 
+      {saveErr&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:12}}>{saveErr}</div>}
       <Btn fullWidth onClick={save} disabled={saving}>{saving?"Saving…":"Save changes"}</Btn>
     </Modal>
   );
@@ -1539,8 +1545,11 @@ export default function App() {
   },[judges,user]);
 
   const editProfile=useCallback(async upd=>{
-    await saveJudges(judges.map(j=>j.id===upd.id?upd:j));
-  },[judges]);
+    setJudges(jj=>jj.map(j=>j.id===upd.id?upd:j));
+    const {db}=await import("./firebase");
+    const {doc,setDoc}=await import("firebase/firestore");
+    await setDoc(doc(db,"judges",upd.id),upd);
+  },[]);
 
   const saveReply=useCallback(async(rid,text)=>{
     await saveReviews(reviews.map(r=>r.id===rid?{...r,reply:text}:r));
