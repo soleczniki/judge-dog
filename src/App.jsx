@@ -1178,7 +1178,10 @@ export default function App() {
   const [bookings,setBookings]=useState([]); const [user,setUser]=useState(null);
   const [loading,setLoading]=useState(true); const [modal,setModal]=useState(null);
   const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all");
+  const [isMobile,setIsMobile]=useState(window.innerWidth<640);
+  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
   const navigate=useNavigate();
+  const location=useLocation();
 
   useEffect(()=>{
     (async()=>{
@@ -1202,6 +1205,14 @@ export default function App() {
     const unsub = onAuthChange(u=>setUser(u));
     return ()=>unsub();
   },[]);
+
+  useEffect(()=>{
+    const h=()=>setIsMobile(window.innerWidth<640);
+    window.addEventListener("resize",h);
+    return()=>window.removeEventListener("resize",h);
+  },[]);
+
+  useEffect(()=>{ setMobileMenuOpen(false); },[location.pathname]);
 
   const saveJudges=async jj=>{
     setJudges(jj);
@@ -1270,8 +1281,8 @@ export default function App() {
 
       {/* Nav */}
       <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64,position:"sticky",top:0,zIndex:200}}>
-        {/* Left: brand */}
-        <div style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",flexShrink:0,minWidth:140}} onClick={()=>navigate("/")}>
+        {/* Brand */}
+        <div style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",flexShrink:0}} onClick={()=>navigate("/")}>
           <svg width="51" height="51" viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
             <circle cx="0"     cy="-28"  r="10" fill="#1a73e8" opacity="0.25"/>
             <circle cx="19.8"  cy="-19.8" r="10" fill="#1a73e8" opacity="0.25"/>
@@ -1284,39 +1295,91 @@ export default function App() {
             <circle cx="0" cy="0" r="22" fill="#1a73e8"/>
             <path d="M0,-12 L2.8,-4.2 L11,-3.5 L4.8,2.4 L6.8,11 L0,6.8 L-6.8,11 L-4.8,2.4 L-11,-3.5 L-2.8,-4.2 Z" fill="white"/>
           </svg>
-          <span style={{fontSize:26,fontWeight:700,color:T.text,letterSpacing:-0.5,fontFamily:"'Google Sans',sans-serif",lineHeight:1}}>
+          {!isMobile&&<span style={{fontSize:26,fontWeight:700,color:T.text,letterSpacing:-0.5,fontFamily:"'Google Sans',sans-serif",lineHeight:1}}>
             judge<span style={{color:T.accent,fontWeight:400}}>.dog</span>
-          </span>
+          </span>}
         </div>
-        {/* Center: search — truly centered regardless of side widths */}
-        <div style={{position:"absolute",left:0,right:0,display:"flex",justifyContent:"center",pointerEvents:"none"}}>
-          <div style={{width:480,maxWidth:"calc(100vw - 340px)",position:"relative",pointerEvents:"all"}}>
-            <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
-            <input value={search} onChange={e=>{setSearch(e.target.value);navigate("/");}}
-              placeholder="Search judges, breeds, countries…"
-              style={{width:"100%",padding:"8px 14px 8px 36px",border:`1.5px solid ${T.border}`,borderRadius:100,fontSize:13,background:T.surface,outline:"none",color:T.text,boxSizing:"border-box",transition:"border-color .15s,box-shadow .15s"}}
-              onFocus={e=>{e.target.style.borderColor=T.accent;e.target.style.boxShadow=`0 0 0 3px ${T.accentLight}`;}}
-              onBlur={e=>{e.target.style.borderColor=T.border;e.target.style.boxShadow="none";}}/>
+
+        {/* Desktop: centered search */}
+        {!isMobile&&(
+          <div style={{position:"absolute",left:0,right:0,display:"flex",justifyContent:"center",pointerEvents:"none"}}>
+            <div style={{width:480,maxWidth:"calc(100vw - 340px)",position:"relative",pointerEvents:"all"}}>
+              <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
+              <input value={search} onChange={e=>{setSearch(e.target.value);navigate("/");}}
+                placeholder="Search judges, breeds, countries…"
+                style={{width:"100%",padding:"8px 14px 8px 36px",border:`1.5px solid ${T.border}`,borderRadius:100,fontSize:13,background:T.surface,outline:"none",color:T.text,boxSizing:"border-box",transition:"border-color .15s,box-shadow .15s"}}
+                onFocus={e=>{e.target.style.borderColor=T.accent;e.target.style.boxShadow=`0 0 0 3px ${T.accentLight}`;}}
+                onBlur={e=>{e.target.style.borderColor=T.border;e.target.style.boxShadow="none";}}/>
+            </div>
           </div>
-        </div>
-        {/* Right: user controls */}
-        <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0,minWidth:140,justifyContent:"flex-end"}}>
-          {user?(
-            <>
-              <div style={{display:"flex",alignItems:"center",gap:8,padding:"5px 12px 5px 6px",borderRadius:100,background:T.surface,border:`1px solid ${T.border}`}}>
-                {user.photo
-                  ? <img src={user.photo} style={{width:26,height:26,borderRadius:"50%",objectFit:"cover"}} alt=""/>
-                  : <Avatar label={initials(user.name)} size={26}/>}
-                <span style={{fontSize:13,color:T.textSub,fontWeight:500}}>{user.name.split(" ")[0]}</span>
-              </div>
-              <Btn onClick={logout} variant="outlined" small>Sign out</Btn>
-              {user.role==="admin"&&<Btn onClick={()=>navigate("/admin")} variant="tonal" small>⚙ Admin</Btn>}
-            </>
-          ):(
-            <Btn onClick={()=>setModal("auth")}>Sign in</Btn>
-          )}
-        </div>
+        )}
+
+        {/* Desktop: user controls */}
+        {!isMobile&&(
+          <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0,minWidth:140,justifyContent:"flex-end"}}>
+            {user?(
+              <>
+                <div style={{display:"flex",alignItems:"center",gap:8,padding:"5px 12px 5px 6px",borderRadius:100,background:T.surface,border:`1px solid ${T.border}`}}>
+                  {user.photo
+                    ?<img src={user.photo} style={{width:26,height:26,borderRadius:"50%",objectFit:"cover"}} alt=""/>
+                    :<Avatar label={initials(user.name)} size={26}/>}
+                  <span style={{fontSize:13,color:T.textSub,fontWeight:500}}>{user.name.split(" ")[0]}</span>
+                </div>
+                <Btn onClick={logout} variant="outlined" small>Sign out</Btn>
+                {user.role==="admin"&&<Btn onClick={()=>navigate("/admin")} variant="tonal" small>⚙ Admin</Btn>}
+              </>
+            ):(
+              <Btn onClick={()=>setModal("auth")}>Sign in</Btn>
+            )}
+          </div>
+        )}
+
+        {/* Mobile: hamburger */}
+        {isMobile&&(
+          <button onClick={()=>setMobileMenuOpen(o=>!o)}
+            style={{background:"none",border:"none",cursor:"pointer",padding:"10px",color:T.text,fontSize:22,lineHeight:1,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8}}>
+            {mobileMenuOpen?"✕":"☰"}
+          </button>
+        )}
       </nav>
+
+      {/* Mobile dropdown menu */}
+      {isMobile&&mobileMenuOpen&&(
+        <>
+          <div onClick={()=>setMobileMenuOpen(false)}
+            style={{position:"fixed",inset:0,top:64,background:"rgba(0,0,0,.25)",zIndex:198}}/>
+          <div style={{position:"fixed",top:64,left:0,right:0,background:T.bg,zIndex:199,padding:"16px 20px 20px",borderBottom:`1px solid ${T.border}`,boxShadow:T.shadowMd}}>
+            <div style={{position:"relative",marginBottom:16}}>
+              <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
+              <input value={search} autoFocus
+                onChange={e=>{setSearch(e.target.value);navigate("/");setMobileMenuOpen(false);}}
+                placeholder="Search judges, breeds, countries…"
+                style={{width:"100%",padding:"11px 14px 11px 36px",border:`1.5px solid ${T.border}`,borderRadius:100,fontSize:14,background:T.surface,outline:"none",color:T.text,boxSizing:"border-box"}}
+                onFocus={e=>e.target.style.borderColor=T.accent}
+                onBlur={e=>e.target.style.borderColor=T.border}/>
+            </div>
+            {user?(
+              <>
+                <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderTop:`1px solid ${T.border}`,marginTop:4}}>
+                  {user.photo
+                    ?<img src={user.photo} style={{width:38,height:38,borderRadius:"50%",objectFit:"cover",flexShrink:0}} alt=""/>
+                    :<Avatar label={initials(user.name)} size={38}/>}
+                  <div style={{minWidth:0}}>
+                    <p style={{margin:0,fontSize:15,fontWeight:500,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.name}</p>
+                    <p style={{margin:0,fontSize:12,color:T.textHint,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.email}</p>
+                  </div>
+                </div>
+                <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:4}}>
+                  <Btn onClick={()=>{logout();setMobileMenuOpen(false);}} variant="outlined" small>Sign out</Btn>
+                  {user.role==="admin"&&<Btn onClick={()=>{navigate("/admin");setMobileMenuOpen(false);}} variant="tonal" small>⚙ Admin</Btn>}
+                </div>
+              </>
+            ):(
+              <Btn onClick={()=>{setModal("auth");setMobileMenuOpen(false);}} fullWidth>Sign in</Btn>
+            )}
+          </div>
+        </>
+      )}
 
       <Routes>
         <Route path="/" element={
