@@ -140,14 +140,14 @@ const reviewDims = r => {
 };
 
 const SEED_JUDGES = [
-  { id:"j1", name:"Margaret Thornton", country:"USA", flag:"🇺🇸", breeds:["Golden Retriever","Labrador Retriever","Flat-Coated Retriever"], group:"Sporting", licensed:1994, orgs:[{org:"AKC",id:"AKC-28841"},{org:"FCI",id:"FCI-00412"}], verified:true, claimedBy:"judge1@example.com", bio:"Forty years in Goldens. I've bred 23 champions and judged on five continents. I judge for correct movement and coat texture above all else. An honest critique is the best thing I can give you.", social:{instagram:"@margaret_thornton_goldens",facebook:"MargaretThorntonGoldens",linkedin:""}, photo:"MT" },
-  { id:"j2", name:"Hans-Werner Keller", country:"Germany", flag:"🇩🇪", breeds:["German Shepherd Dog","Rottweiler","Doberman Pinscher"], group:"Herding / Working", licensed:1988, orgs:[{org:"FCI",id:"FCI-00089"},{org:"KC",id:"KC-JG-1102"}], verified:true, claimedBy:"hw.keller@example.com", bio:"Former SV breed warden. I've judged the WUSV World Championship four times. What I look for: correct rear drive, solid nerves, and a head that screams the breed.", social:{instagram:"",facebook:"HWKellerJudge",linkedin:"hans-werner-keller"}, photo:"HK" },
-  { id:"j3", name:"Siobhan O'Reilly", country:"Ireland", flag:"🇮🇪", breeds:["Irish Setter","Irish Water Spaniel","Kerry Blue Terrier"], group:"Sporting / Terrier", licensed:2001, orgs:[{org:"FCI",id:"FCI-01204"},{org:"KC",id:"KC-JG-2981"}], verified:false, claimedBy:null, bio:"", social:{}, photo:"SR" },
-  { id:"j4", name:"Takeshi Yamamoto", country:"Japan", flag:"🇯🇵", breeds:["Akita","Shiba Inu","Kishu Ken"], group:"Non-Sporting", licensed:1997, orgs:[{org:"JKC",id:"JKC-4421"},{org:"FCI",id:"FCI-00877"}], verified:false, claimedBy:null, bio:"", social:{}, photo:"TY" },
-  { id:"j5", name:"Eleanor Blackwood", country:"UK", flag:"🇬🇧", breeds:["Border Collie","Rough Collie","Shetland Sheepdog"], group:"Herding", licensed:1991, orgs:[{org:"KC",id:"KC-JG-0044"},{org:"FCI",id:"FCI-00201"}], verified:true, claimedBy:"eblackwood@example.com", bio:"Collies have been my life since 1979. I judge for the working whole — a dog that can do the job its ancestors were bred to do. I award the dog that could still herd a flock at the end of the day.", social:{instagram:"@eleanor_blackwood_collies",facebook:"",linkedin:""}, photo:"EB" },
-  { id:"j6", name:"Carlos Mendes", country:"Brazil", flag:"🇧🇷", breeds:["Fila Brasileiro","Dogo Argentino","Cimarron Uruguayo"], group:"Working", licensed:2005, orgs:[{org:"FCI",id:"FCI-02210"},{org:"CKC",id:"CKC-J-9982"}], verified:false, claimedBy:null, bio:"", social:{}, photo:"CM" },
-  { id:"j7", name:"Patricia Van Houten", country:"Netherlands", flag:"🇳🇱", breeds:["Dutch Shepherd","Keeshond","Samoyed"], group:"Herding / Working", licensed:1999, orgs:[{org:"FCI",id:"FCI-00654"}], verified:true, claimedBy:"patricia.vh@example.com", bio:"I've dedicated my career to the preservation of correct Dutch and Nordic type. My assignments have taken me from Tokyo to São Paulo. I write detailed critiques for every class winner.", social:{instagram:"@patriciavh_dogs",facebook:"",linkedin:"patricia-van-houten-judge"}, photo:"PV" },
-  { id:"j8", name:"Robert Ashford", country:"Australia", flag:"🇦🇺", breeds:["Australian Shepherd","Australian Cattle Dog","Kelpie"], group:"Herding", licensed:2003, orgs:[{org:"ANKC",id:"ANKC-J-3312"},{org:"FCI",id:"FCI-01899"}], verified:false, claimedBy:null, bio:"", social:{}, photo:"RA" },
+  { id:"j1", slug:"margaret-thornton", name:"Margaret Thornton", country:"USA", flag:"🇺🇸", breeds:["Golden Retriever","Labrador Retriever","Flat-Coated Retriever"], group:"Sporting", licensed:1994, orgs:[{org:"AKC",id:"AKC-28841"},{org:"FCI",id:"FCI-00412"}], verified:true, claimedBy:"judge1@example.com", bio:"Forty years in Goldens. I've bred 23 champions and judged on five continents. I judge for correct movement and coat texture above all else. An honest critique is the best thing I can give you.", social:{instagram:"@margaret_thornton_goldens",facebook:"MargaretThorntonGoldens",linkedin:""}, photo:"MT" },
+  { id:"j2", slug:"hans-werner-keller", name:"Hans-Werner Keller", country:"Germany", flag:"🇩🇪", breeds:["German Shepherd Dog","Rottweiler","Doberman Pinscher"], group:"Herding / Working", licensed:1988, orgs:[{org:"FCI",id:"FCI-00089"},{org:"KC",id:"KC-JG-1102"}], verified:true, claimedBy:"hw.keller@example.com", bio:"Former SV breed warden. I've judged the WUSV World Championship four times. What I look for: correct rear drive, solid nerves, and a head that screams the breed.", social:{instagram:"",facebook:"HWKellerJudge",linkedin:"hans-werner-keller"}, photo:"HK" },
+  { id:"j3", slug:"siobhan-oreilly", name:"Siobhan O'Reilly", country:"Ireland", flag:"🇮🇪", breeds:["Irish Setter","Irish Water Spaniel","Kerry Blue Terrier"], group:"Sporting / Terrier", licensed:2001, orgs:[{org:"FCI",id:"FCI-01204"},{org:"KC",id:"KC-JG-2981"}], verified:false, claimedBy:null, bio:"", social:{}, photo:"SR" },
+  { id:"j4", slug:"takeshi-yamamoto", name:"Takeshi Yamamoto", country:"Japan", flag:"🇯🇵", breeds:["Akita","Shiba Inu","Kishu Ken"], group:"Non-Sporting", licensed:1997, orgs:[{org:"JKC",id:"JKC-4421"},{org:"FCI",id:"FCI-00877"}], verified:false, claimedBy:null, bio:"", social:{}, photo:"TY" },
+  { id:"j5", slug:"eleanor-blackwood", name:"Eleanor Blackwood", country:"UK", flag:"🇬🇧", breeds:["Border Collie","Rough Collie","Shetland Sheepdog"], group:"Herding", licensed:1991, orgs:[{org:"KC",id:"KC-JG-0044"},{org:"FCI",id:"FCI-00201"}], verified:true, claimedBy:"eblackwood@example.com", bio:"Collies have been my life since 1979. I judge for the working whole — a dog that can do the job its ancestors were bred to do. I award the dog that could still herd a flock at the end of the day.", social:{instagram:"@eleanor_blackwood_collies",facebook:"",linkedin:""}, photo:"EB" },
+  { id:"j6", slug:"carlos-mendes", name:"Carlos Mendes", country:"Brazil", flag:"🇧🇷", breeds:["Fila Brasileiro","Dogo Argentino","Cimarron Uruguayo"], group:"Working", licensed:2005, orgs:[{org:"FCI",id:"FCI-02210"},{org:"CKC",id:"CKC-J-9982"}], verified:false, claimedBy:null, bio:"", social:{}, photo:"CM" },
+  { id:"j7", slug:"patricia-van-houten", name:"Patricia Van Houten", country:"Netherlands", flag:"🇳🇱", breeds:["Dutch Shepherd","Keeshond","Samoyed"], group:"Herding / Working", licensed:1999, orgs:[{org:"FCI",id:"FCI-00654"}], verified:true, claimedBy:"patricia.vh@example.com", bio:"I've dedicated my career to the preservation of correct Dutch and Nordic type. My assignments have taken me from Tokyo to São Paulo. I write detailed critiques for every class winner.", social:{instagram:"@patriciavh_dogs",facebook:"",linkedin:"patricia-van-houten-judge"}, photo:"PV" },
+  { id:"j8", slug:"robert-ashford", name:"Robert Ashford", country:"Australia", flag:"🇦🇺", breeds:["Australian Shepherd","Australian Cattle Dog","Kelpie"], group:"Herding", licensed:2003, orgs:[{org:"ANKC",id:"ANKC-J-3312"},{org:"FCI",id:"FCI-01899"}], verified:false, claimedBy:null, bio:"", social:{}, photo:"RA" },
 ];
 
 const SEED_REVIEWS = [
@@ -1124,10 +1124,10 @@ function ScrollToTop() {
 
 // ── Judge Route ────────────────────────────────────────────────────────────────
 function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editProfile,saveReply,onRequestAuth}) {
-  const {id}=useParams();
+  const {slug}=useParams();
   const navigate=useNavigate();
   const [modal,setModal]=useState(null);
-  const judge=judges.find(j=>j.id===id);
+  const judge=judges.find(j=>j.slug===slug)||judges.find(j=>j.id===slug);
 
   if(!judge) return (
     <div style={{minHeight:"60vh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:12,color:T.textHint}}>
@@ -1426,12 +1426,12 @@ export default function App() {
               </div>
             ):(
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:12}}>
-                {filtered.map(j=><JudgeCard key={j.id} judge={j} reviews={reviews} onClick={()=>navigate("/judge/"+j.id)}/>)}
+                {filtered.map(j=><JudgeCard key={j.id} judge={j} reviews={reviews} onClick={()=>navigate("/judge/"+(j.slug||j.id))}/>)}
               </div>
             )}
           </div>
         }/>
-        <Route path="/judge/:id" element={
+        <Route path="/judge/:slug" element={
           <JudgeRoute judges={judges} reviews={reviews} user={user}
             addReview={addReview} addBooking={addBooking}
             claimJudge={claimJudge} editProfile={editProfile} saveReply={saveReply}
