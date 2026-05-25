@@ -1038,10 +1038,10 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
 
         {/* Actions */}
         <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:24}}>
-          {!hasReviewed&&<Btn onClick={onReview}>{user?"Write a review":"Sign in to review"}</Btn>}
-          {hasReviewed&&<Chip bg={T.greenLight} color={T.green}>✓ Reviewed</Chip>}
+          {!isOwner&&!hasReviewed&&<Btn onClick={onReview}>{user?"Write a review":"Sign in to review"}</Btn>}
+          {!isOwner&&hasReviewed&&<Chip bg={T.greenLight} color={T.green}>✓ Reviewed</Chip>}
           {canBook&&<Btn onClick={onBook} color={T.green} icon="📅">Request booking</Btn>}
-          <Btn onClick={onContact} variant="outlined">Contact</Btn>
+          {!isOwner&&<Btn onClick={onContact} variant="outlined">Contact</Btn>}
           {!judge.verified&&user&&user.role==="judge"&&!judge.claimedBy&&<Btn onClick={onClaim} variant="outlined">Claim profile</Btn>}
           {isOwner&&<Btn onClick={onEditProfile} variant="outlined" icon="✏">Edit profile</Btn>}
           {!canBook&&user&&user.role==="organizer"&&!judge.verified&&<span style={{fontSize:13,color:T.textHint,alignSelf:"center"}}>Judge hasn't claimed their profile — bookings unavailable</span>}
