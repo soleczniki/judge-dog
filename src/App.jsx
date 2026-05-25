@@ -549,18 +549,23 @@ function EditProfileModal({judge,onClose,onSave}) {
   const [web,setWeb]=useState(judge.social?.website||"");
   const [gallery,setGallery]=useState(judge.galleryPhotos||[]);
   const [galleryBusy,setGalleryBusy]=useState(false);
+  const [uploadErr,setUploadErr]=useState("");
 
   const addHL=()=>{ if(!newHL.trim()) return; setHighlights(h=>[...h,newHL.trim()]); setNewHL(""); };
 
   const handleGalleryAdd=async e=>{
     const files=Array.from(e.target.files); if(!files.length) return;
-    setGalleryBusy(true);
+    setGalleryBusy(true); setUploadErr("");
     try {
       const {uploadPhoto}=await import("./firebase");
       const urls=await Promise.all(files.map((f,i)=>uploadPhoto(judge.id,f,`gallery-${i}`)));
       setGallery(g=>[...g,...urls].slice(0,8));
-    } catch(err){console.error(err);}
+    } catch(err){
+      console.error("Gallery upload failed:", err);
+      setUploadErr(err?.message||"Upload failed — check Firebase Storage rules.");
+    }
     setGalleryBusy(false);
+    e.target.value="";
   };
 
   const save=async()=>{
@@ -642,7 +647,8 @@ function EditProfileModal({judge,onClose,onSave}) {
           </label>
         )}
       </div>
-      <p style={{fontSize:12,color:T.textHint,margin:"0 0 22px"}}>Show photos, ringside moments, awards</p>
+      <p style={{fontSize:12,color:T.textHint,margin:"0 0 6px"}}>Show photos, ringside moments, awards</p>
+      {uploadErr&&<div style={{fontSize:12,color:T.red,background:T.redLight,padding:"8px 12px",borderRadius:T.rsm,marginBottom:16}}>{uploadErr}</div>}
 
       <Btn fullWidth onClick={save} disabled={saving}>{saving?"Saving…":"Save changes"}</Btn>
     </Modal>
