@@ -5,6 +5,11 @@ import { FCI_GROUP_NAMES, FCI_GROUP_BREEDS } from "../fci-groups.js";
 
 const tc = s => s ? s.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) : "";
 
+const isoToFlag = code => /^[A-Za-z]{2}$/.test(code)
+  ? String.fromCodePoint(0x1F1E6 + (code.toUpperCase().charCodeAt(0) - 65), 0x1F1E6 + (code.toUpperCase().charCodeAt(1) - 65))
+  : code;
+const judgeFlag = j => { const f = j.flag || j.photo || "??"; return /^[A-Za-z]{2}$/.test(f) ? isoToFlag(f) : f; };
+
 const ORGS = {
   FCI:  { name: "Fédération Cynologique Internationale", short: "FCI",  color: "#1a73e8" },
   AKC:  { name: "American Kennel Club",                  short: "AKC",  color: "#e53935" },
@@ -613,11 +618,11 @@ function JudgeCard({judge,reviews,onClick}) {
       style={{background:T.bg,borderRadius:T.r,padding:"18px",border:`1px solid ${hov?T.accent:T.border}`,cursor:"pointer",transition:"box-shadow .2s, border-color .2s",boxShadow:hov?T.shadowMd:T.shadow,overflow:"hidden"}}>
       <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:10}}>
         <div style={{position:"relative",flexShrink:0}}>
-          <Avatar label={judge.flag||judge.photo} size={44}/>
+          <Avatar label={judgeFlag(judge)} size={44}/>
           {judge.verified&&<div style={{position:"absolute",bottom:-2,right:-2,width:15,height:15,background:T.green,borderRadius:"50%",border:`2px solid ${T.bg}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#fff"}}>✓</div>}
         </div>
         <div style={{flex:1,minWidth:0}}>
-          <h3 style={{margin:"0 0 2px",fontSize:15,fontWeight:500,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{judge.flag} {judge.name}</h3>
+          <h3 style={{margin:"0 0 2px",fontSize:15,fontWeight:500,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{judgeFlag(judge)} {judge.name}</h3>
           <p style={{margin:0,fontSize:12,color:T.textHint}}>
             {judge.country}
             {judge.birthYear&&<> · Born {judge.birthYear}</>}
@@ -671,19 +676,19 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
           onMouseEnter={e=>e.currentTarget.style.background=T.surface} onMouseLeave={e=>e.currentTarget.style.background="none"}>
           ← Back
         </button>
-        <span style={{fontSize:13,color:T.textHint,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{judge.flag} {judge.name}</span>
+        <span style={{fontSize:13,color:T.textHint,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{judgeFlag(judge)} {judge.name}</span>
       </div>
 
       <div style={{maxWidth:780,margin:"0 auto",padding:"32px 20px"}}>
         {/* Hero */}
         <div style={{display:"flex",gap:20,alignItems:"flex-start",marginBottom:24,flexWrap:"wrap"}}>
           <div style={{position:"relative"}}>
-            <Avatar label={judge.flag||judge.photo} size={76}/>
+            <Avatar label={judgeFlag(judge)} size={76}/>
             {judge.verified&&<div style={{position:"absolute",bottom:0,right:0,width:22,height:22,background:T.green,borderRadius:"50%",border:`3px solid ${T.bg}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#fff"}}>✓</div>}
           </div>
           <div style={{flex:1,minWidth:180}}>
             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
-              <h1 style={{margin:0,fontSize:24,fontWeight:400,color:T.text,letterSpacing:-0.4}}>{judge.flag} {judge.name}</h1>
+              <h1 style={{margin:0,fontSize:24,fontWeight:400,color:T.text,letterSpacing:-0.4}}>{judgeFlag(judge)} {judge.name}</h1>
               {judge.verified&&<Chip bg={T.greenLight} color={T.green} small>✓ Verified</Chip>}
             </div>
             {/* Key facts row */}
