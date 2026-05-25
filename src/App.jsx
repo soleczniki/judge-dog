@@ -175,11 +175,14 @@ const T = {
 };
 
 // ── Atoms ──────────────────────────────────────────────────────────────────────
-const Avatar = ({label,size=40}) => (
-  <div style={{width:size,height:size,borderRadius:"50%",background:aColor(label),display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:size*0.36,fontWeight:600,flexShrink:0}}>
-    {label}
-  </div>
-);
+const Avatar = ({label,size=40}) => {
+  const isFlag = /\p{Emoji_Presentation}/u.test(label);
+  return (
+    <div style={{width:size,height:size,borderRadius:"50%",background:isFlag?"#f1f3f4":aColor(label),display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:isFlag?size*0.55:size*0.36,fontWeight:600,flexShrink:0,border:isFlag?`1px solid #e8eaed`:"none"}}>
+      {label}
+    </div>
+  );
+};
 
 const OrgPill = ({org}) => {
   const o = ORGS[org]||{short:org,color:"#5f6368"};
@@ -610,7 +613,7 @@ function JudgeCard({judge,reviews,onClick}) {
       style={{background:T.bg,borderRadius:T.r,padding:"18px",border:`1px solid ${hov?T.accent:T.border}`,cursor:"pointer",transition:"box-shadow .2s, border-color .2s",boxShadow:hov?T.shadowMd:T.shadow,overflow:"hidden"}}>
       <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:10}}>
         <div style={{position:"relative",flexShrink:0}}>
-          <Avatar label={judge.photo} size={44}/>
+          <Avatar label={judge.flag||judge.photo} size={44}/>
           {judge.verified&&<div style={{position:"absolute",bottom:-2,right:-2,width:15,height:15,background:T.green,borderRadius:"50%",border:`2px solid ${T.bg}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#fff"}}>✓</div>}
         </div>
         <div style={{flex:1,minWidth:0}}>
@@ -675,7 +678,7 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
         {/* Hero */}
         <div style={{display:"flex",gap:20,alignItems:"flex-start",marginBottom:24,flexWrap:"wrap"}}>
           <div style={{position:"relative"}}>
-            <Avatar label={judge.photo} size={76}/>
+            <Avatar label={judge.flag||judge.photo} size={76}/>
             {judge.verified&&<div style={{position:"absolute",bottom:0,right:0,width:22,height:22,background:T.green,borderRadius:"50%",border:`3px solid ${T.bg}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#fff"}}>✓</div>}
           </div>
           <div style={{flex:1,minWidth:180}}>
