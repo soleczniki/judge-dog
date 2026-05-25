@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from "react-router-dom";
 import { signInWithGoogle, firebaseSignOut, onAuthChange } from "./firebase";
 import { FCI_GROUP_NAMES, FCI_GROUP_BREEDS } from "../fci-groups.js";
+import QRCode from "qrcode";
 
 const tc = s => s ? s.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) : "";
 
@@ -702,6 +703,60 @@ function JudgeCard({judge,reviews,onClick}) {
   );
 }
 
+// ── QR Section ────────────────────────────────────────────────────────────────
+function QRSection({judge}) {
+  const canvasRef = useRef(null);
+  const [copied, setCopied] = useState(false);
+  const url = `https://judge.dog/judge/${judge.slug||judge.id}`;
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    QRCode.toCanvas(canvasRef.current, url, {
+      width: 180,
+      margin: 2,
+      color: { dark: "#202124", light: "#ffffff" },
+    });
+  }, [url]);
+
+  const handleDownload = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const link = document.createElement("a");
+    link.download = `judge-${judge.slug||judge.id}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <div style={{background:T.surface,borderRadius:T.r,padding:"18px 20px",marginBottom:18,border:`1px solid ${T.border}`}}>
+      <SectionLabel>Share this profile</SectionLabel>
+      <div style={{display:"flex",gap:20,alignItems:"center",flexWrap:"wrap"}}>
+        <canvas ref={canvasRef} style={{borderRadius:8,display:"block",flexShrink:0}}/>
+        <div style={{display:"flex",flexDirection:"column",gap:10,minWidth:0}}>
+          <div style={{fontSize:13,color:T.textSub,wordBreak:"break-all"}}>{url}</div>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            <button onClick={handleDownload}
+              style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:100,background:T.accent,color:"#fff",border:"none",cursor:"pointer",fontSize:13,fontWeight:500,fontFamily:"inherit"}}>
+              ↓ Download QR
+            </button>
+            <button onClick={handleCopy}
+              style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:100,background:copied?T.greenLight:T.surface,color:copied?T.green:T.text,border:`1px solid ${copied?T.green:T.border}`,cursor:"pointer",fontSize:13,fontWeight:500,fontFamily:"inherit",transition:"all .2s"}}>
+              {copied ? "✓ Link copied" : "⎘ Copy link"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Judge Page ─────────────────────────────────────────────────────────────────
 function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProfile,onSaveReply}) {
   const [modal,setModal]=useState(null); const [replyTarget,setReplyTarget]=useState(null);
@@ -781,6 +836,9 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
           {isOwner&&<Btn onClick={onEditProfile} variant="outlined" icon="✏">Edit profile</Btn>}
           {!canBook&&user&&user.role==="organizer"&&!judge.verified&&<span style={{fontSize:13,color:T.textHint,alignSelf:"center"}}>Judge hasn't claimed their profile — bookings unavailable</span>}
         </div>
+
+        {/* QR Code */}
+        <QRSection judge={judge}/>
 
         {/* Official Details */}
         {(judge.kennelClub||judge.fciLanguages?.length>0||judge.otherLanguages?.length>0||judge.kennelName)&&(
