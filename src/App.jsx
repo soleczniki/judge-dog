@@ -705,55 +705,106 @@ function JudgeCard({judge,reviews,onClick}) {
 
 // ── QR Section ────────────────────────────────────────────────────────────────
 function QRSection({judge}) {
-  const canvasRef = useRef(null);
-  const [copied, setCopied] = useState(false);
+  const thumbRef  = useRef(null);
+  const modalRef  = useRef(null);
+  const [copied,  setCopied]  = useState(false);
+  const [expanded,setExpanded]= useState(false);
+  const [mobile,  setMobile]  = useState(window.innerWidth < 640);
   const url = `https://judge.dog/judge/${judge.slug||judge.id}`;
 
   useEffect(() => {
-    if (!canvasRef.current) return;
-    QRCode.toCanvas(canvasRef.current, url, {
-      width: 180,
-      margin: 2,
+    const h = () => setMobile(window.innerWidth < 640);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
+
+  useEffect(() => {
+    if (!thumbRef.current) return;
+    QRCode.toCanvas(thumbRef.current, url, {
+      width: mobile ? 52 : 88, margin: 1,
       color: { dark: "#202124", light: "#ffffff" },
     });
-  }, [url]);
+  }, [url, mobile]);
 
-  const handleDownload = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const link = document.createElement("a");
-    link.download = `judge-${judge.slug||judge.id}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  };
+  useEffect(() => {
+    if (!expanded || !modalRef.current) return;
+    QRCode.toCanvas(modalRef.current, url, {
+      width: 220, margin: 2,
+      color: { dark: "#202124", light: "#ffffff" },
+    });
+  }, [expanded, url]);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+  const download = () => {
+    const c = document.createElement("canvas");
+    QRCode.toCanvas(c, url, { width: 400, margin: 3, color: { dark: "#202124", light: "#ffffff" } }, () => {
+      const a = document.createElement("a");
+      a.download = `judge-${judge.slug||judge.id}.png`;
+      a.href = c.toDataURL("image/png");
+      a.click();
     });
   };
 
+  const copy = () => {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    });
+  };
+
+  const iconBtn = (onClick, title, content, active) => (
+    <button onClick={onClick} title={title}
+      style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",borderRadius:100,
+        background:active?T.greenLight:T.surface,color:active?T.green:T.textSub,
+        border:`1px solid ${active?T.green:T.border}`,cursor:"pointer",fontSize:12,
+        fontWeight:500,fontFamily:"inherit",transition:"all .18s",whiteSpace:"nowrap"}}>
+      {content}
+    </button>
+  );
+
   return (
-    <div style={{background:T.surface,borderRadius:T.r,padding:"18px 20px",marginBottom:18,border:`1px solid ${T.border}`}}>
-      <SectionLabel>Share this profile</SectionLabel>
-      <div style={{display:"flex",gap:20,alignItems:"center",flexWrap:"wrap"}}>
-        <canvas ref={canvasRef} style={{borderRadius:8,display:"block",flexShrink:0}}/>
-        <div style={{display:"flex",flexDirection:"column",gap:10,minWidth:0}}>
-          <div style={{fontSize:13,color:T.textSub,wordBreak:"break-all"}}>{url}</div>
-          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-            <button onClick={handleDownload}
-              style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:100,background:T.accent,color:"#fff",border:"none",cursor:"pointer",fontSize:13,fontWeight:500,fontFamily:"inherit"}}>
-              ↓ Download QR
-            </button>
-            <button onClick={handleCopy}
-              style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:100,background:copied?T.greenLight:T.surface,color:copied?T.green:T.text,border:`1px solid ${copied?T.green:T.border}`,cursor:"pointer",fontSize:13,fontWeight:500,fontFamily:"inherit",transition:"all .2s"}}>
-              {copied ? "✓ Link copied" : "⎘ Copy link"}
-            </button>
+    <>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:6,flexShrink:0}}>
+        <canvas ref={thumbRef}
+          onClick={mobile ? () => setExpanded(true) : undefined}
+          style={{borderRadius:6,display:"block",cursor:mobile?"pointer":"default",
+            boxShadow:"0 1px 4px rgba(0,0,0,.12)"}}/>
+        {!mobile && (
+          <div style={{display:"flex",gap:4}}>
+            {iconBtn(download, "Download QR", "↓ QR")}
+            {iconBtn(copy, "Copy profile link", copied ? "✓ Copied" : "⎘ Copy", copied)}
           </div>
-        </div>
+        )}
       </div>
-    </div>
+
+      {/* Mobile modal */}
+      {expanded && (
+        <>
+          <div onClick={() => setExpanded(false)}
+            style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:200}}/>
+          <div style={{position:"fixed",left:"50%",top:"50%",transform:"translate(-50%,-50%)",
+            zIndex:201,background:"#fff",borderRadius:20,padding:"28px 32px",
+            display:"flex",flexDirection:"column",alignItems:"center",gap:18,
+            boxShadow:T.shadowLg}}>
+            <canvas ref={modalRef} style={{borderRadius:10,display:"block"}}/>
+            <div style={{display:"flex",gap:10}}>
+              <button onClick={download}
+                style={{display:"flex",alignItems:"center",gap:6,padding:"9px 18px",
+                  borderRadius:100,background:T.surface,color:T.text,border:`1px solid ${T.border}`,
+                  cursor:"pointer",fontSize:14,fontWeight:500,fontFamily:"inherit"}}>
+                ↓ Download
+              </button>
+              <button onClick={copy}
+                style={{display:"flex",alignItems:"center",gap:6,padding:"9px 18px",
+                  borderRadius:100,background:copied?T.greenLight:T.accent,
+                  color:copied?T.green:"#fff",border:"none",
+                  cursor:"pointer",fontSize:14,fontWeight:500,fontFamily:"inherit",transition:"all .18s"}}>
+                {copied ? "✓ Copied" : "⎘ Copy link"}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </>
   );
 }
 
@@ -825,6 +876,7 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
               <div style={{fontSize:12,color:T.textHint,marginTop:5}}>{rv.length} review{rv.length!==1?"s":""}</div>
             </div>
           )}
+          <QRSection judge={judge}/>
         </div>
 
         {/* Actions */}
@@ -836,9 +888,6 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
           {isOwner&&<Btn onClick={onEditProfile} variant="outlined" icon="✏">Edit profile</Btn>}
           {!canBook&&user&&user.role==="organizer"&&!judge.verified&&<span style={{fontSize:13,color:T.textHint,alignSelf:"center"}}>Judge hasn't claimed their profile — bookings unavailable</span>}
         </div>
-
-        {/* QR Code */}
-        <QRSection judge={judge}/>
 
         {/* Official Details */}
         {(judge.kennelClub||judge.fciLanguages?.length>0||judge.otherLanguages?.length>0||judge.kennelName)&&(
