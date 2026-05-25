@@ -1272,7 +1272,7 @@ export default function App() {
       <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64,position:"sticky",top:0,zIndex:200}}>
         {/* Left: brand */}
         <div style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",flexShrink:0,minWidth:140}} onClick={()=>navigate("/")}>
-          <svg width="34" height="34" viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
+          <svg width="51" height="51" viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
             <circle cx="0"     cy="-28"  r="10" fill="#1a73e8" opacity="0.25"/>
             <circle cx="19.8"  cy="-19.8" r="10" fill="#1a73e8" opacity="0.25"/>
             <circle cx="28"    cy="0"    r="10" fill="#1a73e8" opacity="0.25"/>
@@ -1284,7 +1284,7 @@ export default function App() {
             <circle cx="0" cy="0" r="22" fill="#1a73e8"/>
             <path d="M0,-12 L2.8,-4.2 L11,-3.5 L4.8,2.4 L6.8,11 L0,6.8 L-6.8,11 L-4.8,2.4 L-11,-3.5 L-2.8,-4.2 Z" fill="white"/>
           </svg>
-          <span style={{fontSize:17,fontWeight:700,color:T.text,letterSpacing:-0.5,fontFamily:"'Google Sans',sans-serif",lineHeight:1}}>
+          <span style={{fontSize:26,fontWeight:700,color:T.text,letterSpacing:-0.5,fontFamily:"'Google Sans',sans-serif",lineHeight:1}}>
             judge<span style={{color:T.accent,fontWeight:400}}>.dog</span>
           </span>
         </div>
