@@ -572,6 +572,35 @@ function ReviewCard({review,isJudge,onReply}) {
   );
 }
 
+// ── Collapsible breed chip list ────────────────────────────────────────────────
+const BREEDS_PREVIEW = 10;
+function BreedList({breeds, label}) {
+  const [expanded, setExpanded] = useState(false);
+  if (!breeds?.length) return null;
+  const shown = expanded ? breeds : breeds.slice(0, BREEDS_PREVIEW);
+  const extra = breeds.length - BREEDS_PREVIEW;
+  return (
+    <>
+      {label && <p style={{fontSize:12,fontWeight:500,color:T.textSub,margin:"14px 0 8px"}}>{label}</p>}
+      <div style={{display:"flex",flexWrap:"wrap",gap:4,alignItems:"center"}}>
+        {shown.map(b=><Chip key={b} small>{b}</Chip>)}
+        {!expanded && extra>0 && (
+          <button onClick={()=>setExpanded(true)}
+            style={{fontSize:12,color:T.accent,background:"none",border:`1px solid ${T.border}`,borderRadius:100,padding:"2px 10px",cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap"}}>
+            +{extra} more
+          </button>
+        )}
+        {expanded && breeds.length>BREEDS_PREVIEW && (
+          <button onClick={()=>setExpanded(false)}
+            style={{fontSize:12,color:T.textHint,background:"none",border:"none",cursor:"pointer",fontFamily:"inherit",padding:"2px 4px"}}>
+            show less
+          </button>
+        )}
+      </div>
+    </>
+  );
+}
+
 // ── Group Section (expandable breed list) ─────────────────────────────────────
 function GroupSection({groupNum, groupName}) {
   const [open,setOpen]=useState(false);
@@ -789,19 +818,10 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
               ) : judge.groupNames?.length>0 ? (
                 <>
                   {judge.groupNames.map(g=><GroupSection key={g.group} groupNum={g.group} groupName={g.name}/>)}
-                  {extra.length>0&&(
-                    <>
-                      <p style={{fontSize:12,fontWeight:500,color:T.textSub,margin:"14px 0 8px"}}>Additional individual breeds</p>
-                      <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
-                        {extra.map(b=><Chip key={b} small>{b}</Chip>)}
-                      </div>
-                    </>
-                  )}
+                  {extra.length>0&&<BreedList breeds={extra} label="Additional individual breeds"/>}
                 </>
               ) : judge.breeds?.length>0 ? (
-                <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
-                  {judge.breeds.map(b=><Chip key={b} small>{b}</Chip>)}
-                </div>
+                <BreedList breeds={judge.breeds}/>
               ) : (
                 <p style={{margin:0,fontSize:13,color:T.textHint,fontStyle:"italic"}}>No breed authorization data on file</p>
               )}
