@@ -189,7 +189,7 @@ const Avatar = ({label, iso, size=40}) => {
   const resolvedISO = iso || isoFromLabel(label);
   if (resolvedISO) return (
     <div style={{width:size,height:size,borderRadius:"50%",overflow:"hidden",border:"1px solid #e8eaed",flexShrink:0,background:"#f1f3f4",display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <img src={`https://flagcdn.com/w${size*2}/${resolvedISO.toLowerCase()}.png`}
+      <img src={`https://flagcdn.com/w160/${resolvedISO.toLowerCase()}.png`}
            style={{width:"100%",height:"100%",objectFit:"cover"}} alt={resolvedISO}/>
     </div>
   );
