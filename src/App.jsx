@@ -14,20 +14,120 @@ const ORGS = {
   JKC:  { name: "Japan Kennel Club",                     short: "JKC",  color: "#e52592" },
 };
 
-// All rating dimensions — single source of truth
-const RATING_DIMS = [
-  { key:"overall",              label:"Overall",                  group:"core" },
-  { key:"breedKnowledge",       label:"Breed Knowledge",          group:"core" },
-  { key:"consistency",          label:"Consistency & Fairness",   group:"core" },
-  { key:"ringManner",           label:"Ring Manner",              group:"core" },
-  { key:"examinationThoroughness", label:"Examination Thoroughness", group:"extra" },
-  { key:"punctuality",          label:"Punctuality",              group:"extra" },
-  { key:"noviceFriendliness",   label:"Novice Friendliness",      group:"extra" },
-  { key:"handlerIndependence",  label:"Handler Independence",     group:"extra" },
-  { key:"critiqueQuality",      label:"Critique Quality",         group:"extra" },
+// ── Discipline-based rating system ────────────────────────────────────────────
+const UNIVERSAL_DIMS = [
+  {key:"overall",        label:"Overall"},
+  {key:"consistency",    label:"Consistency & Fairness"},
+  {key:"professionalism",label:"Professionalism"},
 ];
 
-const EMPTY_RATINGS = Object.fromEntries(RATING_DIMS.map(d=>[d.key,0]));
+const GROUP_DIMS = {
+  A:[
+    {key:"breedKnowledge",          label:"Breed Knowledge"},
+    {key:"examinationThoroughness", label:"Examination Thoroughness"},
+    {key:"ringManner",              label:"Ring Manner"},
+    {key:"handlerIndependence",     label:"Handler Independence"},
+    {key:"critiqueQuality",         label:"Critique Quality"},
+    {key:"noviceFriendliness",      label:"Novice Friendliness"},
+    {key:"punctuality",             label:"Punctuality"},
+  ],
+  B:[
+    {key:"fieldKnowledge",      label:"Game & Field Knowledge"},
+    {key:"testDesign",          label:"Test Design Quality"},
+    {key:"scoringAccuracy",     label:"Scoring Accuracy"},
+    {key:"terrainSelection",    label:"Terrain & Cover Selection"},
+    {key:"dogWelfare",          label:"Dog Welfare Awareness"},
+    {key:"handlerCommunication",label:"Handler Communication"},
+  ],
+  C:[
+    {key:"rulebookKnowledge",   label:"Rulebook Knowledge"},
+    {key:"scoringAccuracy",     label:"Scoring Accuracy"},
+    {key:"ringSetup",           label:"Ring Setup"},
+    {key:"briefingClarity",     label:"Briefing Clarity"},
+    {key:"stressOnDogs",        label:"Stress on Dogs"},
+    {key:"handlerCommunication",label:"Handler Communication"},
+  ],
+  D:[
+    {key:"courseDesign",    label:"Course Design"},
+    {key:"safetyAwareness", label:"Safety Awareness"},
+    {key:"timingAccuracy",  label:"Timing & Technical Accuracy"},
+    {key:"competitionFlow", label:"Flow of Competition"},
+    {key:"briefingClarity", label:"Briefing Clarity"},
+    {key:"dogWelfare",      label:"Dog Welfare Awareness"},
+  ],
+  E:[
+    {key:"testDesign",             label:"Test Design Quality"},
+    {key:"noseWorkKnowledge",      label:"Nose Work Knowledge"},
+    {key:"scoringAccuracy",        label:"Scoring Accuracy"},
+    {key:"environmentalAwareness", label:"Environmental Awareness"},
+    {key:"briefingClarity",        label:"Briefing Clarity"},
+    {key:"dogWelfare",             label:"Dog Welfare Awareness"},
+  ],
+  F:[
+    {key:"workingKnowledge", label:"Working Knowledge"},
+    {key:"testDesign",       label:"Test Design Quality"},
+    {key:"scoringAccuracy",  label:"Scoring Accuracy"},
+    {key:"dogWelfare",       label:"Dog Welfare Awareness"},
+    {key:"stockEnvironment", label:"Stock & Environment Awareness"},
+    {key:"briefingClarity",  label:"Briefing Clarity"},
+  ],
+  G:[
+    {key:"breedTrimKnowledge",     label:"Breed Trim Knowledge"},
+    {key:"technicalEye",           label:"Technical Eye"},
+    {key:"breedStandardAlignment", label:"Breed Standard Alignment"},
+    {key:"timeManagement",         label:"Time Management"},
+    {key:"feedbackQuality",        label:"Feedback Quality"},
+    {key:"dogWelfare",             label:"Dog Welfare Awareness"},
+  ],
+  H:[
+    {key:"choreographyKnowledge",   label:"Choreography Knowledge"},
+    {key:"technicalScoringAccuracy",label:"Technical Scoring Accuracy"},
+    {key:"artisticAppreciation",    label:"Artistic Appreciation"},
+    {key:"briefingClarity",         label:"Briefing Clarity"},
+    {key:"dogWelfare",              label:"Dog Welfare Awareness"},
+  ],
+};
+
+const GROUP_NAMES = {
+  A:"Conformation & Shows", B:"Field Trials & Hunting",
+  C:"Obedience & Precision Sports", D:"Agility & Speed Sports",
+  E:"Nose Work & Tracking", F:"Working & Rescue",
+  G:"Grooming", H:"Dog Dancing",
+};
+
+const ENTRY_LABELS = {
+  A:{entry:"Your breed",   event:"Show & year"},
+  B:{entry:"Your dog / entry",  event:"Event & year"},
+  C:{entry:"Your dog / class",  event:"Event & year"},
+  D:{entry:"Your dog / class",  event:"Event & year"},
+  E:{entry:"Your dog / category",event:"Event & year"},
+  F:{entry:"Your dog / class",  event:"Event & year"},
+  G:{entry:"Breed / trim style", event:"Competition & year"},
+  H:{entry:"Dog name / routine", event:"Competition & year"},
+};
+
+// All unique rating keys across all groups
+const ALL_RATING_KEYS = [...new Set([
+  ...UNIVERSAL_DIMS.map(d=>d.key),
+  ...Object.values(GROUP_DIMS).flatMap(dims=>dims.map(d=>d.key)),
+])];
+const EMPTY_RATINGS = Object.fromEntries(ALL_RATING_KEYS.map(k=>[k,0]));
+
+// Helper: get discipline group(s) for a judge (falls back to ["A"])
+const judgeGroups = j => (j.disciplineGroups?.length ? j.disciplineGroups : ["A"]);
+
+// Old-format review compatibility: detect if review was written before discipline groups
+const reviewDims = r => {
+  if (r.disciplineGroup) return [...UNIVERSAL_DIMS, ...(GROUP_DIMS[r.disciplineGroup]||GROUP_DIMS.A)];
+  // legacy: return old keys that are present
+  return [
+    {key:"overall",label:"Overall"},{key:"breedKnowledge",label:"Breed Knowledge"},
+    {key:"consistency",label:"Consistency & Fairness"},{key:"ringManner",label:"Ring Manner"},
+    {key:"examinationThoroughness",label:"Examination Thoroughness"},
+    {key:"punctuality",label:"Punctuality"},{key:"noviceFriendliness",label:"Novice Friendliness"},
+    {key:"handlerIndependence",label:"Handler Independence"},{key:"critiqueQuality",label:"Critique Quality"},
+  ].filter(d=>r[d.key]);
+};
 
 const SEED_JUDGES = [
   { id:"j1", name:"Margaret Thornton", country:"USA", flag:"🇺🇸", breeds:["Golden Retriever","Labrador Retriever","Flat-Coated Retriever"], group:"Sporting", licensed:1994, orgs:[{org:"AKC",id:"AKC-28841"},{org:"FCI",id:"FCI-00412"}], verified:true, claimedBy:"judge1@example.com", bio:"Forty years in Goldens. I've bred 23 champions and judged on five continents. I judge for correct movement and coat texture above all else. An honest critique is the best thing I can give you.", social:{instagram:"@margaret_thornton_goldens",facebook:"MargaretThorntonGoldens",linkedin:""}, photo:"MT" },
@@ -210,23 +310,27 @@ function AuthModal({onClose,onAuth}) {
 
 // ── Review Modal ───────────────────────────────────────────────────────────────
 function ReviewModal({judge,user,onClose,onSubmit}) {
+  const groups = judgeGroups(judge);
+  const [selGroup,setSelGroup]=useState(groups[0]);
   const [f,setF]=useState({breed:"",show:"",wouldReturn:null,text:"",...EMPTY_RATINGS});
   const [err,setErr]=useState("");
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
 
+  const specificDims = GROUP_DIMS[selGroup]||GROUP_DIMS.A;
+  const allDims = [...UNIVERSAL_DIMS, ...specificDims];
+  const labels = ENTRY_LABELS[selGroup]||ENTRY_LABELS.A;
+
   async function submit() {
     setErr("");
-    if (!f.breed.trim()||!f.show.trim()) { setErr("Please fill in breed and show name."); return; }
-    const missing = RATING_DIMS.filter(d=>!f[d.key]);
+    if (!f.breed.trim()||!f.show.trim()) { setErr(`Please fill in ${labels.entry.toLowerCase()} and ${labels.event.toLowerCase()}.`); return; }
+    const missing = allDims.filter(d=>!f[d.key]);
     if (missing.length) { setErr(`Please rate: ${missing.map(d=>d.label).join(", ")}.`); return; }
-    if (f.wouldReturn===null) { setErr("Please indicate if you'd show under them again."); return; }
+    if (f.wouldReturn===null) { setErr("Please indicate if you'd compete/show under them again."); return; }
     if (!f.text.trim()) { setErr("Please write a review."); return; }
-    await onSubmit({id:uid(),judgeId:judge.id,userId:user.id,userName:user.name,date:new Date().toISOString().slice(0,10),reply:null,...f});
+    await onSubmit({id:uid(),judgeId:judge.id,userId:user.id,userName:user.name,
+      date:new Date().toISOString().slice(0,10),reply:null,disciplineGroup:selGroup,...f});
     onClose();
   }
-
-  const coreDims = RATING_DIMS.filter(d=>d.group==="core");
-  const extraDims = RATING_DIMS.filter(d=>d.group==="extra");
 
   const RatingGroup = ({dims}) => (
     <div style={{background:T.surface,borderRadius:T.rsm,overflow:"hidden",border:`1px solid ${T.border}`}}>
@@ -241,18 +345,33 @@ function ReviewModal({judge,user,onClose,onSubmit}) {
 
   return (
     <Modal onClose={onClose} title={`Review ${judge.name}`} subtitle="Your experience helps fellow exhibitors" wide>
+      {/* Discipline group selector — only shown when judge has multiple groups */}
+      {groups.length>1&&(
+        <div style={{marginBottom:16}}>
+          <p style={{fontSize:12,fontWeight:500,color:T.textSub,margin:"0 0 8px"}}>Which discipline are you reviewing?</p>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+            {groups.map(g=>(
+              <button key={g} onClick={()=>setSelGroup(g)}
+                style={{padding:"6px 14px",borderRadius:100,border:`1.5px solid ${selGroup===g?T.accent:T.border}`,background:selGroup===g?T.accentLight:T.bg,color:selGroup===g?T.accent:T.textSub,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
+                {GROUP_NAMES[g]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
-        <Field label="Your breed" value={f.breed} onChange={e=>set("breed",e.target.value)} placeholder="e.g. Golden Retriever"/>
-        <Field label="Show & year" value={f.show} onChange={e=>set("show",e.target.value)} placeholder="e.g. Crufts 2024"/>
+        <Field label={labels.entry} value={f.breed} onChange={e=>set("breed",e.target.value)} placeholder={selGroup==="A"?"e.g. Golden Retriever":"e.g. Max / Open class"}/>
+        <Field label={labels.event} value={f.show} onChange={e=>set("show",e.target.value)} placeholder={selGroup==="A"?"e.g. Crufts 2024":"e.g. National Championship 2024"}/>
       </div>
 
-      <SectionLabel>Core ratings</SectionLabel>
-      <div style={{marginBottom:14}}><RatingGroup dims={coreDims}/></div>
+      <SectionLabel>Universal criteria</SectionLabel>
+      <div style={{marginBottom:14}}><RatingGroup dims={UNIVERSAL_DIMS}/></div>
 
-      <SectionLabel>Additional ratings</SectionLabel>
-      <div style={{marginBottom:16}}><RatingGroup dims={extraDims}/></div>
+      <SectionLabel>{GROUP_NAMES[selGroup]} criteria</SectionLabel>
+      <div style={{marginBottom:16}}><RatingGroup dims={specificDims}/></div>
 
-      <p style={{fontSize:12,fontWeight:500,color:T.textSub,margin:"0 0 8px"}}>Would you show under them again?</p>
+      <p style={{fontSize:12,fontWeight:500,color:T.textSub,margin:"0 0 8px"}}>Would you compete / show under them again?</p>
       <div style={{display:"flex",gap:8,marginBottom:16}}>
         {[true,false].map(v=>(
           <button key={String(v)} onClick={()=>set("wouldReturn",v)}
@@ -262,7 +381,7 @@ function ReviewModal({judge,user,onClose,onSubmit}) {
         ))}
       </div>
 
-      <Field label="Your review" multiline rows={5} value={f.text} onChange={e=>set("text",e.target.value)} placeholder="Describe the judging style, what they prioritised, ring management…" style={{marginBottom:16}}/>
+      <Field label="Your review" multiline rows={5} value={f.text} onChange={e=>set("text",e.target.value)} placeholder="Describe the judging style, what they prioritised, how they ran the ring…" style={{marginBottom:16}}/>
       {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
       <Btn fullWidth onClick={submit}>Submit review</Btn>
     </Modal>
@@ -366,7 +485,9 @@ function ReviewCard({review,isJudge,onReply}) {
   const [exp,setExp]=useState(false);
   const [showAll,setShowAll]=useState(false);
   const long=review.text.length>240;
-  const extraDims = RATING_DIMS.filter(d=>d.group==="extra" && review[d.key]);
+  const dims = reviewDims(review).filter(d=>d.key!=="overall"&&review[d.key]);
+  const primary = dims.slice(0,3);
+  const extra   = dims.slice(3);
   return (
     <div style={{padding:"20px 0",borderBottom:`1px solid ${T.border}`}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
@@ -374,7 +495,10 @@ function ReviewCard({review,isJudge,onReply}) {
           <Avatar label={initials(review.userName)} size={36}/>
           <div>
             <p style={{margin:0,fontWeight:500,color:T.text,fontSize:14}}>{review.userName}</p>
-            <p style={{margin:0,fontSize:12,color:T.textHint}}>{review.breed} · {review.show}</p>
+            <p style={{margin:0,fontSize:12,color:T.textHint}}>
+              {review.breed} · {review.show}
+              {review.disciplineGroup&&<span style={{marginLeft:6,padding:"1px 6px",borderRadius:100,background:T.surface,border:`1px solid ${T.border}`,fontSize:11}}>{GROUP_NAMES[review.disciplineGroup]}</span>}
+            </p>
           </div>
         </div>
         <div style={{textAlign:"right",flexShrink:0}}>
@@ -383,25 +507,25 @@ function ReviewCard({review,isJudge,onReply}) {
         </div>
       </div>
 
-      {/* Core mini-ratings */}
+      {/* Primary mini-ratings */}
       <div style={{display:"flex",gap:14,marginBottom:8,flexWrap:"wrap"}}>
-        {RATING_DIMS.filter(d=>d.group==="core"&&d.key!=="overall"&&review[d.key]).map(d=>(
+        {primary.map(d=>(
           <span key={d.key} style={{fontSize:12,color:T.textSub}}>{d.label}: <span style={{color:T.amber,fontWeight:600}}>{"★".repeat(review[d.key])}{"☆".repeat(5-review[d.key])}</span></span>
         ))}
       </div>
 
       {/* Extra ratings — collapsible */}
-      {extraDims.length>0&&(
+      {extra.length>0&&(
         <div style={{marginBottom:10}}>
           {showAll&&(
             <div style={{display:"flex",gap:14,flexWrap:"wrap",marginBottom:6}}>
-              {extraDims.map(d=>(
+              {extra.map(d=>(
                 <span key={d.key} style={{fontSize:12,color:T.textSub}}>{d.label}: <span style={{color:T.amber,fontWeight:600}}>{"★".repeat(review[d.key])}{"☆".repeat(5-review[d.key])}</span></span>
               ))}
             </div>
           )}
           <button onClick={()=>setShowAll(!showAll)} style={{fontSize:12,color:T.accent,background:"none",border:"none",cursor:"pointer",padding:0,fontFamily:"inherit",fontWeight:500}}>
-            {showAll?"Hide additional ratings ▲":`Show ${extraDims.length} more ratings ▼`}
+            {showAll?"Hide additional ratings ▲":`Show ${extra.length} more ratings ▼`}
           </button>
         </div>
       )}
@@ -529,10 +653,12 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
   const hasReviewed=user&&rv.some(r=>r.userId===user.id);
   const canBook=user&&user.role==="organizer"&&judge.verified;
 
-  // Compute averages for all dims
-  const dimAvgs = Object.fromEntries(RATING_DIMS.map(d=>[d.key, avg(rv.map(r=>r[d.key]||0))]));
-  const coreDims = RATING_DIMS.filter(d=>d.group==="core");
-  const extraDims = RATING_DIMS.filter(d=>d.group==="extra");
+  // Use the judge's primary discipline group for the rating breakdown
+  const primaryGroup = judgeGroups(judge)[0];
+  const breakdownDims = [...UNIVERSAL_DIMS, ...(GROUP_DIMS[primaryGroup]||GROUP_DIMS.A)];
+  const dimAvgs = Object.fromEntries(breakdownDims.map(d=>[d.key, avg(rv.map(r=>r[d.key]||0).filter(Boolean))]));
+  const universalDims = UNIVERSAL_DIMS;
+  const specificDims  = GROUP_DIMS[primaryGroup]||GROUP_DIMS.A;
 
   return (
     <div style={{minHeight:"100vh",background:T.bg}}>
@@ -661,14 +787,14 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
         {/* Rating breakdown */}
         {rv.length>0&&(
           <div style={{background:T.surface,borderRadius:T.r,padding:"18px 20px",marginBottom:24,border:`1px solid ${T.border}`}}>
-            <SectionLabel>Rating breakdown</SectionLabel>
+            <SectionLabel>Rating breakdown · {GROUP_NAMES[primaryGroup]}</SectionLabel>
 
-            <p style={{fontSize:12,color:T.textSub,margin:"0 0 10px",fontWeight:500}}>Core</p>
-            {coreDims.map(d=><RatingBar key={d.key} label={d.label} value={dimAvgs[d.key]} highlight={d.key==="overall"}/>)}
+            <p style={{fontSize:12,color:T.textSub,margin:"0 0 10px",fontWeight:500}}>Universal</p>
+            {universalDims.map(d=><RatingBar key={d.key} label={d.label} value={dimAvgs[d.key]} highlight={d.key==="overall"}/>)}
 
             <Divider my={14}/>
-            <p style={{fontSize:12,color:T.textSub,margin:"0 0 10px",fontWeight:500}}>Additional</p>
-            {extraDims.map(d=><RatingBar key={d.key} label={d.label} value={dimAvgs[d.key]}/>)}
+            <p style={{fontSize:12,color:T.textSub,margin:"0 0 10px",fontWeight:500}}>{GROUP_NAMES[primaryGroup]}</p>
+            {specificDims.map(d=><RatingBar key={d.key} label={d.label} value={dimAvgs[d.key]}/>)}
 
             <Divider my={14}/>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
