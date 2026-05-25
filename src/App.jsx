@@ -186,11 +186,17 @@ const T = {
 };
 
 // ── Atoms ──────────────────────────────────────────────────────────────────────
-const Avatar = ({label, size=40}) => (
-  <div style={{width:size,height:size,borderRadius:"50%",background:aColor(label||"?"),display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:size*0.36,fontWeight:600,flexShrink:0}}>
-    {label||"?"}
-  </div>
-);
+const Avatar = ({label, photoUrl, size=40}) => {
+  if (photoUrl) return (
+    <img src={photoUrl} alt={label||""}
+      style={{width:size,height:size,borderRadius:"50%",objectFit:"cover",flexShrink:0,border:`2px solid ${T.border}`}}/>
+  );
+  return (
+    <div style={{width:size,height:size,borderRadius:"50%",background:aColor(label||"?"),display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:size*0.36,fontWeight:600,flexShrink:0}}>
+      {label||"?"}
+    </div>
+  );
+};
 
 const FlagImg = ({judge, height=14}) => {
   const iso = countryISO(judge);
@@ -472,23 +478,173 @@ function ClaimModal({judge,user,onClose,onClaim}) {
   );
 }
 
+// ── Contact Modal ─────────────────────────────────────────────────────────────
+function ContactModal({judge,user,onClose}) {
+  const [name,setName]=useState(user?.name||"");
+  const [email,setEmail]=useState(user?.email||"");
+  const [message,setMessage]=useState("");
+  const [sending,setSending]=useState(false);
+  const [sent,setSent]=useState(false);
+  const [err,setErr]=useState("");
+
+  const send=async()=>{
+    if(!name.trim()||!email.trim()||!message.trim()){setErr("Please fill in all fields.");return;}
+    setSending(true); setErr("");
+    try {
+      const {db}=await import("./firebase");
+      const {collection,addDoc}=await import("firebase/firestore");
+      await addDoc(collection(db,"messages"),{
+        judgeId:judge.id, judgeName:judge.name, judgeSlug:judge.slug||judge.id,
+        fromName:name.trim(), fromEmail:email.trim(),
+        message:message.trim(), sentAt:new Date().toISOString(),
+        read:false, claimed:!!judge.claimedBy,
+      });
+      setSent(true);
+    } catch(e){console.error(e);setErr("Failed to send — please try again.");}
+    setSending(false);
+  };
+
+  if(sent) return (
+    <Modal onClose={onClose} title="Message sent">
+      <div style={{textAlign:"center",padding:"12px 0 8px"}}>
+        <div style={{fontSize:40,marginBottom:14}}>✓</div>
+        <p style={{fontSize:15,color:T.text,margin:"0 0 8px",fontWeight:500}}>Your message has been sent</p>
+        <p style={{fontSize:13,color:T.textSub,margin:"0 0 24px",lineHeight:1.6}}>
+          {judge.claimedBy
+            ? `${judge.name} will receive your message on judge.dog.`
+            : `We'll forward your message to ${judge.name}'s registered email. They may not have joined judge.dog yet.`}
+        </p>
+        <Btn onClick={onClose}>Close</Btn>
+      </div>
+    </Modal>
+  );
+
+  return (
+    <Modal onClose={onClose} title={`Contact ${judge.name}`}
+      subtitle={judge.claimedBy?"The judge will receive your message.":"This judge hasn't joined judge.dog yet — we'll forward your message to their registered email."}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
+        <Field label="Your name" value={name} onChange={e=>setName(e.target.value)}/>
+        <Field label="Your email" value={email} onChange={e=>setEmail(e.target.value)} type="email"/>
+      </div>
+      <Field label="Message" multiline rows={5} value={message} onChange={e=>setMessage(e.target.value)}
+        placeholder={`Write your message to ${judge.name}…`} style={{marginBottom:16}}/>
+      {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
+      <Btn fullWidth onClick={send} disabled={sending}>{sending?"Sending…":"Send message"}</Btn>
+    </Modal>
+  );
+}
+
 // ── Edit Profile Modal ─────────────────────────────────────────────────────────
 function EditProfileModal({judge,onClose,onSave}) {
+  const [saving,setSaving]=useState(false);
+  const [photoFile,setPhotoFile]=useState(null);
+  const [photoPreview,setPhotoPreview]=useState(judge.profilePhoto||null);
+  const [headline,setHeadline]=useState(judge.headline||"");
   const [bio,setBio]=useState(judge.bio||"");
+  const [highlights,setHighlights]=useState(judge.highlights||[]);
+  const [newHL,setNewHL]=useState("");
   const [ig,setIg]=useState(judge.social?.instagram||"");
   const [fb,setFb]=useState(judge.social?.facebook||"");
   const [li,setLi]=useState(judge.social?.linkedin||"");
-  async function save() { await onSave({...judge,bio,social:{instagram:ig,facebook:fb,linkedin:li}}); onClose(); }
+  const [web,setWeb]=useState(judge.social?.website||"");
+  const [gallery,setGallery]=useState(judge.galleryPhotos||[]);
+  const [galleryBusy,setGalleryBusy]=useState(false);
+
+  const addHL=()=>{ if(!newHL.trim()) return; setHighlights(h=>[...h,newHL.trim()]); setNewHL(""); };
+
+  const handleGalleryAdd=async e=>{
+    const files=Array.from(e.target.files); if(!files.length) return;
+    setGalleryBusy(true);
+    try {
+      const {uploadPhoto}=await import("./firebase");
+      const urls=await Promise.all(files.map((f,i)=>uploadPhoto(judge.id,f,`gallery-${i}`)));
+      setGallery(g=>[...g,...urls].slice(0,8));
+    } catch(err){console.error(err);}
+    setGalleryBusy(false);
+  };
+
+  const save=async()=>{
+    setSaving(true);
+    try {
+      let profilePhoto=judge.profilePhoto||null;
+      if(photoFile){
+        const {uploadPhoto}=await import("./firebase");
+        profilePhoto=await uploadPhoto(judge.id,photoFile,"profile");
+      }
+      await onSave({...judge,profilePhoto,headline,bio,highlights,galleryPhotos:gallery,
+        social:{instagram:ig,facebook:fb,linkedin:li,website:web}});
+      onClose();
+    } catch(err){console.error(err);}
+    setSaving(false);
+  };
+
   return (
-    <Modal onClose={onClose} title="Edit profile" subtitle="Shown on your public judge profile" wide>
-      <Field label="Bio" multiline rows={5} value={bio} onChange={e=>setBio(e.target.value)} placeholder="Your background, philosophy, what you look for…" style={{marginBottom:16}}/>
-      <p style={{fontSize:12,fontWeight:500,color:T.textSub,margin:"0 0 8px"}}>Social links</p>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:20}}>
+    <Modal onClose={onClose} title="Edit profile" subtitle="Changes are visible on your public profile" wide>
+      {/* Photo */}
+      <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Profile photo</p>
+      <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:22}}>
+        <Avatar label={judge.photo} photoUrl={photoPreview} size={72}/>
+        <label style={{cursor:"pointer",padding:"8px 18px",borderRadius:100,border:`1px solid ${T.border}`,background:T.surface,fontSize:13,fontWeight:500,color:T.text,fontFamily:"inherit"}}>
+          Upload photo
+          <input type="file" accept="image/*" style={{display:"none"}} onChange={e=>{const f=e.target.files[0];if(f){setPhotoFile(f);setPhotoPreview(URL.createObjectURL(f));}}}/>
+        </label>
+      </div>
+
+      {/* About */}
+      <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>About you</p>
+      <Field label="Headline" value={headline} onChange={e=>setHeadline(e.target.value)} placeholder="e.g. FCI All-Breed Judge · 30 years experience" style={{marginBottom:10}}/>
+      <Field label="Bio" multiline rows={4} value={bio} onChange={e=>setBio(e.target.value)} placeholder="Your background, philosophy, what you look for…" style={{marginBottom:22}}/>
+
+      {/* Highlights */}
+      <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Career highlights</p>
+      <div style={{marginBottom:22}}>
+        {highlights.map((h,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+            <span style={{flex:1,fontSize:13,color:T.text,padding:"7px 12px",background:T.surface,borderRadius:T.rsm,border:`1px solid ${T.border}`}}>{h}</span>
+            <button onClick={()=>setHighlights(hh=>hh.filter((_,j)=>j!==i))}
+              style={{background:"none",border:"none",cursor:"pointer",color:T.textHint,fontSize:18,padding:"2px 6px",borderRadius:6,lineHeight:1,fontFamily:"inherit"}}>×</button>
+          </div>
+        ))}
+        <div style={{display:"flex",gap:8}}>
+          <input value={newHL} onChange={e=>setNewHL(e.target.value)}
+            onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();addHL();}}}
+            placeholder="Add a highlight and press Enter"
+            style={{flex:1,padding:"9px 13px",borderRadius:T.rsm,border:`1.5px solid ${T.border}`,fontSize:13,fontFamily:"inherit",outline:"none",color:T.text,background:T.bg}}
+            onFocus={e=>e.target.style.borderColor=T.accent} onBlur={e=>e.target.style.borderColor=T.border}/>
+          <button onClick={addHL}
+            style={{padding:"9px 16px",borderRadius:T.rsm,background:T.accentLight,color:T.accent,border:"none",cursor:"pointer",fontSize:13,fontWeight:600,fontFamily:"inherit"}}>Add</button>
+        </div>
+      </div>
+
+      {/* Social */}
+      <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Social & web</p>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:22}}>
         <Field label="Instagram" value={ig} onChange={e=>setIg(e.target.value)} placeholder="@handle"/>
-        <Field label="Facebook" value={fb} onChange={e=>setFb(e.target.value)} placeholder="Page name"/>
+        <Field label="Website" value={web} onChange={e=>setWeb(e.target.value)} placeholder="https://"/>
+        <Field label="Facebook" value={fb} onChange={e=>setFb(e.target.value)} placeholder="Page or username"/>
         <Field label="LinkedIn" value={li} onChange={e=>setLi(e.target.value)} placeholder="Username"/>
       </div>
-      <Btn fullWidth onClick={save}>Save changes</Btn>
+
+      {/* Gallery */}
+      <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Photo gallery <span style={{fontWeight:400,textTransform:"none",letterSpacing:0,color:T.textHint}}>· up to 8 photos</span></p>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:8}}>
+        {gallery.map((url,i)=>(
+          <div key={i} style={{position:"relative",aspectRatio:"1",borderRadius:T.rsm,overflow:"hidden"}}>
+            <img src={url} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+            <button onClick={()=>setGallery(g=>g.filter((_,j)=>j!==i))}
+              style={{position:"absolute",top:4,right:4,background:"rgba(0,0,0,.6)",border:"none",borderRadius:"50%",width:22,height:22,color:"#fff",cursor:"pointer",fontSize:14,display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>×</button>
+          </div>
+        ))}
+        {gallery.length<8&&(
+          <label style={{aspectRatio:"1",borderRadius:T.rsm,border:`2px dashed ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:24,color:T.textHint,background:T.surface}}>
+            {galleryBusy?"…":"+"}
+            <input type="file" accept="image/*" multiple style={{display:"none"}} onChange={handleGalleryAdd}/>
+          </label>
+        )}
+      </div>
+      <p style={{fontSize:12,color:T.textHint,margin:"0 0 22px"}}>Show photos, ringside moments, awards</p>
+
+      <Btn fullWidth onClick={save} disabled={saving}>{saving?"Saving…":"Save changes"}</Btn>
     </Modal>
   );
 }
@@ -809,7 +965,7 @@ function QRSection({judge}) {
 }
 
 // ── Judge Page ─────────────────────────────────────────────────────────────────
-function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProfile,onSaveReply}) {
+function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProfile,onContact,onSaveReply}) {
   const [modal,setModal]=useState(null); const [replyTarget,setReplyTarget]=useState(null);
   const rv=reviews.filter(r=>r.judgeId===judge.id).sort((a,b)=>b.date.localeCompare(a.date));
   const wr=rv.filter(r=>r.wouldReturn).length;
@@ -839,7 +995,7 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
         {/* Hero */}
         <div style={{display:"flex",gap:20,alignItems:"flex-start",marginBottom:24,flexWrap:"wrap"}}>
           <div style={{position:"relative"}}>
-            <Avatar label={judge.photo} size={76}/>
+            <Avatar label={judge.photo} photoUrl={judge.profilePhoto} size={76}/>
             {judge.verified&&<div style={{position:"absolute",bottom:0,right:0,width:22,height:22,background:T.green,borderRadius:"50%",border:`3px solid ${T.bg}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#fff"}}>✓</div>}
           </div>
           <div style={{flex:1,minWidth:180}}>
@@ -847,6 +1003,7 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
               <h1 style={{margin:0,fontSize:24,fontWeight:400,color:T.text,letterSpacing:-0.4,display:"flex",alignItems:"center",gap:8}}><FlagImg judge={judge} height={18}/>{judge.name}</h1>
               {judge.verified&&<Chip bg={T.greenLight} color={T.green} small>✓ Verified</Chip>}
             </div>
+            {judge.headline&&<p style={{margin:"0 0 6px",fontSize:14,color:T.textSub,fontStyle:"italic"}}>{judge.headline}</p>}
             {/* Key facts row */}
             <div style={{display:"flex",flexWrap:"wrap",gap:16,marginBottom:12}}>
               <span style={{fontSize:13,color:T.textSub}}>{judge.country}</span>
@@ -884,6 +1041,7 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
           {!hasReviewed&&<Btn onClick={onReview}>{user?"Write a review":"Sign in to review"}</Btn>}
           {hasReviewed&&<Chip bg={T.greenLight} color={T.green}>✓ Reviewed</Chip>}
           {canBook&&<Btn onClick={onBook} color={T.green} icon="📅">Request booking</Btn>}
+          <Btn onClick={onContact} variant="outlined">Contact</Btn>
           {!judge.verified&&user&&user.role==="judge"&&!judge.claimedBy&&<Btn onClick={onClaim} variant="outlined">Claim profile</Btn>}
           {isOwner&&<Btn onClick={onEditProfile} variant="outlined" icon="✏">Edit profile</Btn>}
           {!canBook&&user&&user.role==="organizer"&&!judge.verified&&<span style={{fontSize:13,color:T.textHint,alignSelf:"center"}}>Judge hasn't claimed their profile — bookings unavailable</span>}
@@ -931,11 +1089,44 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
         )}
 
         {/* Social */}
-        {judge.social&&(judge.social.instagram||judge.social.facebook||judge.social.linkedin)&&(
+        {judge.social&&(judge.social.instagram||judge.social.facebook||judge.social.linkedin||judge.social.website)&&(
           <div style={{display:"flex",gap:8,marginBottom:18,flexWrap:"wrap"}}>
             {judge.social.instagram&&<a href={`https://instagram.com/${judge.social.instagram.replace("@","")}`} target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:100,background:T.surface,color:T.text,textDecoration:"none",fontSize:13,border:`1px solid ${T.border}`,fontWeight:500}}>📷 {judge.social.instagram}</a>}
             {judge.social.facebook&&<a href={`https://facebook.com/${judge.social.facebook}`} target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:100,background:T.surface,color:T.text,textDecoration:"none",fontSize:13,border:`1px solid ${T.border}`,fontWeight:500}}>f {judge.social.facebook}</a>}
             {judge.social.linkedin&&<a href={`https://linkedin.com/in/${judge.social.linkedin}`} target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:100,background:T.surface,color:T.text,textDecoration:"none",fontSize:13,border:`1px solid ${T.border}`,fontWeight:500}}>in {judge.social.linkedin}</a>}
+            {judge.social.website&&<a href={judge.social.website.startsWith("http")?judge.social.website:"https://"+judge.social.website} target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:100,background:T.surface,color:T.text,textDecoration:"none",fontSize:13,border:`1px solid ${T.border}`,fontWeight:500}}>🌐 Website</a>}
+          </div>
+        )}
+
+        {/* Career highlights */}
+        {judge.highlights?.length>0&&(
+          <div style={{background:T.surface,borderRadius:T.r,padding:"18px 20px",marginBottom:18,border:`1px solid ${T.border}`}}>
+            <SectionLabel>Career highlights</SectionLabel>
+            <div style={{display:"flex",flexDirection:"column",gap:10,marginTop:4}}>
+              {judge.highlights.map((h,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10}}>
+                  <span style={{color:T.accent,fontSize:13,marginTop:2,flexShrink:0}}>★</span>
+                  <span style={{fontSize:14,color:T.text,lineHeight:1.6}}>{h}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Gallery */}
+        {judge.galleryPhotos?.length>0&&(
+          <div style={{background:T.surface,borderRadius:T.r,padding:"18px 20px",marginBottom:18,border:`1px solid ${T.border}`}}>
+            <SectionLabel>Gallery</SectionLabel>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:8,marginTop:4}}>
+              {judge.galleryPhotos.map((url,i)=>(
+                <div key={i} style={{aspectRatio:"1",borderRadius:T.rsm,overflow:"hidden",cursor:"pointer"}}
+                  onClick={()=>window.open(url,"_blank")}>
+                  <img src={url} alt="" style={{width:"100%",height:"100%",objectFit:"cover",transition:"transform .2s"}}
+                    onMouseEnter={e=>e.currentTarget.style.transform="scale(1.04)"}
+                    onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}/>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -1250,11 +1441,13 @@ function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editPro
         onReview={()=>{if(!user){onRequestAuth();}else{setModal("review");}}}
         onBook={()=>setModal("booking")}
         onClaim={()=>setModal("claim")}
+        onContact={()=>setModal("contact")}
         onEditProfile={()=>setModal("editProfile")}
         onSaveReply={saveReply}/>
       {modal==="review"&&user&&<ReviewModal judge={judge} user={user} onClose={()=>setModal(null)} onSubmit={addReview}/>}
       {modal==="booking"&&user&&<BookingModal judge={judge} user={user} onClose={()=>setModal(null)} onSubmit={addBooking}/>}
       {modal==="claim"&&user&&<ClaimModal judge={judge} user={user} onClose={()=>setModal(null)} onClaim={()=>claimJudge(judge.id)}/>}
+      {modal==="contact"&&<ContactModal judge={judge} user={user} onClose={()=>setModal(null)}/>}
       {modal==="editProfile"&&<EditProfileModal judge={judge} onClose={()=>setModal(null)} onSave={editProfile}/>}
     </>
   );

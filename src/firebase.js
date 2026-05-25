@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB4qLXRui9ZaOT5bF6Cd1EMuEbQwmDgUMA",
@@ -15,7 +16,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
+
+export async function uploadPhoto(judgeId, file, slot) {
+  const ext = file.name.split(".").pop() || "jpg";
+  const storageRef = ref(storage, `judges/${judgeId}/${slot}-${Date.now()}.${ext}`);
+  await uploadBytes(storageRef, file);
+  return getDownloadURL(storageRef);
+}
 
 export async function signInWithGoogle() {
   const result = await signInWithPopup(auth, googleProvider);
