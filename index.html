@@ -6,6 +6,19 @@
     <meta name="description" content="Real reviews from dog show exhibitors worldwide. Verified judge profiles across FCI, AKC, KC and more." />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>judge.dog — Know your judge before you enter</title>
+    <script>
+      document.addEventListener('touchmove', function(e) {
+        if (e.touches.length > 1) e.preventDefault();
+      }, { passive: false });
+    </script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WR1N7R6MZR"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-WR1N7R6MZR');
+    </script>
   </head>
   <body>
     <div id="root"></div>
