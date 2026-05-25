@@ -1483,6 +1483,83 @@ function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editPro
   );
 }
 
+// ── Inbox Route ────────────────────────────────────────────────────────────────
+function MessageCard({msg, selected, onSelect}) {
+  return (
+    <div onClick={onSelect}
+      style={{padding:"16px 20px",marginBottom:8,borderRadius:T.r,cursor:"pointer",transition:"background .15s",
+        background:selected?T.accentLight:T.bg, border:`1px solid ${selected?T.accent:T.border}`}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
+          {!msg.read&&<div style={{width:8,height:8,borderRadius:"50%",background:T.accent,flexShrink:0}}/>}
+          <span style={{fontWeight:msg.read?400:600,fontSize:14,color:T.text,flexShrink:0}}>{msg.fromName}</span>
+          <span style={{fontSize:12,color:T.textHint,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{msg.fromEmail}</span>
+        </div>
+        <span style={{fontSize:12,color:T.textHint,flexShrink:0}}>{fmtDate(msg.sentAt)}</span>
+      </div>
+      {!selected&&<p style={{margin:"6px 0 0",fontSize:13,color:T.textSub,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{msg.message}</p>}
+      {selected&&<p style={{margin:"12px 0 0",fontSize:14,color:T.text,lineHeight:1.75,whiteSpace:"pre-wrap"}}>{msg.message}</p>}
+    </div>
+  );
+}
+
+function InboxRoute({user}) {
+  const navigate=useNavigate();
+  const [msgs,setMsgs]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [selected,setSelected]=useState(null);
+
+  useEffect(()=>{
+    if(!user?.judgeId) return;
+    (async()=>{
+      const {db}=await import("./firebase");
+      const {collection,query,where,getDocs}=await import("firebase/firestore");
+      const snap=await getDocs(query(collection(db,"messages"),where("judgeId","==",user.judgeId)));
+      setMsgs(snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.sentAt.localeCompare(a.sentAt)));
+      setLoading(false);
+    })();
+  },[user]);
+
+  const open=async msg=>{
+    setSelected(s=>s===msg.id?null:msg.id);
+    if(!msg.read){
+      setMsgs(mm=>mm.map(m=>m.id===msg.id?{...m,read:true}:m));
+      const {db}=await import("./firebase");
+      const {doc,updateDoc}=await import("firebase/firestore");
+      await updateDoc(doc(db,"messages",msg.id),{read:true});
+    }
+  };
+
+  if(!user||user.role!=="judge") return <Navigate to="/"/>;
+  const unread=msgs.filter(m=>!m.read).length;
+
+  return (
+    <div style={{minHeight:"100vh",background:T.bg}}>
+      <div style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"10px 20px",display:"flex",alignItems:"center",gap:8,position:"sticky",top:0,zIndex:100}}>
+        <button onClick={()=>navigate(-1)}
+          style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",cursor:"pointer",color:T.textSub,fontSize:14,fontWeight:500,padding:"7px 12px",borderRadius:100,fontFamily:"inherit"}}>
+          ← Back
+        </button>
+      </div>
+      <div style={{maxWidth:700,margin:"0 auto",padding:"32px 20px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:28}}>
+          <h1 style={{margin:0,fontSize:24,fontWeight:400,color:T.text,letterSpacing:-0.4}}>Messages</h1>
+          {unread>0&&<span style={{fontSize:12,fontWeight:600,color:"#fff",background:T.accent,padding:"2px 9px",borderRadius:100}}>{unread} unread</span>}
+        </div>
+        {loading?(
+          <div style={{textAlign:"center",padding:"60px 0",color:T.textHint,fontSize:14}}>Loading…</div>
+        ):msgs.length===0?(
+          <div style={{textAlign:"center",padding:"60px 0"}}>
+            <div style={{fontSize:40,marginBottom:12}}>✉</div>
+            <p style={{color:T.textSub,fontSize:15,margin:0}}>No messages yet</p>
+            <p style={{color:T.textHint,fontSize:13,margin:"8px 0 0"}}>When exhibitors or organizers contact you, messages will appear here.</p>
+          </div>
+        ):msgs.map(m=><MessageCard key={m.id} msg={m} selected={selected===m.id} onSelect={()=>open(m)}/>)}
+      </div>
+    </div>
+  );
+}
+
 // ── Admin Route ────────────────────────────────────────────────────────────────
 function AdminRoute({judges,reviews,bookings,user,saveJudges,saveReviews}) {
   const navigate=useNavigate();
@@ -1507,6 +1584,7 @@ export default function App() {
   const [judges,setJudges]=useState([]); const [reviews,setReviews]=useState([]);
   const [bookings,setBookings]=useState([]); const [user,setUser]=useState(null);
   const [loading,setLoading]=useState(true); const [modal,setModal]=useState(null);
+  const [unreadMsgCount,setUnreadMsgCount]=useState(0);
   const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all");
   const [isMobile,setIsMobile]=useState(window.innerWidth<640);
   const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
@@ -1544,6 +1622,16 @@ export default function App() {
 
   useEffect(()=>{ setMobileMenuOpen(false); },[location.pathname]);
 
+  useEffect(()=>{
+    if(!user?.judgeId) return;
+    (async()=>{
+      const {db}=await import("./firebase");
+      const {collection,query,where,getDocs}=await import("firebase/firestore");
+      const snap=await getDocs(query(collection(db,"messages"),where("judgeId","==",user.judgeId),where("read","==",false)));
+      setUnreadMsgCount(snap.size);
+    })();
+  },[user]);
+
   const saveJudges=async jj=>{
     setJudges(jj);
     try {
@@ -1560,6 +1648,10 @@ export default function App() {
   const claimJudge=useCallback(async(judgeId)=>{
     if(!judgeId||!user) return;
     await saveJudges(judges.map(j=>j.id===judgeId?{...j,verified:true,claimedBy:user.email}:j));
+    const {db}=await import("./firebase");
+    const {doc,updateDoc}=await import("firebase/firestore");
+    await updateDoc(doc(db,"users",user.uid),{role:"judge",judgeId});
+    setUser(u=>({...u,role:"judge",judgeId}));
   },[judges,user]);
 
   const editProfile=useCallback(async upd=>{
@@ -1666,6 +1758,13 @@ export default function App() {
           <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0,minWidth:140,justifyContent:"flex-end"}}>
             {user?(
               <>
+                {user?.role==="judge"&&(
+                  <button onClick={()=>navigate("/inbox")} title="Messages"
+                    style={{position:"relative",background:"none",border:"none",cursor:"pointer",padding:"6px 10px",borderRadius:100,color:T.textSub,fontSize:22,display:"flex",alignItems:"center",lineHeight:1}}>
+                    ✉
+                    {unreadMsgCount>0&&<span style={{position:"absolute",top:2,right:4,width:16,height:16,background:T.red,borderRadius:"50%",fontSize:10,fontWeight:700,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{unreadMsgCount}</span>}
+                  </button>
+                )}
                 <div style={{display:"flex",alignItems:"center",gap:8,padding:"5px 12px 5px 6px",borderRadius:100,background:T.surface,border:`1px solid ${T.border}`}}>
                   {user.photo
                     ?<img src={user.photo} style={{width:26,height:26,borderRadius:"50%",objectFit:"cover"}} alt=""/>
@@ -1710,6 +1809,7 @@ export default function App() {
                 <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
                   <Btn onClick={()=>{logout();setMobileMenuOpen(false);}} variant="outlined" small>Sign out</Btn>
                   {user.role==="admin"&&<Btn onClick={()=>{navigate("/admin");setMobileMenuOpen(false);}} variant="tonal" small>⚙ Admin</Btn>}
+                  {user?.role==="judge"&&<Btn onClick={()=>{navigate("/inbox");setMobileMenuOpen(false);}} variant="outlined" small>✉ Messages{unreadMsgCount>0?` (${unreadMsgCount})`:""}</Btn>}
                 </div>
               </>
             ):(
@@ -1772,6 +1872,7 @@ export default function App() {
             claimJudge={claimJudge} editProfile={editProfile} saveReply={saveReply}
             onRequestAuth={()=>setModal("auth")}/>
         }/>
+        <Route path="/inbox" element={<InboxRoute user={user}/>}/>
         <Route path="/admin" element={
           <AdminRoute judges={judges} reviews={reviews} bookings={bookings} user={user}
             saveJudges={saveJudges} saveReviews={saveReviews}/>
