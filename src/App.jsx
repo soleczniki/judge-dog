@@ -1457,6 +1457,15 @@ function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editPro
   const [modal,setModal]=useState(null);
   const judge=judges.find(j=>j.slug===slug);
 
+  const handleContact=()=>{
+    if(judge.claimedBy){
+      if(!user){onRequestAuth();return;}
+      setModal("startConv");
+    } else {
+      setModal("contact");
+    }
+  };
+
   if(!judge) return (
     <div style={{minHeight:"60vh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:12,color:T.textHint}}>
       <div style={{fontSize:36}}>🔍</div>
@@ -1471,91 +1480,442 @@ function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editPro
         onReview={()=>{if(!user){onRequestAuth();}else{setModal("review");}}}
         onBook={()=>setModal("booking")}
         onClaim={()=>setModal("claim")}
-        onContact={()=>setModal("contact")}
+        onContact={handleContact}
         onEditProfile={()=>setModal("editProfile")}
         onSaveReply={saveReply}/>
       {modal==="review"&&user&&<ReviewModal judge={judge} user={user} onClose={()=>setModal(null)} onSubmit={addReview}/>}
       {modal==="booking"&&user&&<BookingModal judge={judge} user={user} onClose={()=>setModal(null)} onSubmit={addBooking}/>}
       {modal==="claim"&&user&&<ClaimModal judge={judge} user={user} onClose={()=>setModal(null)} onClaim={()=>claimJudge(judge.id)}/>}
       {modal==="contact"&&<ContactModal judge={judge} user={user} onClose={()=>setModal(null)}/>}
+      {modal==="startConv"&&user&&<StartConvModal judge={judge} user={user} onClose={()=>setModal(null)} onCreated={()=>navigate("/messages")}/>}
       {modal==="editProfile"&&<EditProfileModal judge={judge} onClose={()=>setModal(null)} onSave={editProfile}/>}
     </>
   );
 }
 
-// ── Inbox Route ────────────────────────────────────────────────────────────────
-function MessageCard({msg, selected, onSelect}) {
+// ── Start Conversation Modal ───────────────────────────────────────────────────
+function StartConvModal({judge, user, onClose, onCreated}) {
+  const [text,setText]=useState("");
+  const [sending,setSending]=useState(false);
+  const [err,setErr]=useState("");
+
+  const send=async()=>{
+    if(!text.trim()){setErr("Please write a message.");return;}
+    setSending(true); setErr("");
+    try {
+      const {db}=await import("./firebase");
+      const {doc,setDoc,collection,addDoc}=await import("firebase/firestore");
+      const cid=`${judge.id}__${user.uid}`;
+      const now=new Date().toISOString();
+      await setDoc(doc(db,"conversations",cid),{
+        judgeId:judge.id, judgeName:judge.name, judgeSlug:judge.slug||judge.id,
+        senderUid:user.uid, senderName:user.name, senderPhoto:user.photo||null,
+        lastMessage:text.trim(), lastMessageAt:now, lastMessageBy:"sender",
+        unreadForJudge:1, unreadForSender:0, createdAt:now,
+      },{merge:true});
+      await addDoc(collection(db,"conversations",cid,"messages"),{
+        from:"sender", fromName:user.name, fromUid:user.uid,
+        text:text.trim(), sentAt:now,
+      });
+      onCreated(cid);
+      onClose();
+    } catch(e){console.error(e);setErr("Failed to send — please try again.");}
+    setSending(false);
+  };
+
   return (
-    <div onClick={onSelect}
-      style={{padding:"16px 20px",marginBottom:8,borderRadius:T.r,cursor:"pointer",transition:"background .15s",
-        background:selected?T.accentLight:T.bg, border:`1px solid ${selected?T.accent:T.border}`}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:12}}>
-        <div style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
-          {!msg.read&&<div style={{width:8,height:8,borderRadius:"50%",background:T.accent,flexShrink:0}}/>}
-          <span style={{fontWeight:msg.read?400:600,fontSize:14,color:T.text,flexShrink:0}}>{msg.fromName}</span>
-          <span style={{fontSize:12,color:T.textHint,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{msg.fromEmail}</span>
-        </div>
-        <span style={{fontSize:12,color:T.textHint,flexShrink:0}}>{fmtDate(msg.sentAt)}</span>
+    <Modal onClose={onClose} title={`Message ${judge.name}`} subtitle="They'll be notified and can reply from their inbox">
+      <Field label="Your message" multiline rows={5} value={text}
+        onChange={e=>setText(e.target.value)}
+        placeholder={`Write your message to ${judge.name}…`}
+        style={{marginBottom:16}}/>
+      {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
+      <Btn fullWidth onClick={send} disabled={sending}>{sending?"Sending…":"Send message"}</Btn>
+    </Modal>
+  );
+}
+
+// ── Messages Route ─────────────────────────────────────────────────────────────
+function MessagesRoute({user}) {
+  const navigate=useNavigate();
+  const location=useLocation();
+  const [convs,setConvs]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [activeId,setActiveId]=useState(location.state?.activeConvId||null);
+  const [msgs,setMsgs]=useState([]);
+  const [msgsLoading,setMsgsLoading]=useState(false);
+  const [replyText,setReplyText]=useState("");
+  const [sending,setSending]=useState(false);
+  const [isMobile,setIsMobile]=useState(window.innerWidth<768);
+  const bottomRef=useRef(null);
+
+  const isJudge=user?.role==="judge"&&!!user?.judgeId;
+
+  useEffect(()=>{
+    const h=()=>setIsMobile(window.innerWidth<768);
+    window.addEventListener("resize",h);
+    return()=>window.removeEventListener("resize",h);
+  },[]);
+
+  // Real-time conversation list
+  useEffect(()=>{
+    if(!user) return;
+    let unsub;
+    (async()=>{
+      try {
+        const {db}=await import("./firebase");
+        const {collection,query,where,onSnapshot}=await import("firebase/firestore");
+        const q=isJudge
+          ? query(collection(db,"conversations"),where("judgeId","==",user.judgeId))
+          : query(collection(db,"conversations"),where("senderUid","==",user.uid));
+        unsub=onSnapshot(q,snap=>{
+          setConvs(snap.docs.map(d=>({id:d.id,...d.data()}))
+            .sort((a,b)=>(b.lastMessageAt||"").localeCompare(a.lastMessageAt||"")));
+          setLoading(false);
+        },e=>{console.error(e);setLoading(false);});
+      } catch(e){console.error(e);setLoading(false);}
+    })();
+    return()=>{if(unsub)unsub();};
+  },[user]);
+
+  // Real-time messages for active conversation
+  useEffect(()=>{
+    if(!activeId){setMsgs([]);return;}
+    setMsgsLoading(true); setMsgs([]);
+    let unsub;
+    (async()=>{
+      try {
+        const {db}=await import("./firebase");
+        const {collection,query,orderBy,onSnapshot}=await import("firebase/firestore");
+        unsub=onSnapshot(
+          query(collection(db,"conversations",activeId,"messages"),orderBy("sentAt","asc")),
+          snap=>{setMsgs(snap.docs.map(d=>({id:d.id,...d.data()})));setMsgsLoading(false);},
+          e=>{console.error(e);setMsgsLoading(false);}
+        );
+      } catch(e){console.error(e);setMsgsLoading(false);}
+    })();
+    return()=>{if(unsub)unsub();};
+  },[activeId]);
+
+  // Mark as read on open
+  useEffect(()=>{
+    if(!activeId||!user) return;
+    const conv=convs.find(c=>c.id===activeId);
+    if(!conv) return;
+    const field=isJudge?"unreadForJudge":"unreadForSender";
+    if(!conv[field]) return;
+    (async()=>{
+      try {
+        const {db}=await import("./firebase");
+        const {doc,updateDoc}=await import("firebase/firestore");
+        await updateDoc(doc(db,"conversations",activeId),{[field]:0});
+      } catch(e){}
+    })();
+  },[activeId,convs]);
+
+  // Scroll to bottom on new messages
+  useEffect(()=>{
+    if(msgs.length) bottomRef.current?.scrollIntoView({behavior:"smooth"});
+  },[msgs]);
+
+  const send=async()=>{
+    if(!replyText.trim()||!activeId||sending) return;
+    const text=replyText.trim();
+    setReplyText("");
+    setSending(true);
+    try {
+      const {db}=await import("./firebase");
+      const {doc,updateDoc,collection,addDoc}=await import("firebase/firestore");
+      const now=new Date().toISOString();
+      const side=isJudge?"judge":"sender";
+      const otherField=isJudge?"unreadForSender":"unreadForJudge";
+      const conv=convs.find(c=>c.id===activeId);
+      await addDoc(collection(db,"conversations",activeId,"messages"),{
+        from:side, fromName:user.name, fromUid:user.uid, text, sentAt:now,
+      });
+      await updateDoc(doc(db,"conversations",activeId),{
+        lastMessage:text, lastMessageAt:now, lastMessageBy:side,
+        [otherField]:(conv?.[otherField]||0)+1,
+      });
+    } catch(e){console.error(e);setReplyText(text);}
+    setSending(false);
+  };
+
+  if(!user) return <Navigate to="/"/>;
+
+  const activeConv=convs.find(c=>c.id===activeId);
+  const myUnread=c=>isJudge?(c.unreadForJudge||0):(c.unreadForSender||0);
+  const otherName=c=>isJudge?c.senderName:c.judgeName;
+  const otherPhoto=c=>isJudge?(c.senderPhoto||null):null;
+  const showList=!isMobile||!activeId;
+  const showThread=!isMobile||!!activeId;
+
+  return (
+    <div style={{height:"calc(100vh - 64px)",display:"flex",flexDirection:"column",background:T.bg}}>
+      {/* Header */}
+      <div style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"0 20px",display:"flex",alignItems:"center",gap:8,height:52,flexShrink:0}}>
+        {isMobile&&activeId?(
+          <button onClick={()=>setActiveId(null)}
+            style={{background:"none",border:"none",cursor:"pointer",color:T.textSub,fontSize:14,fontWeight:500,padding:"6px 10px",borderRadius:100,fontFamily:"inherit"}}>
+            ← Back
+          </button>
+        ):(
+          <button onClick={()=>navigate(-1)}
+            style={{background:"none",border:"none",cursor:"pointer",color:T.textSub,fontSize:14,fontWeight:500,padding:"6px 10px",borderRadius:100,fontFamily:"inherit"}}>
+            ← Back
+          </button>
+        )}
+        <span style={{fontSize:15,fontWeight:500,color:T.text}}>
+          {isMobile&&activeConv?otherName(activeConv):"Messages"}
+        </span>
       </div>
-      {!selected&&<p style={{margin:"6px 0 0",fontSize:13,color:T.textSub,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{msg.message}</p>}
-      {selected&&<p style={{margin:"12px 0 0",fontSize:14,color:T.text,lineHeight:1.75,whiteSpace:"pre-wrap"}}>{msg.message}</p>}
+
+      {/* Body */}
+      <div style={{flex:1,display:"flex",overflow:"hidden"}}>
+        {/* Conversation list */}
+        {showList&&(
+          <div style={{width:isMobile?"100%":300,flexShrink:0,borderRight:isMobile?"none":`1px solid ${T.border}`,overflowY:"auto"}}>
+            {loading?(
+              <div style={{padding:40,textAlign:"center",color:T.textHint,fontSize:13}}>Loading…</div>
+            ):convs.length===0?(
+              <div style={{padding:"60px 24px",textAlign:"center"}}>
+                <div style={{fontSize:36,marginBottom:12}}>✉</div>
+                <p style={{margin:"0 0 6px",fontSize:14,color:T.textSub,fontWeight:500}}>No conversations yet</p>
+                <p style={{margin:0,fontSize:13,color:T.textHint}}>
+                  {isJudge?"Exhibitors who contact you through your profile will appear here.":"Visit a judge's profile and click Contact to start a conversation."}
+                </p>
+              </div>
+            ):convs.map(c=>{
+              const unread=myUnread(c);
+              const name=otherName(c);
+              const photo=otherPhoto(c);
+              return (
+                <div key={c.id} onClick={()=>setActiveId(c.id)}
+                  style={{padding:"14px 16px",cursor:"pointer",borderBottom:`1px solid ${T.border}`,
+                    background:activeId===c.id?T.accentLight:"transparent",
+                    borderLeft:`3px solid ${activeId===c.id?T.accent:"transparent"}`,
+                    transition:"background .15s"}}>
+                  <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                    {photo
+                      ?<img src={photo} style={{width:36,height:36,borderRadius:"50%",objectFit:"cover",flexShrink:0}} alt=""/>
+                      :<Avatar label={initials(name||"?")} size={36}/>}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:6,marginBottom:2}}>
+                        <span style={{fontWeight:unread>0?600:400,fontSize:14,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5}}>
+                          {unread>0&&<span style={{width:7,height:7,borderRadius:"50%",background:T.accent,flexShrink:0,display:"inline-block"}}/>}
+                          {name}
+                        </span>
+                        <span style={{fontSize:11,color:T.textHint,flexShrink:0}}>{fmtDate(c.lastMessageAt)}</span>
+                      </div>
+                      <p style={{margin:0,fontSize:12,color:T.textSub,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                        {c.lastMessageBy===(isJudge?"judge":"sender")?"You: ":""}{c.lastMessage}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Thread */}
+        {showThread&&(
+          <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
+            {!activeId?(
+              <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,color:T.textHint}}>
+                <div style={{fontSize:48,opacity:.35}}>💬</div>
+                <p style={{margin:0,fontSize:14,color:T.textSub}}>Select a conversation</p>
+              </div>
+            ):(
+              <>
+                {/* Thread header */}
+                {!isMobile&&activeConv&&(
+                  <div style={{padding:"12px 20px",borderBottom:`1px solid ${T.border}`,flexShrink:0,display:"flex",alignItems:"center",gap:10}}>
+                    {otherPhoto(activeConv)
+                      ?<img src={otherPhoto(activeConv)} style={{width:30,height:30,borderRadius:"50%",objectFit:"cover"}} alt=""/>
+                      :<Avatar label={initials(otherName(activeConv)||"?")} size={30}/>}
+                    <span style={{fontSize:15,fontWeight:500,color:T.text}}>{otherName(activeConv)}</span>
+                  </div>
+                )}
+                {/* Messages */}
+                <div style={{flex:1,overflowY:"auto",padding:"20px 20px 8px",display:"flex",flexDirection:"column",gap:2}}>
+                  {msgsLoading?(
+                    <div style={{textAlign:"center",color:T.textHint,fontSize:13,padding:20}}>Loading…</div>
+                  ):msgs.map(m=>{
+                    const mine=m.fromUid===user.uid;
+                    return (
+                      <div key={m.id} style={{display:"flex",flexDirection:"column",alignItems:mine?"flex-end":"flex-start",marginBottom:8}}>
+                        {!mine&&<span style={{fontSize:11,color:T.textHint,marginBottom:3,paddingLeft:2}}>{m.fromName}</span>}
+                        <div style={{
+                          maxWidth:"70%",padding:"10px 14px",
+                          borderRadius:mine?"18px 18px 4px 18px":"18px 18px 18px 4px",
+                          background:mine?T.accent:T.surface,
+                          color:mine?"#fff":T.text,
+                          fontSize:14,lineHeight:1.6,boxShadow:T.shadow,
+                        }}>{m.text}</div>
+                        <span style={{fontSize:11,color:T.textHint,marginTop:3}}>{fmtDate(m.sentAt)}</span>
+                      </div>
+                    );
+                  })}
+                  <div ref={bottomRef}/>
+                </div>
+                {/* Reply input */}
+                <div style={{padding:"10px 16px",borderTop:`1px solid ${T.border}`,display:"flex",gap:8,alignItems:"flex-end",flexShrink:0,background:T.bg}}>
+                  <textarea value={replyText} onChange={e=>setReplyText(e.target.value)}
+                    onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}}}
+                    placeholder="Type a message… Enter to send, Shift+Enter for new line"
+                    rows={2}
+                    style={{flex:1,padding:"10px 14px",border:`1.5px solid ${T.border}`,borderRadius:T.r,fontSize:14,fontFamily:"inherit",resize:"none",outline:"none",color:T.text,background:T.bg,lineHeight:1.5}}
+                    onFocus={e=>e.target.style.borderColor=T.accent}
+                    onBlur={e=>e.target.style.borderColor=T.border}/>
+                  <button onClick={send} disabled={sending||!replyText.trim()}
+                    style={{padding:"10px 18px",borderRadius:100,background:T.accent,color:"#fff",border:"none",
+                      cursor:sending||!replyText.trim()?"not-allowed":"pointer",
+                      fontSize:14,fontWeight:500,fontFamily:"inherit",
+                      opacity:sending||!replyText.trim()?0.5:1,flexShrink:0,transition:"opacity .15s"}}>
+                    Send
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-function InboxRoute({user}) {
-  const navigate=useNavigate();
-  const [msgs,setMsgs]=useState([]);
-  const [loading,setLoading]=useState(true);
-  const [selected,setSelected]=useState(null);
+// ── Judge Dashboard ────────────────────────────────────────────────────────────
+function JudgeDashboard({user, judge, reviews, unreadMsgCount, onEditProfile, onNavigate}) {
+  const navigate = useNavigate();
+  const myReviews = reviews.filter(r=>r.judgeId===judge?.id)
+    .sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3);
+  const overallAvg = judge && myReviews.length
+    ? (myReviews.reduce((s,r)=>s+(r.overall||0),0)/myReviews.length).toFixed(1)
+    : null;
 
-  useEffect(()=>{
-    if(!user?.judgeId) return;
-    (async()=>{
-      const {db}=await import("./firebase");
-      const {collection,query,where,getDocs}=await import("firebase/firestore");
-      const snap=await getDocs(query(collection(db,"messages"),where("judgeId","==",user.judgeId)));
-      setMsgs(snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.sentAt.localeCompare(a.sentAt)));
-      setLoading(false);
-    })();
-  },[user]);
+  const Card = ({children, style:s}) => (
+    <div style={{background:T.surface,borderRadius:T.r,padding:"20px 22px",border:`1px solid ${T.border}`,...s}}>
+      {children}
+    </div>
+  );
 
-  const open=async msg=>{
-    setSelected(s=>s===msg.id?null:msg.id);
-    if(!msg.read){
-      setMsgs(mm=>mm.map(m=>m.id===msg.id?{...m,read:true}:m));
-      const {db}=await import("./firebase");
-      const {doc,updateDoc}=await import("firebase/firestore");
-      await updateDoc(doc(db,"messages",msg.id),{read:true});
-    }
-  };
-
-  if(!user||user.role!=="judge") return <Navigate to="/"/>;
-  const unread=msgs.filter(m=>!m.read).length;
+  const SectionHd = ({children, action}) => (
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+      <span style={{fontSize:11,fontWeight:700,color:T.textHint,textTransform:"uppercase",letterSpacing:1}}>{children}</span>
+      {action}
+    </div>
+  );
 
   return (
-    <div style={{minHeight:"100vh",background:T.bg}}>
-      <div style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"10px 20px",display:"flex",alignItems:"center",gap:8,position:"sticky",top:0,zIndex:100}}>
-        <button onClick={()=>navigate(-1)}
-          style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",cursor:"pointer",color:T.textSub,fontSize:14,fontWeight:500,padding:"7px 12px",borderRadius:100,fontFamily:"inherit"}}>
-          ← Back
-        </button>
+    <div style={{maxWidth:900,margin:"0 auto",padding:"36px 20px"}}>
+      {/* Welcome */}
+      <div style={{marginBottom:28}}>
+        <h1 style={{margin:"0 0 4px",fontSize:28,fontWeight:400,color:T.text,letterSpacing:-0.5}}>
+          Welcome back, {user.name.split(" ")[0]}
+        </h1>
+        <p style={{margin:0,fontSize:14,color:T.textSub}}>Here's your judge.dog overview</p>
       </div>
-      <div style={{maxWidth:700,margin:"0 auto",padding:"32px 20px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:28}}>
-          <h1 style={{margin:0,fontSize:24,fontWeight:400,color:T.text,letterSpacing:-0.4}}>Messages</h1>
-          {unread>0&&<span style={{fontSize:12,fontWeight:600,color:"#fff",background:T.accent,padding:"2px 9px",borderRadius:100}}>{unread} unread</span>}
-        </div>
-        {loading?(
-          <div style={{textAlign:"center",padding:"60px 0",color:T.textHint,fontSize:14}}>Loading…</div>
-        ):msgs.length===0?(
-          <div style={{textAlign:"center",padding:"60px 0"}}>
-            <div style={{fontSize:40,marginBottom:12}}>✉</div>
-            <p style={{color:T.textSub,fontSize:15,margin:0}}>No messages yet</p>
-            <p style={{color:T.textHint,fontSize:13,margin:"8px 0 0"}}>When exhibitors or organizers contact you, messages will appear here.</p>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
+
+        {/* Profile card */}
+        <Card>
+          <SectionHd action={
+            <button onClick={onEditProfile}
+              style={{fontSize:12,color:T.accent,background:"none",border:"none",cursor:"pointer",fontWeight:500,padding:0,fontFamily:"inherit"}}>
+              Edit profile
+            </button>
+          }>My profile</SectionHd>
+          {judge ? (
+            <>
+              <div style={{display:"flex",gap:14,alignItems:"center",marginBottom:14}}>
+                <Avatar label={judge.photo} photoUrl={judge.profilePhoto} size={52}/>
+                <div>
+                  <div style={{fontSize:16,fontWeight:500,color:T.text,marginBottom:2}}>{judge.name}</div>
+                  {judge.headline&&<div style={{fontSize:13,color:T.textSub,fontStyle:"italic"}}>{judge.headline}</div>}
+                  {!judge.headline&&<div style={{fontSize:13,color:T.textHint,fontStyle:"italic"}}>No headline yet</div>}
+                </div>
+              </div>
+              <div style={{display:"flex",gap:16,marginBottom:16}}>
+                {overallAvg&&<div style={{textAlign:"center"}}>
+                  <div style={{fontSize:22,fontWeight:500,color:T.text}}>{overallAvg}</div>
+                  <div style={{fontSize:11,color:T.textHint}}>avg rating</div>
+                </div>}
+                <div style={{textAlign:"center"}}>
+                  <div style={{fontSize:22,fontWeight:500,color:T.text}}>{myReviews.length}</div>
+                  <div style={{fontSize:11,color:T.textHint}}>reviews</div>
+                </div>
+                {judge.galleryPhotos?.length>0&&<div style={{textAlign:"center"}}>
+                  <div style={{fontSize:22,fontWeight:500,color:T.text}}>{judge.galleryPhotos.length}</div>
+                  <div style={{fontSize:11,color:T.textHint}}>gallery photos</div>
+                </div>}
+              </div>
+              <Btn small onClick={()=>navigate(`/judge/${judge.slug||judge.id}`)}>View my profile</Btn>
+            </>
+          ):(
+            <p style={{fontSize:13,color:T.textHint,margin:0}}>Profile not found — contact support.</p>
+          )}
+        </Card>
+
+        {/* Messages card */}
+        <Card style={{cursor:"pointer"}} onClick={()=>navigate("/messages")}>
+          <SectionHd action={
+            <span style={{fontSize:12,color:T.accent,fontWeight:500}}>View all →</span>
+          }>Messages</SectionHd>
+          {unreadMsgCount>0?(
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+              <span style={{fontSize:28,fontWeight:300,color:T.accent}}>{unreadMsgCount}</span>
+              <span style={{fontSize:13,color:T.textSub}}>unread message{unreadMsgCount!==1?"s":""}</span>
+            </div>
+          ):(
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
+              <span style={{fontSize:28,fontWeight:300,color:T.textHint}}>0</span>
+              <span style={{fontSize:13,color:T.textHint}}>unread messages</span>
+            </div>
+          )}
+          <div style={{fontSize:13,color:T.textSub,lineHeight:1.6}}>
+            Exhibitors and organizers can contact you through your profile page.
           </div>
-        ):msgs.map(m=><MessageCard key={m.id} msg={m} selected={selected===m.id} onSelect={()=>open(m)}/>)}
+        </Card>
       </div>
+
+      {/* Recent reviews */}
+      {myReviews.length>0&&(
+        <Card>
+          <SectionHd action={
+            <button onClick={()=>navigate(`/judge/${judge?.slug||judge?.id}`)}
+              style={{fontSize:12,color:T.accent,background:"none",border:"none",cursor:"pointer",fontWeight:500,padding:0,fontFamily:"inherit"}}>
+              See all →
+            </button>
+          }>Recent reviews</SectionHd>
+          {myReviews.map((r,i)=>(
+            <div key={r.id} style={{padding:"12px 0",borderTop:i>0?`1px solid ${T.border}`:"none"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
+                <div>
+                  <span style={{fontSize:14,fontWeight:500,color:T.text}}>{r.userName}</span>
+                  <span style={{fontSize:12,color:T.textHint,marginLeft:10}}>{r.breed} · {r.show}</span>
+                </div>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+                  <Stars val={r.overall} size={12}/>
+                  <span style={{fontSize:12,color:T.textHint}}>{fmtDate(r.date)}</span>
+                </div>
+              </div>
+              <p style={{margin:0,fontSize:13,color:T.textSub,lineHeight:1.6,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>
+                {r.text}
+              </p>
+            </div>
+          ))}
+        </Card>
+      )}
+
+      {myReviews.length===0&&(
+        <Card style={{textAlign:"center",padding:"40px 22px"}}>
+          <div style={{fontSize:36,marginBottom:12}}>★</div>
+          <p style={{margin:"0 0 6px",fontSize:15,color:T.text,fontWeight:500}}>No reviews yet</p>
+          <p style={{margin:0,fontSize:13,color:T.textHint}}>Share your profile link so exhibitors can leave reviews after shows.</p>
+        </Card>
+      )}
     </div>
   );
 }
@@ -1623,13 +1983,26 @@ export default function App() {
   useEffect(()=>{ setMobileMenuOpen(false); },[location.pathname]);
 
   useEffect(()=>{
-    if(!user?.judgeId) return;
+    if(!user){setUnreadMsgCount(0);return;}
+    const isJudge=user.role==="judge"&&user.judgeId;
+    let unsub;
     (async()=>{
-      const {db}=await import("./firebase");
-      const {collection,query,where,getDocs}=await import("firebase/firestore");
-      const snap=await getDocs(query(collection(db,"messages"),where("judgeId","==",user.judgeId),where("read","==",false)));
-      setUnreadMsgCount(snap.size);
+      try {
+        const {db}=await import("./firebase");
+        const {collection,query,where,onSnapshot}=await import("firebase/firestore");
+        const q=isJudge
+          ? query(collection(db,"conversations"),where("judgeId","==",user.judgeId))
+          : query(collection(db,"conversations"),where("senderUid","==",user.uid));
+        unsub=onSnapshot(q,snap=>{
+          const total=snap.docs.reduce((s,d)=>{
+            const data=d.data();
+            return s+(isJudge?(data.unreadForJudge||0):(data.unreadForSender||0));
+          },0);
+          setUnreadMsgCount(total);
+        },()=>{});
+      } catch(e){}
     })();
+    return()=>{if(unsub)unsub();};
   },[user]);
 
   const saveJudges=async jj=>{
@@ -1758,13 +2131,11 @@ export default function App() {
           <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0,minWidth:140,justifyContent:"flex-end"}}>
             {user?(
               <>
-                {user?.role==="judge"&&(
-                  <button onClick={()=>navigate("/inbox")} title="Messages"
-                    style={{position:"relative",background:"none",border:"none",cursor:"pointer",padding:"6px 10px",borderRadius:100,color:T.textSub,fontSize:22,display:"flex",alignItems:"center",lineHeight:1}}>
-                    ✉
-                    {unreadMsgCount>0&&<span style={{position:"absolute",top:2,right:4,width:16,height:16,background:T.red,borderRadius:"50%",fontSize:10,fontWeight:700,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{unreadMsgCount}</span>}
-                  </button>
-                )}
+                <button onClick={()=>navigate("/messages")} title="Messages"
+                  style={{position:"relative",background:"none",border:"none",cursor:"pointer",padding:"6px 10px",borderRadius:100,color:T.textSub,fontSize:22,display:"flex",alignItems:"center",lineHeight:1}}>
+                  ✉
+                  {unreadMsgCount>0&&<span style={{position:"absolute",top:2,right:4,width:16,height:16,background:T.red,borderRadius:"50%",fontSize:10,fontWeight:700,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{unreadMsgCount}</span>}
+                </button>
                 <div style={{display:"flex",alignItems:"center",gap:8,padding:"5px 12px 5px 6px",borderRadius:100,background:T.surface,border:`1px solid ${T.border}`}}>
                   {user.photo
                     ?<img src={user.photo} style={{width:26,height:26,borderRadius:"50%",objectFit:"cover"}} alt=""/>
@@ -1809,7 +2180,7 @@ export default function App() {
                 <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
                   <Btn onClick={()=>{logout();setMobileMenuOpen(false);}} variant="outlined" small>Sign out</Btn>
                   {user.role==="admin"&&<Btn onClick={()=>{navigate("/admin");setMobileMenuOpen(false);}} variant="tonal" small>⚙ Admin</Btn>}
-                  {user?.role==="judge"&&<Btn onClick={()=>{navigate("/inbox");setMobileMenuOpen(false);}} variant="outlined" small>✉ Messages{unreadMsgCount>0?` (${unreadMsgCount})`:""}</Btn>}
+                  <Btn onClick={()=>{navigate("/messages");setMobileMenuOpen(false);}} variant="outlined" small>✉ Messages{unreadMsgCount>0?` (${unreadMsgCount})`:""}</Btn>
                 </div>
               </>
             ):(
@@ -1820,7 +2191,15 @@ export default function App() {
       )}
 
       <Routes>
-        <Route path="/" element={
+        <Route path="/" element={user?.role==="judge"
+          ? <JudgeDashboard
+              user={user}
+              judge={judges.find(j=>j.id===user.judgeId)}
+              reviews={reviews}
+              unreadMsgCount={unreadMsgCount}
+              onEditProfile={()=>navigate(`/judge/${judges.find(j=>j.id===user.judgeId)?.slug||user.judgeId}`)}
+            />
+          : (
           <div style={{maxWidth:1040,margin:"0 auto",padding:"44px 20px"}}>
             <div style={{textAlign:"center",marginBottom:44}}>
               <h1 style={{fontSize:42,fontWeight:300,color:T.text,margin:"0 0 14px",letterSpacing:-1.2,lineHeight:1.15,fontFamily:"'Google Sans',sans-serif"}}>
@@ -1865,14 +2244,14 @@ export default function App() {
               </div>
             )}
           </div>
-        }/>
+          )}/>
         <Route path="/judge/:slug" element={
           <JudgeRoute judges={judges} reviews={reviews} user={user}
             addReview={addReview} addBooking={addBooking}
             claimJudge={claimJudge} editProfile={editProfile} saveReply={saveReply}
             onRequestAuth={()=>setModal("auth")}/>
         }/>
-        <Route path="/inbox" element={<InboxRoute user={user}/>}/>
+        <Route path="/messages" element={<MessagesRoute user={user}/>}/>
         <Route path="/admin" element={
           <AdminRoute judges={judges} reviews={reviews} bookings={bookings} user={user}
             saveJudges={saveJudges} saveReviews={saveReviews}/>
