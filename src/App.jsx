@@ -1127,7 +1127,7 @@ function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editPro
   const {slug}=useParams();
   const navigate=useNavigate();
   const [modal,setModal]=useState(null);
-  const judge=judges.find(j=>j.slug===slug)||judges.find(j=>j.id===slug);
+  const judge=judges.find(j=>j.slug===slug);
 
   if(!judge) return (
     <div style={{minHeight:"60vh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:12,color:T.textHint}}>
