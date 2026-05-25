@@ -1280,7 +1280,7 @@ export default function App() {
       <ScrollToTop/>
 
       {/* Nav */}
-      <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64,position:"sticky",top:0,zIndex:200}}>
+      <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:isMobile?"0 12px":"0 20px",display:"flex",alignItems:"center",gap:isMobile?8:0,justifyContent:"space-between",height:64,position:"sticky",top:0,zIndex:200}}>
         {/* Brand */}
         <div style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",flexShrink:0}} onClick={()=>navigate("/")}>
           <svg width="51" height="51" viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
@@ -1299,6 +1299,18 @@ export default function App() {
             judge<span style={{color:T.accent,fontWeight:400}}>.dog</span>
           </span>}
         </div>
+
+        {/* Mobile: inline search bar — always visible, fills available space */}
+        {isMobile&&(
+          <div style={{flex:1,position:"relative",minWidth:0}}>
+            <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",fontSize:13,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
+            <input value={search} onChange={e=>{setSearch(e.target.value);navigate("/");}}
+              placeholder="Search…"
+              style={{width:"100%",padding:"8px 10px 8px 30px",border:`1.5px solid ${T.border}`,borderRadius:100,fontSize:13,background:T.surface,outline:"none",color:T.text,boxSizing:"border-box"}}
+              onFocus={e=>{e.target.style.borderColor=T.accent;e.target.placeholder="Search judges, breeds, countries…";}}
+              onBlur={e=>{e.target.style.borderColor=T.border;e.target.placeholder="Search…";}}/>
+          </div>
+        )}
 
         {/* Desktop: centered search */}
         {!isMobile&&(
@@ -1337,30 +1349,21 @@ export default function App() {
         {/* Mobile: hamburger */}
         {isMobile&&(
           <button onClick={()=>setMobileMenuOpen(o=>!o)}
-            style={{background:"none",border:"none",cursor:"pointer",padding:"10px",color:T.text,fontSize:22,lineHeight:1,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8}}>
+            style={{background:"none",border:"none",cursor:"pointer",padding:"8px",color:T.text,fontSize:22,lineHeight:1,display:"flex",alignItems:"center",justifyContent:"center",borderRadius:8,flexShrink:0}}>
             {mobileMenuOpen?"✕":"☰"}
           </button>
         )}
       </nav>
 
-      {/* Mobile dropdown menu */}
+      {/* Mobile dropdown — user controls only (search is in the nav) */}
       {isMobile&&mobileMenuOpen&&(
         <>
           <div onClick={()=>setMobileMenuOpen(false)}
             style={{position:"fixed",inset:0,top:64,background:"rgba(0,0,0,.25)",zIndex:198}}/>
           <div style={{position:"fixed",top:64,left:0,right:0,background:T.bg,zIndex:199,padding:"16px 20px 20px",borderBottom:`1px solid ${T.border}`,boxShadow:T.shadowMd}}>
-            <div style={{position:"relative",marginBottom:16}}>
-              <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
-              <input value={search} autoFocus
-                onChange={e=>{setSearch(e.target.value);navigate("/");setMobileMenuOpen(false);}}
-                placeholder="Search judges, breeds, countries…"
-                style={{width:"100%",padding:"11px 14px 11px 36px",border:`1.5px solid ${T.border}`,borderRadius:100,fontSize:14,background:T.surface,outline:"none",color:T.text,boxSizing:"border-box"}}
-                onFocus={e=>e.target.style.borderColor=T.accent}
-                onBlur={e=>e.target.style.borderColor=T.border}/>
-            </div>
             {user?(
               <>
-                <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderTop:`1px solid ${T.border}`,marginTop:4}}>
+                <div style={{display:"flex",alignItems:"center",gap:12,paddingBottom:12,borderBottom:`1px solid ${T.border}`,marginBottom:12}}>
                   {user.photo
                     ?<img src={user.photo} style={{width:38,height:38,borderRadius:"50%",objectFit:"cover",flexShrink:0}} alt=""/>
                     :<Avatar label={initials(user.name)} size={38}/>}
@@ -1369,7 +1372,7 @@ export default function App() {
                     <p style={{margin:0,fontSize:12,color:T.textHint,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.email}</p>
                   </div>
                 </div>
-                <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:4}}>
+                <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
                   <Btn onClick={()=>{logout();setMobileMenuOpen(false);}} variant="outlined" small>Sign out</Btn>
                   {user.role==="admin"&&<Btn onClick={()=>{navigate("/admin");setMobileMenuOpen(false);}} variant="tonal" small>⚙ Admin</Btn>}
                 </div>
