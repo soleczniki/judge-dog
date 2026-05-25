@@ -609,7 +609,7 @@ function EditProfileModal({judge,onClose,onSave}) {
       <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Profile photo</p>
       <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:22}}>
         <Avatar label={judge.photo} photoUrl={photoPreview} size={72}/>
-        <label style={{cursor:"pointer",padding:"8px 18px",borderRadius:100,border:`1px solid ${T.border}`,background:T.surface,fontSize:13,fontWeight:500,color:T.text,fontFamily:"inherit"}}>
+        <label onClick={e=>e.stopPropagation()} style={{cursor:"pointer",padding:"8px 18px",borderRadius:100,border:`1px solid ${T.border}`,background:T.surface,fontSize:13,fontWeight:500,color:T.text,fontFamily:"inherit"}}>
           Upload photo
           <input type="file" accept="image/*" style={{display:"none"}} onChange={e=>{const f=e.target.files[0];if(f){setPhotoFile(f);setPhotoPreview(URL.createObjectURL(f));setDirty(true);}}}/>
         </label>
@@ -661,9 +661,12 @@ function EditProfileModal({judge,onClose,onSave}) {
           </div>
         ))}
         {gallery.length<8&&(
-          <label style={{aspectRatio:"1",borderRadius:T.rsm,border:`2px dashed ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:24,color:T.textHint,background:T.surface}}>
-            {galleryBusy?"…":"+"}
-            <input type="file" accept="image/*" multiple style={{display:"none"}} onChange={handleGalleryAdd}/>
+          <label onClick={e=>e.stopPropagation()} style={{aspectRatio:"1",borderRadius:T.rsm,border:`2px dashed ${galleryBusy?T.accent:T.border}`,display:"flex",alignItems:"center",justifyContent:"center",cursor:galleryBusy?"default":"pointer",background:T.surface,position:"relative"}}>
+            {galleryBusy
+              ? <div style={{width:24,height:24,border:`3px solid ${T.border}`,borderTopColor:T.accent,borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
+              : <span style={{fontSize:24,color:T.textHint}}>+</span>
+            }
+            {!galleryBusy&&<input type="file" accept="image/*" multiple style={{display:"none"}} onChange={handleGalleryAdd}/>}
           </label>
         )}
       </div>
@@ -1605,6 +1608,7 @@ export default function App() {
         *{box-sizing:border-box;} body{margin:0;background:${T.bg};font-family:'Google Sans Text','Segoe UI',system-ui,sans-serif;color:${T.text};-webkit-font-smoothing:antialiased;}
         input,textarea,button,select{font-family:inherit;}
         ::-webkit-scrollbar{width:6px;} ::-webkit-scrollbar-track{background:${T.surface};} ::-webkit-scrollbar-thumb{background:${T.border};border-radius:3px;}
+        @keyframes spin{to{transform:rotate(360deg);}}
         select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235f6368'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px!important;}
       `}</style>
 
