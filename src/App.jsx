@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from "react-router-dom";
 import { signInWithGoogle, firebaseSignOut, onAuthChange } from "./firebase";
 
 const ORGS = {
@@ -820,17 +821,73 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
   );
 }
 
+// ── Scroll restoration ─────────────────────────────────────────────────────────
+function ScrollToTop() {
+  const {pathname}=useLocation();
+  useEffect(()=>{ window.scrollTo(0,0); },[pathname]);
+  return null;
+}
+
+// ── Judge Route ────────────────────────────────────────────────────────────────
+function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editProfile,saveReply,onRequestAuth}) {
+  const {id}=useParams();
+  const navigate=useNavigate();
+  const [modal,setModal]=useState(null);
+  const judge=judges.find(j=>j.id===id);
+
+  if(!judge) return (
+    <div style={{minHeight:"60vh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:12,color:T.textHint}}>
+      <div style={{fontSize:36}}>🔍</div>
+      <p style={{fontSize:15,color:T.textSub,margin:0}}>Judge not found.</p>
+    </div>
+  );
+
+  return (
+    <>
+      <JudgePage judge={judge} reviews={reviews} user={user}
+        onBack={()=>navigate(-1)}
+        onReview={()=>{if(!user){onRequestAuth();}else{setModal("review");}}}
+        onBook={()=>setModal("booking")}
+        onClaim={()=>setModal("claim")}
+        onEditProfile={()=>setModal("editProfile")}
+        onSaveReply={saveReply}/>
+      {modal==="review"&&user&&<ReviewModal judge={judge} user={user} onClose={()=>setModal(null)} onSubmit={addReview}/>}
+      {modal==="booking"&&user&&<BookingModal judge={judge} user={user} onClose={()=>setModal(null)} onSubmit={addBooking}/>}
+      {modal==="claim"&&user&&<ClaimModal judge={judge} user={user} onClose={()=>setModal(null)} onClaim={()=>claimJudge(judge.id)}/>}
+      {modal==="editProfile"&&<EditProfileModal judge={judge} onClose={()=>setModal(null)} onSave={editProfile}/>}
+    </>
+  );
+}
+
+// ── Admin Route ────────────────────────────────────────────────────────────────
+function AdminRoute({judges,reviews,bookings,user,saveJudges,saveReviews}) {
+  const navigate=useNavigate();
+  if(!user||user.role!=="admin") return <Navigate to="/"/>;
+  return (
+    <AdminDashboard
+      judges={judges} reviews={reviews} bookings={bookings} user={user}
+      onBack={()=>navigate("/")}
+      onRemoveReview={async(rid)=>{
+        if(!window.confirm("Remove this review?")) return;
+        await saveReviews(reviews.filter(r=>r.id!==rid));
+      }}
+      onVerifyJudge={async(jid,approve)=>{
+        await saveJudges(judges.map(j=>j.id===jid?{...j,verified:approve,claimedBy:approve?j.claimedBy:null}:j));
+      }}
+    />
+  );
+}
+
 // ── Main App ───────────────────────────────────────────────────────────────────
 export default function App() {
   const [judges,setJudges]=useState([]); const [reviews,setReviews]=useState([]);
   const [bookings,setBookings]=useState([]); const [user,setUser]=useState(null);
-  const [loading,setLoading]=useState(true); const [view,setView]=useState("list");
-  const [selectedJudge,setSelectedJudge]=useState(null); const [modal,setModal]=useState(null);
+  const [loading,setLoading]=useState(true); const [modal,setModal]=useState(null);
   const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all");
+  const navigate=useNavigate();
 
   useEffect(()=>{
     (async()=>{
-      // Load judges from Firestore
       try {
         const {db} = await import("./firebase");
         const {collection, getDocs} = await import("firebase/firestore");
@@ -839,12 +896,9 @@ export default function App() {
         setJudges(firestoreJudges);
       } catch(e) {
         console.error("Failed to load judges from Firestore:", e);
-        // Fallback to local storage
         const sj = await sGet(K.judges,SEED_JUDGES);
         setJudges(sj);
       }
-
-      // Load reviews and bookings from local storage
       const sr=await sGet(K.reviews,null);
       const sb=await sGet(K.bookings,null);
       if(!sr){await sSet(K.reviews,SEED_REVIEWS);setReviews(SEED_REVIEWS);}else setReviews(sr);
@@ -857,13 +911,10 @@ export default function App() {
 
   const saveJudges=async jj=>{
     setJudges(jj);
-    // Also update in Firestore
     try {
       const {db} = await import("./firebase");
       const {doc,setDoc} = await import("firebase/firestore");
-      for(const j of jj) {
-        await setDoc(doc(db,"judges",j.id),j);
-      }
+      for(const j of jj) await setDoc(doc(db,"judges",j.id),j);
     } catch(e){ console.error("Failed to save judges:", e); }
   };
   const saveReviews=async rr=>{setReviews(rr);await sSet(K.reviews,rr);};
@@ -871,20 +922,17 @@ export default function App() {
   const addReview=useCallback(async r=>{const u=[...reviews,r];await saveReviews(u);},[reviews]);
   const addBooking=useCallback(async b=>{const u=[...bookings,b];await saveBookings(u);},[bookings]);
 
-  const claimJudge=useCallback(async()=>{
-    if(!selectedJudge||!user) return;
-    const u=judges.map(j=>j.id===selectedJudge.id?{...j,verified:true,claimedBy:user.email}:j);
-    await saveJudges(u); setSelectedJudge(u.find(j=>j.id===selectedJudge.id));
-  },[judges,selectedJudge,user]);
+  const claimJudge=useCallback(async(judgeId)=>{
+    if(!judgeId||!user) return;
+    await saveJudges(judges.map(j=>j.id===judgeId?{...j,verified:true,claimedBy:user.email}:j));
+  },[judges,user]);
 
   const editProfile=useCallback(async upd=>{
-    const u=judges.map(j=>j.id===upd.id?upd:j);
-    await saveJudges(u); setSelectedJudge(upd);
+    await saveJudges(judges.map(j=>j.id===upd.id?upd:j));
   },[judges]);
 
   const saveReply=useCallback(async(rid,text)=>{
-    const u=reviews.map(r=>r.id===rid?{...r,reply:text}:r);
-    await saveReviews(u);
+    await saveReviews(reviews.map(r=>r.id===rid?{...r,reply:text}:r));
   },[reviews]);
 
   const logout=async()=>{await firebaseSignOut();setUser(null);};
@@ -904,8 +952,6 @@ export default function App() {
 
   if(loading) return <div style={{minHeight:"100vh",background:T.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:T.textHint}}>Loading…</div>;
 
-  const openJudge=j=>{setSelectedJudge(j);setView("judge");window.scrollTo(0,0);};
-
   return (
     <>
       <style>{`
@@ -916,9 +962,11 @@ export default function App() {
         select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235f6368'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px!important;}
       `}</style>
 
+      <ScrollToTop/>
+
       {/* Nav */}
       <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"0 20px",display:"flex",alignItems:"center",justifyContent:"space-between",height:64,position:"sticky",top:0,zIndex:200}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onClick={()=>{setView("list");setSelectedJudge(null);}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onClick={()=>navigate("/")}>
           <svg width="38" height="38" viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
             <circle cx="0"     cy="-28"  r="10" fill="#1a73e8" opacity="0.25"/>
             <circle cx="19.8"  cy="-19.8" r="10" fill="#1a73e8" opacity="0.25"/>
@@ -943,7 +991,7 @@ export default function App() {
                 <span style={{fontSize:13,color:T.textSub,fontWeight:500}}>{user.name.split(" ")[0]}</span>
               </div>
               <Btn onClick={logout} variant="outlined" small>Sign out</Btn>
-              {user.role==="admin"&&<Btn onClick={()=>setView("admin")} variant="tonal" small>⚙ Admin</Btn>}
+              {user.role==="admin"&&<Btn onClick={()=>navigate("/admin")} variant="tonal" small>⚙ Admin</Btn>}
             </>
           ):(
             <Btn onClick={()=>setModal("auth")}>Sign in</Btn>
@@ -951,87 +999,74 @@ export default function App() {
         </div>
       </nav>
 
-      {view==="admin"&&user?.role==="admin"?(
-        <AdminDashboard
-          judges={judges} reviews={reviews} bookings={bookings} user={user}
-          onBack={()=>setView("list")}
-          onRemoveReview={async(rid)=>{
-            if(!window.confirm("Remove this review?")) return;
-            const u=reviews.filter(r=>r.id!==rid);
-            await saveReviews(u);
-          }}
-          onVerifyJudge={async(jid,approve)=>{
-            const u=judges.map(j=>j.id===jid?{...j,verified:approve,claimedBy:approve?j.claimedBy:null}:j);
-            await saveJudges(u);
-          }}
-        />
-      ):view==="judge"&&selectedJudge ? (
-        <JudgePage judge={selectedJudge} reviews={reviews} user={user}
-          onBack={()=>{setView("list");setSelectedJudge(null);}}
-          onReview={()=>{if(!user){setModal("auth");}else{setModal("review");}}}
-          onBook={()=>setModal("booking")}
-          onClaim={()=>setModal("claim")}
-          onEditProfile={()=>setModal("editProfile")}
-          onSaveReply={saveReply}/>
-      ):(
-        <div style={{maxWidth:1040,margin:"0 auto",padding:"44px 20px"}}>
-          <div style={{textAlign:"center",marginBottom:44}}>
-            <h1 style={{fontSize:42,fontWeight:300,color:T.text,margin:"0 0 14px",letterSpacing:-1.2,lineHeight:1.15,fontFamily:"'Google Sans',sans-serif"}}>
-              Know your judge<br/><span style={{fontWeight:500}}>before you enter.</span>
-            </h1>
-            <p style={{color:T.textSub,fontSize:16,maxWidth:420,margin:"0 auto",lineHeight:1.6,fontWeight:300}}>
-              Real reviews from exhibitors worldwide. Verified judge profiles across FCI, AKC, KC and more.
-            </p>
-          </div>
-
-          <div style={{maxWidth:720,margin:"0 auto 28px",display:"flex",gap:8,flexWrap:"wrap"}}>
-            <div style={{flex:1,minWidth:220,position:"relative"}}>
-              <span style={{position:"absolute",left:16,top:"50%",transform:"translateY(-50%)",fontSize:16,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
-              <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search judges, breeds, countries…"
-                style={{width:"100%",padding:"12px 16px 12px 42px",border:`1.5px solid ${T.border}`,borderRadius:100,fontSize:14,background:T.bg,outline:"none",color:T.text,boxSizing:"border-box",transition:"border-color .15s, box-shadow .15s"}}
-                onFocus={e=>{e.target.style.borderColor=T.accent;e.target.style.boxShadow=`0 0 0 3px ${T.accentLight}`;}}
-                onBlur={e=>{e.target.style.borderColor=T.border;e.target.style.boxShadow="none";}}/>
+      <Routes>
+        <Route path="/" element={
+          <div style={{maxWidth:1040,margin:"0 auto",padding:"44px 20px"}}>
+            <div style={{textAlign:"center",marginBottom:44}}>
+              <h1 style={{fontSize:42,fontWeight:300,color:T.text,margin:"0 0 14px",letterSpacing:-1.2,lineHeight:1.15,fontFamily:"'Google Sans',sans-serif"}}>
+                Know your judge<br/><span style={{fontWeight:500}}>before you enter.</span>
+              </h1>
+              <p style={{color:T.textSub,fontSize:16,maxWidth:420,margin:"0 auto",lineHeight:1.6,fontWeight:300}}>
+                Real reviews from exhibitors worldwide. Verified judge profiles across FCI, AKC, KC and more.
+              </p>
             </div>
-            <select value={orgFilter} onChange={e=>setOrgFilter(e.target.value)}
-              style={{padding:"12px 14px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:13,color:T.textSub,cursor:"pointer",outline:"none",minWidth:120}}>
-              <option value="all">All orgs</option>
-              {Object.keys(ORGS).map(o=><option key={o} value={o}>{o}</option>)}
-            </select>
-            <select value={sort} onChange={e=>setSort(e.target.value)}
-              style={{padding:"12px 14px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:13,color:T.textSub,cursor:"pointer",outline:"none",minWidth:150}}>
-              <option value="name">Sort: Name</option>
-              <option value="rating">Sort: Top rated</option>
-              <option value="reviews">Sort: Most reviewed</option>
-            </select>
-          </div>
 
-          <div style={{display:"flex",marginBottom:28,background:T.surface,borderRadius:T.r,border:`1px solid ${T.border}`,overflow:"hidden"}}>
-            {[["Judges",judges.length],["Reviews",reviews.length],["Organisations",Object.keys(ORGS).length],["Countries",[...new Set(judges.map(j=>j.country))].length]].map(([l,v],i,arr)=>(
-              <div key={l} style={{flex:1,padding:"14px 20px",borderRight:i<arr.length-1?`1px solid ${T.border}`:"none",textAlign:"center"}}>
-                <div style={{fontSize:22,fontWeight:500,color:T.text,marginBottom:2,fontFamily:"'Google Sans',sans-serif"}}>{v}</div>
-                <div style={{fontSize:12,color:T.textHint}}>{l}</div>
+            <div style={{maxWidth:720,margin:"0 auto 28px",display:"flex",gap:8,flexWrap:"wrap"}}>
+              <div style={{flex:1,minWidth:220,position:"relative"}}>
+                <span style={{position:"absolute",left:16,top:"50%",transform:"translateY(-50%)",fontSize:16,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
+                <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search judges, breeds, countries…"
+                  style={{width:"100%",padding:"12px 16px 12px 42px",border:`1.5px solid ${T.border}`,borderRadius:100,fontSize:14,background:T.bg,outline:"none",color:T.text,boxSizing:"border-box",transition:"border-color .15s, box-shadow .15s"}}
+                  onFocus={e=>{e.target.style.borderColor=T.accent;e.target.style.boxShadow=`0 0 0 3px ${T.accentLight}`;}}
+                  onBlur={e=>{e.target.style.borderColor=T.border;e.target.style.boxShadow="none";}}/>
               </div>
-            ))}
-          </div>
+              <select value={orgFilter} onChange={e=>setOrgFilter(e.target.value)}
+                style={{padding:"12px 14px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:13,color:T.textSub,cursor:"pointer",outline:"none",minWidth:120}}>
+                <option value="all">All orgs</option>
+                {Object.keys(ORGS).map(o=><option key={o} value={o}>{o}</option>)}
+              </select>
+              <select value={sort} onChange={e=>setSort(e.target.value)}
+                style={{padding:"12px 14px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:13,color:T.textSub,cursor:"pointer",outline:"none",minWidth:150}}>
+                <option value="name">Sort: Name</option>
+                <option value="rating">Sort: Top rated</option>
+                <option value="reviews">Sort: Most reviewed</option>
+              </select>
+            </div>
 
-          {filtered.length===0?(
-            <div style={{textAlign:"center",padding:"64px 0",color:T.textHint}}>
-              <div style={{fontSize:36,marginBottom:12}}>🔍</div>
-              <p style={{fontSize:16,fontWeight:300,color:T.textSub}}>No judges found for "{search}"</p>
+            <div style={{display:"flex",marginBottom:28,background:T.surface,borderRadius:T.r,border:`1px solid ${T.border}`,overflow:"hidden"}}>
+              {[["Judges",judges.length],["Reviews",reviews.length],["Organisations",Object.keys(ORGS).length],["Countries",[...new Set(judges.map(j=>j.country))].length]].map(([l,v],i,arr)=>(
+                <div key={l} style={{flex:1,padding:"14px 20px",borderRight:i<arr.length-1?`1px solid ${T.border}`:"none",textAlign:"center"}}>
+                  <div style={{fontSize:22,fontWeight:500,color:T.text,marginBottom:2,fontFamily:"'Google Sans',sans-serif"}}>{v}</div>
+                  <div style={{fontSize:12,color:T.textHint}}>{l}</div>
+                </div>
+              ))}
             </div>
-          ):(
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:12}}>
-              {filtered.map(j=><JudgeCard key={j.id} judge={j} reviews={reviews} onClick={()=>openJudge(j)}/>)}
-            </div>
-          )}
-        </div>
-      )}
+
+            {filtered.length===0?(
+              <div style={{textAlign:"center",padding:"64px 0",color:T.textHint}}>
+                <div style={{fontSize:36,marginBottom:12}}>🔍</div>
+                <p style={{fontSize:16,fontWeight:300,color:T.textSub}}>No judges found for "{search}"</p>
+              </div>
+            ):(
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:12}}>
+                {filtered.map(j=><JudgeCard key={j.id} judge={j} reviews={reviews} onClick={()=>navigate("/judge/"+j.id)}/>)}
+              </div>
+            )}
+          </div>
+        }/>
+        <Route path="/judge/:id" element={
+          <JudgeRoute judges={judges} reviews={reviews} user={user}
+            addReview={addReview} addBooking={addBooking}
+            claimJudge={claimJudge} editProfile={editProfile} saveReply={saveReply}
+            onRequestAuth={()=>setModal("auth")}/>
+        }/>
+        <Route path="/admin" element={
+          <AdminRoute judges={judges} reviews={reviews} bookings={bookings} user={user}
+            saveJudges={saveJudges} saveReviews={saveReviews}/>
+        }/>
+        <Route path="*" element={<Navigate to="/" replace/>}/>
+      </Routes>
 
       {modal==="auth"&&<AuthModal onClose={()=>setModal(null)} onAuth={u=>{setUser(u);setModal(null);}}/>}
-      {modal==="review"&&selectedJudge&&user&&<ReviewModal judge={selectedJudge} user={user} onClose={()=>setModal(null)} onSubmit={addReview}/>}
-      {modal==="booking"&&selectedJudge&&user&&<BookingModal judge={selectedJudge} user={user} onClose={()=>setModal(null)} onSubmit={addBooking}/>}
-      {modal==="claim"&&selectedJudge&&user&&<ClaimModal judge={selectedJudge} user={user} onClose={()=>setModal(null)} onClaim={claimJudge}/>}
-      {modal==="editProfile"&&selectedJudge&&<EditProfileModal judge={selectedJudge} onClose={()=>setModal(null)} onSave={editProfile}/>}
     </>
   );
 }
