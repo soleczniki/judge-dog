@@ -1225,8 +1225,8 @@ export default function App() {
       <ScrollToTop/>
 
       {/* Nav */}
-      <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"0 20px",display:"flex",alignItems:"center",gap:12,height:64,position:"sticky",top:0,zIndex:200}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",flexShrink:0}} onClick={()=>navigate("/")}>
+      <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:"0 20px",display:"grid",gridTemplateColumns:"1fr auto 1fr",alignItems:"center",gap:12,height:64,position:"sticky",top:0,zIndex:200}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onClick={()=>navigate("/")}>
           <svg width="38" height="38" viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
             <circle cx="0"     cy="-28"  r="10" fill="#1a73e8" opacity="0.25"/>
             <circle cx="19.8"  cy="-19.8" r="10" fill="#1a73e8" opacity="0.25"/>
@@ -1241,8 +1241,8 @@ export default function App() {
           </svg>
           <span style={{fontSize:18,fontWeight:500,color:T.text,letterSpacing:-0.3,fontFamily:"'Google Sans',sans-serif"}}>judge.dog</span>
         </div>
-        {/* Global search */}
-        <div style={{flex:1,maxWidth:480,position:"relative"}}>
+        {/* Global search — center column */}
+        <div style={{width:"100%",maxWidth:480,position:"relative"}}>
           <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
           <input value={search} onChange={e=>{setSearch(e.target.value);navigate("/");}}
             placeholder="Search judges, breeds, countries…"
@@ -1250,7 +1250,7 @@ export default function App() {
             onFocus={e=>{e.target.style.borderColor=T.accent;e.target.style.boxShadow=`0 0 0 3px ${T.accentLight}`;}}
             onBlur={e=>{e.target.style.borderColor=T.border;e.target.style.boxShadow="none";}}/>
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,justifyContent:"flex-end"}}>
           {user?(
             <>
               <div style={{display:"flex",alignItems:"center",gap:8,padding:"5px 12px 5px 6px",borderRadius:100,background:T.surface,border:`1px solid ${T.border}`}}>
