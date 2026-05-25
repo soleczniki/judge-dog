@@ -7,6 +7,7 @@
 
 import puppeteer from "puppeteer";
 import fs from "fs";
+import { FCI_GROUP_NAMES, FCI_GROUP_BREEDS } from "./fci-groups.js";
 
 const args = process.argv.slice(2);
 const startFrom = parseInt(args.find(a=>a.startsWith("--start-from="))?.split("=")[1] || "1");
@@ -303,7 +304,18 @@ async function scrapeJudge(page, id) {
       bisJudge: data.bisJudge,
       groupJudge: data.groupJudge,
       authorizedBreeds: data.authorizedBreeds,
-      breeds: data.authorizedBreeds.map(b=>b.name),
+      groupNames: data.groupJudge.map(g => ({ group: g, name: FCI_GROUP_NAMES[g] || `Group ${g}` })),
+      breeds: (() => {
+        if (data.allBreedJudge) return ["All breeds"];
+        const individual = data.authorizedBreeds.map(b => b.name);
+        const groupB = [];
+        for (const g of data.groupJudge) {
+          if (FCI_GROUP_BREEDS[g]) groupB.push(...FCI_GROUP_BREEDS[g]);
+        }
+        const seen = new Set(groupB.map(b => b.toLowerCase()));
+        const extra = individual.filter(b => !seen.has(b.toLowerCase()));
+        return [...groupB, ...extra];
+      })(),
       group: disciplineGroups[0] || "A",
       orgs: [{ org:"FCI", id: fciLicenceId || `FCI-${id}` }],
 

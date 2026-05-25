@@ -6,6 +6,7 @@
 
 import puppeteer from "puppeteer";
 import fs from "fs";
+import { FCI_GROUP_NAMES, FCI_GROUP_BREEDS } from "./fci-groups.js";
 
 const TARGET   = 50;
 const MAX_ID   = 500;
@@ -67,26 +68,26 @@ function toTitleCase(str) {
 }
 
 async function expandBreedSections(page) {
-  // Click all expand controls for ASP.NET UpdatePanel breed sections.
-  // FCI uses accordion-style panels — clicking group headers triggers postbacks
-  // that render the RaceCheckBox breed lists inside each group panel.
+  // Click expand controls for breed groups inside the Authorisations section only.
+  // Scoping to ContentPlaceHolder1_AutorisationsControl prevents clicking
+  // site-wide navigation links that would cause a full page navigation.
   const clicked = await page.evaluate(() => {
+    const root = document.getElementById("ContentPlaceHolder1_AutorisationsControl")
+               || document.getElementById("ContentPlaceHolder1_UpdatePanel1")
+               || document.body;
+
     let n = 0;
-    // Target: panel headings, collapse toggles, any postback links in the
-    // Authorisations section that look like group expand controls
+    const seen = new Set();
     const selectors = [
       '[data-toggle="collapse"]',
       '.panel-heading a',
       '.panel-title a',
-      '[href*="javascript:__doPostBack"]',
-      'a[id*="LinkButton"]',
       'a[id*="Expand"]',
       'a[id*="Group"]',
-      '[id*="AutorisationsControl"] a',
+      'a[id*="LinkButton"]',
     ];
-    const seen = new Set();
     for (const sel of selectors) {
-      document.querySelectorAll(sel).forEach(el => {
+      root.querySelectorAll(sel).forEach(el => {
         if (!seen.has(el)) {
           seen.add(el);
           try { el.click(); n++; } catch(e) {}
@@ -97,7 +98,6 @@ async function expandBreedSections(page) {
   });
 
   if (clicked > 0) {
-    // Wait for UpdatePanel AJAX responses to complete
     await sleep(2500);
   }
   return clicked;
@@ -255,16 +255,25 @@ async function scrapeJudge(page, id) {
     const licParts = fciLicenceId.match(/^([A-Z]{2,3})(\d+)$/);
     const photo = fullName.split(" ").filter(w => w && /[A-Z]/i.test(w[0])).map(w => w[0]).slice(0, 2).join("").toUpperCase() || "??";
 
-    // Determine breeds list
+    // Determine breeds list:
+    // - All-breed: single sentinel value
+    // - Group-authorized: expand each authorized group into its full breed list
+    // - Individual breeds: use as-is
+    // - Group + individual: union of both (search hits any breed in any group + extras)
     let breeds;
     if (data.allBreedJudge) {
       breeds = ["All breeds"];
-    } else if (data.authorizedBreeds.length > 0) {
-      breeds = data.authorizedBreeds.map(b => toTitleCase(b.name));
-    } else if (data.groupJudge.length > 0) {
-      breeds = data.groupJudge.map(g => `FCI Group ${g}`);
     } else {
-      breeds = [];
+      const individualBreeds = data.authorizedBreeds.map(b => toTitleCase(b.name));
+      // Expand group-level authorizations into full breed lists
+      const groupBreeds = [];
+      for (const g of data.groupJudge) {
+        if (FCI_GROUP_BREEDS[g]) groupBreeds.push(...FCI_GROUP_BREEDS[g]);
+      }
+      // Union: group breeds first, then any individual breeds not already in the list
+      const seen = new Set(groupBreeds.map(b => b.toLowerCase()));
+      const extra = individualBreeds.filter(b => !seen.has(b.toLowerCase()));
+      breeds = [...groupBreeds, ...extra];
     }
 
     return {
@@ -291,6 +300,7 @@ async function scrapeJudge(page, id) {
       allBreedJudge: data.allBreedJudge,
       bisJudge: data.bisJudge,
       groupJudge: data.groupJudge,
+      groupNames: data.groupJudge.map(g => ({ group: g, name: FCI_GROUP_NAMES[g] || `Group ${g}` })),
       authorizedBreeds: data.authorizedBreeds,
       breeds,
       group: disciplineGroups[0] || "A",

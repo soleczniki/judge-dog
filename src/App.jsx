@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from "react-router-dom";
 import { signInWithGoogle, firebaseSignOut, onAuthChange } from "./firebase";
+import { FCI_GROUP_NAMES, FCI_GROUP_BREEDS } from "../fci-groups.js";
+
+const tc = s => s ? s.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) : "";
 
 const ORGS = {
   FCI:  { name: "Fédération Cynologique Internationale", short: "FCI",  color: "#1a73e8" },
@@ -427,28 +430,72 @@ function ReviewCard({review,isJudge,onReply}) {
   );
 }
 
+// ── Group Section (expandable breed list) ─────────────────────────────────────
+function GroupSection({groupNum, groupName}) {
+  const [open,setOpen]=useState(false);
+  const breeds = FCI_GROUP_BREEDS[groupNum] || [];
+  return (
+    <div style={{border:`1px solid ${T.border}`,borderRadius:T.rsm,marginBottom:6,overflow:"hidden"}}>
+      <button onClick={()=>setOpen(!open)}
+        style={{width:"100%",display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",background:open?T.accentLight:T.bg,border:"none",cursor:"pointer",fontFamily:"inherit",transition:"background .15s"}}>
+        <span style={{fontSize:14,fontWeight:500,color:T.text}}>Group {groupNum} — {groupName}</span>
+        <span style={{fontSize:12,color:T.textHint,display:"flex",alignItems:"center",gap:6}}>
+          {breeds.length} breeds
+          <span style={{fontSize:10,color:T.accent}}>{open?"▲":"▼"}</span>
+        </span>
+      </button>
+      {open&&(
+        <div style={{padding:"10px 14px",borderTop:`1px solid ${T.border}`,display:"flex",flexWrap:"wrap",gap:4,background:T.surface}}>
+          {breeds.map(b=><Chip key={b} small>{b}</Chip>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Judge Card ─────────────────────────────────────────────────────────────────
 function JudgeCard({judge,reviews,onClick}) {
   const [hov,setHov]=useState(false);
   const rv=reviews.filter(r=>r.judgeId===judge.id);
   const oa=avg(rv.map(r=>r.overall));
   const wr=rv.filter(r=>r.wouldReturn).length;
-  // Top 2 extra scores to surface on card
-  const extraHighlights = RATING_DIMS.filter(d=>d.group==="extra").map(d=>({
-    label:d.label, val:avg(rv.map(r=>r[d.key]||0))
-  })).filter(x=>x.val>0).sort((a,b)=>b.val-a.val).slice(0,2);
+
+  // Breed/group summary for card
+  const breedSummary = () => {
+    if (judge.allBreedJudge) return <Chip small bg={T.greenLight} color={T.green}>All breeds</Chip>;
+    if (judge.groupNames?.length) return (
+      <>
+        {judge.groupNames.slice(0,4).map(g=><Chip key={g.group} small>Group {g.group}</Chip>)}
+        {judge.groupNames.length>4&&<Chip small>+{judge.groupNames.length-4} groups</Chip>}
+        {judge.authorizedBreeds?.length>0&&<Chip small>+{judge.authorizedBreeds.length} breeds</Chip>}
+      </>
+    );
+    if (judge.breeds?.length) return (
+      <>
+        {judge.breeds.slice(0,2).map(b=><Chip key={b} small>{b}</Chip>)}
+        {judge.breeds.length>2&&<Chip small>+{judge.breeds.length-2}</Chip>}
+      </>
+    );
+    return <Chip small color={T.textHint}>No breed data</Chip>;
+  };
+
+  const disciplineLabel = judge.disciplines?.length ? judge.disciplines[0] : (judge.group||"Shows");
 
   return (
     <div onClick={onClick} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
       style={{background:T.bg,borderRadius:T.r,padding:"18px",border:`1px solid ${hov?T.accent:T.border}`,cursor:"pointer",transition:"box-shadow .2s, border-color .2s",boxShadow:hov?T.shadowMd:T.shadow,overflow:"hidden"}}>
-      <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:12}}>
+      <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:10}}>
         <div style={{position:"relative",flexShrink:0}}>
           <Avatar label={judge.photo} size={44}/>
           {judge.verified&&<div style={{position:"absolute",bottom:-2,right:-2,width:15,height:15,background:T.green,borderRadius:"50%",border:`2px solid ${T.bg}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#fff"}}>✓</div>}
         </div>
         <div style={{flex:1,minWidth:0}}>
           <h3 style={{margin:"0 0 2px",fontSize:15,fontWeight:500,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{judge.flag} {judge.name}</h3>
-          <p style={{margin:0,fontSize:12,color:T.textHint}}>{judge.country} · Since {judge.licensed}</p>
+          <p style={{margin:0,fontSize:12,color:T.textHint}}>
+            {judge.country}
+            {judge.birthYear&&<> · Born {judge.birthYear}</>}
+            {judge.licensedYear&&<> · Lic. {judge.licensedYear}</>}
+          </p>
         </div>
         {rv.length>0&&(
           <div style={{textAlign:"right",flexShrink:0}}>
@@ -459,22 +506,11 @@ function JudgeCard({judge,reviews,onClick}) {
       </div>
       <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:8}}>
         {judge.orgs.map(o=><OrgPill key={o.org} org={o.org}/>)}
-        <Chip small>{judge.group}</Chip>
+        <Chip small>{disciplineLabel}</Chip>
       </div>
-      <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:rv.length>0&&extraHighlights.length>0?10:12}}>
-        {judge.breeds.slice(0,2).map(b=><Chip key={b} small>{b}</Chip>)}
-        {judge.breeds.length>2&&<Chip small>+{judge.breeds.length-2}</Chip>}
+      <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:12}}>
+        {breedSummary()}
       </div>
-      {rv.length>0&&extraHighlights.length>0&&(
-        <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap"}}>
-          {extraHighlights.map(x=>(
-            <div key={x.label} style={{display:"flex",alignItems:"center",gap:5,padding:"3px 9px",borderRadius:100,background:T.surface,border:`1px solid ${T.border}`}}>
-              <span style={{fontSize:11,color:T.textSub}}>{x.label}</span>
-              <span style={{fontSize:11,fontWeight:600,color:T.accent}}>{x.val.toFixed(1)}</span>
-            </div>
-          ))}
-        </div>
-      )}
       <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:T.textHint,paddingTop:10,borderTop:`1px solid ${T.border}`}}>
         <span>{rv.length} review{rv.length!==1?"s":""}</span>
         {rv.length>0&&<span style={{color:T.green,fontWeight:500}}>{Math.round(wr/rv.length*100)}% would return</span>}
@@ -521,8 +557,15 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
               <h1 style={{margin:0,fontSize:24,fontWeight:400,color:T.text,letterSpacing:-0.4}}>{judge.flag} {judge.name}</h1>
               {judge.verified&&<Chip bg={T.greenLight} color={T.green} small>✓ Verified</Chip>}
             </div>
-            <p style={{color:T.textSub,fontSize:13,margin:"0 0 10px"}}>{judge.country} · Licensed since {judge.licensed}</p>
-            <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:8}}>
+            {/* Key facts row */}
+            <div style={{display:"flex",flexWrap:"wrap",gap:16,marginBottom:12}}>
+              <span style={{fontSize:13,color:T.textSub}}>{judge.country}</span>
+              {judge.birthYear&&<span style={{fontSize:13,color:T.textSub}}>Born {judge.birthYear}</span>}
+              {judge.licensedYear&&<span style={{fontSize:13,color:T.textSub}}>Licensed {judge.licensedYear}</span>}
+              {judge.kennelClub&&<span style={{fontSize:13,color:T.textSub}}>{judge.kennelClub}</span>}
+            </div>
+            {/* FCI licence */}
+            <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10}}>
               {judge.orgs.map(o=>(
                 <div key={o.org} style={{display:"flex",alignItems:"center",gap:4}}>
                   <OrgPill org={o.org}/>
@@ -530,10 +573,12 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
                 </div>
               ))}
             </div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
-              <Chip small>{judge.group}</Chip>
-              {judge.breeds.map(b=><Chip key={b} small>{b}</Chip>)}
-            </div>
+            {/* Languages */}
+            {judge.fciLanguages?.length>0&&(
+              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                {judge.fciLanguages.map(l=><Chip key={l} small>{l}</Chip>)}
+              </div>
+            )}
           </div>
           {rv.length>0&&(
             <div style={{textAlign:"center",background:T.surface,borderRadius:T.r,padding:"14px 22px",flexShrink:0,border:`1px solid ${T.border}`}}>
@@ -570,6 +615,48 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
             {judge.social.linkedin&&<a href={`https://linkedin.com/in/${judge.social.linkedin}`} target="_blank" rel="noreferrer" style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:100,background:T.surface,color:T.text,textDecoration:"none",fontSize:13,border:`1px solid ${T.border}`,fontWeight:500}}>in {judge.social.linkedin}</a>}
           </div>
         )}
+
+        {/* Disciplines */}
+        {judge.disciplines?.length>0&&(
+          <div style={{background:T.surface,borderRadius:T.r,padding:"18px 20px",marginBottom:18,border:`1px solid ${T.border}`}}>
+            <SectionLabel>Disciplines</SectionLabel>
+            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+              {judge.disciplines.map(d=><Chip key={d}>{d}</Chip>)}
+            </div>
+          </div>
+        )}
+
+        {/* Breed authorizations */}
+        {(()=>{
+          const groupCovered=new Set((judge.groupNames||[]).flatMap(g=>(FCI_GROUP_BREEDS[g.group]||[]).map(b=>b.toLowerCase())));
+          const extra=(judge.breeds||[]).filter(b=>!groupCovered.has(b.toLowerCase()));
+          return (
+            <div style={{background:T.surface,borderRadius:T.r,padding:"18px 20px",marginBottom:18,border:`1px solid ${T.border}`}}>
+              <SectionLabel>Breed authorizations</SectionLabel>
+              {judge.allBreedJudge ? (
+                <Chip bg={T.greenLight} color={T.green}>All breeds</Chip>
+              ) : judge.groupNames?.length>0 ? (
+                <>
+                  {judge.groupNames.map(g=><GroupSection key={g.group} groupNum={g.group} groupName={g.name}/>)}
+                  {extra.length>0&&(
+                    <>
+                      <p style={{fontSize:12,fontWeight:500,color:T.textSub,margin:"14px 0 8px"}}>Additional individual breeds</p>
+                      <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                        {extra.map(b=><Chip key={b} small>{b}</Chip>)}
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : judge.breeds?.length>0 ? (
+                <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                  {judge.breeds.map(b=><Chip key={b} small>{b}</Chip>)}
+                </div>
+              ) : (
+                <p style={{margin:0,fontSize:13,color:T.textHint,fontStyle:"italic"}}>No breed authorization data on file</p>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Rating breakdown */}
         {rv.length>0&&(
@@ -939,7 +1026,7 @@ export default function App() {
 
   const filtered=judges.filter(j=>{
     const q=search.toLowerCase();
-    const mQ=!q||j.name.toLowerCase().includes(q)||j.country.toLowerCase().includes(q)||j.breeds.some(b=>b.toLowerCase().includes(q))||j.group.toLowerCase().includes(q);
+    const mQ=!q||j.name.toLowerCase().includes(q)||(j.country||"").toLowerCase().includes(q)||(j.breeds||[]).some(b=>b.toLowerCase().includes(q))||(j.group||"").toLowerCase().includes(q);
     const mO=orgFilter==="all"||j.orgs.some(o=>o.org===orgFilter);
     return mQ&&mO;
   }).sort((a,b)=>{
