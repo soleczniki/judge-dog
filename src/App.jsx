@@ -185,19 +185,18 @@ const T = {
 };
 
 // ── Atoms ──────────────────────────────────────────────────────────────────────
-const Avatar = ({label, iso, size=40}) => {
-  const resolvedISO = iso || isoFromLabel(label);
-  if (resolvedISO) return (
-    <div style={{width:size,height:size,borderRadius:"50%",overflow:"hidden",border:"1px solid #e8eaed",flexShrink:0,background:"#f1f3f4",display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <img src={`https://flagcdn.com/w160/${resolvedISO.toLowerCase()}.png`}
-           style={{width:"100%",height:"100%",objectFit:"cover"}} alt={resolvedISO}/>
-    </div>
-  );
-  return (
-    <div style={{width:size,height:size,borderRadius:"50%",background:aColor(label||"?"),display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:size*0.36,fontWeight:600,flexShrink:0}}>
-      {label||"?"}
-    </div>
-  );
+const Avatar = ({label, size=40}) => (
+  <div style={{width:size,height:size,borderRadius:"50%",background:aColor(label||"?"),display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:size*0.36,fontWeight:600,flexShrink:0}}>
+    {label||"?"}
+  </div>
+);
+
+const FlagImg = ({judge, height=14}) => {
+  const iso = countryISO(judge);
+  if (!iso) return null;
+  return <img src={`https://flagcdn.com/w40/${iso.toLowerCase()}.png`}
+              style={{height,width:"auto",borderRadius:2,verticalAlign:"middle",marginRight:4,flexShrink:0}}
+              alt={iso}/>;
 };
 
 const OrgPill = ({org}) => {
@@ -629,11 +628,11 @@ function JudgeCard({judge,reviews,onClick}) {
       style={{background:T.bg,borderRadius:T.r,padding:"18px",border:`1px solid ${hov?T.accent:T.border}`,cursor:"pointer",transition:"box-shadow .2s, border-color .2s",boxShadow:hov?T.shadowMd:T.shadow,overflow:"hidden"}}>
       <div style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:10}}>
         <div style={{position:"relative",flexShrink:0}}>
-          <Avatar iso={countryISO(judge)} label={judge.photo} size={44}/>
+          <Avatar label={judge.photo} size={44}/>
           {judge.verified&&<div style={{position:"absolute",bottom:-2,right:-2,width:15,height:15,background:T.green,borderRadius:"50%",border:`2px solid ${T.bg}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:8,color:"#fff"}}>✓</div>}
         </div>
         <div style={{flex:1,minWidth:0}}>
-          <h3 style={{margin:"0 0 2px",fontSize:15,fontWeight:500,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{judge.name}</h3>
+          <h3 style={{margin:"0 0 2px",fontSize:15,fontWeight:500,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"flex",alignItems:"center"}}><FlagImg judge={judge}/>{judge.name}</h3>
           <p style={{margin:0,fontSize:12,color:T.textHint}}>
             {judge.country}
             {judge.birthYear&&<> · Born {judge.birthYear}</>}
@@ -687,19 +686,19 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
           onMouseEnter={e=>e.currentTarget.style.background=T.surface} onMouseLeave={e=>e.currentTarget.style.background="none"}>
           ← Back
         </button>
-        <span style={{fontSize:13,color:T.textHint,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{judge.name}</span>
+        <span style={{fontSize:13,color:T.textHint,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",display:"flex",alignItems:"center"}}><FlagImg judge={judge}/>{judge.name}</span>
       </div>
 
       <div style={{maxWidth:780,margin:"0 auto",padding:"32px 20px"}}>
         {/* Hero */}
         <div style={{display:"flex",gap:20,alignItems:"flex-start",marginBottom:24,flexWrap:"wrap"}}>
           <div style={{position:"relative"}}>
-            <Avatar iso={countryISO(judge)} label={judge.photo} size={76}/>
+            <Avatar label={judge.photo} size={76}/>
             {judge.verified&&<div style={{position:"absolute",bottom:0,right:0,width:22,height:22,background:T.green,borderRadius:"50%",border:`3px solid ${T.bg}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#fff"}}>✓</div>}
           </div>
           <div style={{flex:1,minWidth:180}}>
             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
-              <h1 style={{margin:0,fontSize:24,fontWeight:400,color:T.text,letterSpacing:-0.4}}>{judge.name}</h1>
+              <h1 style={{margin:0,fontSize:24,fontWeight:400,color:T.text,letterSpacing:-0.4,display:"flex",alignItems:"center",gap:8}}><FlagImg judge={judge} height={18}/>{judge.name}</h1>
               {judge.verified&&<Chip bg={T.greenLight} color={T.green} small>✓ Verified</Chip>}
             </div>
             {/* Key facts row */}
@@ -1000,7 +999,7 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
               <div style={{padding:48,textAlign:"center",color:T.textHint,fontSize:13}}>No pending claims</div>
             ):claimQueue.map((j,i)=>(
               <div key={j.id} style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",borderBottom:i<claimQueue.length-1?`1px solid ${T.border}`:"none",flexWrap:"wrap"}}>
-                <Avatar iso={countryISO(j)} label={j.photo} size={40}/>
+                <Avatar label={j.photo} size={40}/>
                 <div style={{flex:1,minWidth:0}}>
                   <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>{j.flag} {j.name}</p>
                   <p style={{margin:0,fontSize:12,color:T.textHint}}>{j.country} · {j.orgs.map(o=>o.id).join(", ")}</p>
