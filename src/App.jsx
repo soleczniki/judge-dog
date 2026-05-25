@@ -239,6 +239,16 @@ const SectionLabel = ({children}) => (
   <p style={{margin:"0 0 10px",fontSize:11,fontWeight:600,color:T.textHint,textTransform:"uppercase",letterSpacing:1}}>{children}</p>
 );
 
+const InfoRow = ({label,value}) => {
+  if (!value) return null;
+  return (
+    <div style={{display:"flex",gap:12,padding:"8px 0",borderBottom:`1px solid ${T.border}`}}>
+      <span style={{minWidth:168,fontSize:13,color:T.textHint,flexShrink:0}}>{label}</span>
+      <span style={{fontSize:13,color:T.text}}>{value}</span>
+    </div>
+  );
+};
+
 const Divider = ({my=16}) => <div style={{height:1,background:T.border,margin:`${my}px 0`}}/>;
 
 const Btn = ({children,onClick,variant="filled",color,small,fullWidth,icon,disabled}) => {
@@ -735,8 +745,7 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
             <div style={{display:"flex",flexWrap:"wrap",gap:16,marginBottom:12}}>
               <span style={{fontSize:13,color:T.textSub}}>{judge.country}</span>
               {judge.birthYear&&<span style={{fontSize:13,color:T.textSub}}>Born {judge.birthYear}</span>}
-              {judge.licensedYear&&<span style={{fontSize:13,color:T.textSub}}>Licensed {judge.licensedYear}</span>}
-              {judge.kennelClub&&<span style={{fontSize:13,color:T.textSub}}>{judge.kennelClub}</span>}
+              {judge.licensedYear&&<span style={{fontSize:13,color:T.textSub}}>Lic. {judge.licensedYear}</span>}
             </div>
             {/* FCI licence */}
             <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10}}>
@@ -751,12 +760,6 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
             {judge.bisJudge&&(
               <div style={{marginBottom:8}}>
                 <Chip bg="#fff8e1" color="#f57f17" small>★ BIS Judge</Chip>
-              </div>
-            )}
-            {/* Languages */}
-            {judge.fciLanguages?.length>0&&(
-              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                {judge.fciLanguages.map(l=><Chip key={l} small>{l}</Chip>)}
               </div>
             )}
           </div>
@@ -778,6 +781,39 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
           {isOwner&&<Btn onClick={onEditProfile} variant="outlined" icon="✏">Edit profile</Btn>}
           {!canBook&&user&&user.role==="organizer"&&!judge.verified&&<span style={{fontSize:13,color:T.textHint,alignSelf:"center"}}>Judge hasn't claimed their profile — bookings unavailable</span>}
         </div>
+
+        {/* Official Details */}
+        {(judge.kennelClub||judge.fciLanguages?.length>0||judge.otherLanguages?.length>0||judge.kennelName)&&(
+          <div style={{background:T.surface,borderRadius:T.r,padding:"18px 20px",marginBottom:18,border:`1px solid ${T.border}`}}>
+            <SectionLabel>Official details</SectionLabel>
+            <div style={{marginTop:-4}}>
+              <InfoRow label="Country of legal residence" value={judge.countryOfResidence||judge.country}/>
+              <InfoRow label="National kennel club" value={judge.kennelClub}/>
+              <InfoRow label="FCI languages" value={judge.fciLanguages?.length>0?judge.fciLanguages.join(", "):null}/>
+              <InfoRow label="Other languages" value={judge.otherLanguages?.length>0?judge.otherLanguages.join(", "):null}/>
+              <InfoRow label="FCI kennel name" value={judge.kennelName}/>
+            </div>
+          </div>
+        )}
+
+        {/* Suspensions */}
+        {judge.suspensions?.length>0&&(
+          <div style={{background:T.redLight,borderRadius:T.r,padding:"18px 20px",marginBottom:18,border:`2px solid ${T.red}30`}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+              <span style={{fontSize:11,fontWeight:700,color:T.red,textTransform:"uppercase",letterSpacing:1}}>
+                ⚠ Suspensions
+              </span>
+              <span style={{fontSize:11,fontWeight:600,color:"#fff",background:T.red,padding:"1px 8px",borderRadius:100}}>{judge.suspensions.length}</span>
+            </div>
+            {judge.suspensions.map((cells,i)=>(
+              <div key={i} style={{display:"flex",flexWrap:"wrap",gap:8,padding:"10px 0",borderTop:i>0?`1px solid ${T.red}25`:undefined}}>
+                {cells.filter(Boolean).map((cell,j)=>(
+                  <span key={j} style={{fontSize:13,color:T.text,background:"rgba(217,48,37,.07)",padding:"4px 12px",borderRadius:6}}>{cell}</span>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Bio */}
         {judge.bio&&(
