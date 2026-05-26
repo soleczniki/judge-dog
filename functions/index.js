@@ -1,9 +1,10 @@
 const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const { defineSecret } = require("firebase-functions/params");
-const { initializeApp } = require("firebase-admin/app");
+const { initializeApp, getApps } = require("firebase-admin/app");
+const { getFirestore } = require("firebase-admin/firestore");
 const { Resend } = require("resend");
 
-initializeApp();
+if (!getApps().length) initializeApp();
 
 const RESEND_KEY = defineSecret("RESEND_API_KEY");
 const FROM = "judge.dog <noreply@judge.dog>";
@@ -109,6 +110,43 @@ function rejectedHtml({ userName, judgeName }) {
 </html>`;
 }
 
+function forwardMessageHtml({ judgeName, judgeSlug, fromName, messageText }) {
+  const profileUrl = `https://judge.dog/judge/${judgeSlug}`;
+  const safeMessage = messageText.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f8f9fa;font-family:'Segoe UI',system-ui,sans-serif;color:#202124;">
+  <div style="max-width:520px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(60,64,67,.15);">
+    <div style="background:#1a73e8;padding:28px 32px;">
+      <span style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.5px;">judge<span style="font-weight:400;">.dog</span></span>
+    </div>
+    <div style="padding:32px;">
+      <p style="margin:0 0 8px;font-size:22px;font-weight:400;color:#202124;">${fromName} sent you a message</p>
+      <p style="margin:0 0 20px;font-size:14px;color:#5f6368;line-height:1.6;">
+        Hi ${judgeName}, you received a message through your profile on
+        <a href="https://judge.dog" style="color:#1a73e8;text-decoration:none;">judge.dog</a>
+        — a platform where exhibitors find and review dog show judges worldwide.
+      </p>
+      <div style="background:#f8f9fa;border-left:3px solid #1a73e8;border-radius:4px;padding:16px 18px;margin-bottom:24px;font-size:14px;color:#202124;line-height:1.75;">
+        ${safeMessage}
+      </div>
+      <p style="margin:0 0 20px;font-size:13px;color:#5f6368;line-height:1.6;">
+        Sign in to judge.dog to reply. If you don't have an account yet, your profile is already there — it takes a minute to set up.
+      </p>
+      <a href="${profileUrl}" style="display:inline-block;padding:12px 24px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:100px;font-size:14px;font-weight:500;">Sign in to reply →</a>
+    </div>
+    <div style="padding:16px 32px 24px;border-top:1px solid #e8eaed;">
+      <p style="margin:0;font-size:12px;color:#9aa0a6;line-height:1.6;">
+        Your email address was obtained from a publicly available judge registry. judge.dog is an independent platform not affiliated with any kennel club or cynological organisation.
+        To stop receiving these notifications, contact <a href="mailto:hi@judge.dog" style="color:#1a73e8;text-decoration:none;">hi@judge.dog</a>.
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
 // ── Notify admin when a new claim is submitted ─────────────────────────────────
 exports.onClaimCreated = onDocumentCreated(
   { document: "claims/{claimId}", secrets: [RESEND_KEY] },
@@ -125,6 +163,35 @@ exports.onClaimCreated = onDocumentCreated(
         userEmail: claim.userEmail,
         judgeName: claim.judgeName,
         judgeSlug: claim.judgeSlug,
+      }),
+    });
+  }
+);
+
+// ── Forward message to unclaimed judge's scraped email ────────────────────────
+exports.onMessageCreated = onDocumentCreated(
+  { document: "messages/{messageId}", secrets: [RESEND_KEY] },
+  async (event) => {
+    const msg = event.data.data();
+    if (!msg || msg.claimed) return; // claimed judges receive messages on-platform
+
+    const db = getFirestore();
+    const judgeSnap = await db.collection("judges").doc(msg.judgeId).get();
+    if (!judgeSnap.exists) return;
+
+    const judge = judgeSnap.data();
+    if (!judge.email) return; // no scraped email on file
+
+    const resend = new Resend(RESEND_KEY.value());
+    await resend.emails.send({
+      from: FROM,
+      to: judge.email,
+      subject: `${msg.fromName} sent you a message on judge.dog`,
+      html: forwardMessageHtml({
+        judgeName: judge.name,
+        judgeSlug: msg.judgeSlug || msg.judgeId,
+        fromName: msg.fromName,
+        messageText: msg.message,
       }),
     });
   }
