@@ -1466,11 +1466,11 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
                   <p style={{margin:"2px 0 0",fontSize:12,color:T.textHint}}>{claim.userEmail} · {new Date(claim.submittedAt).toLocaleString()}</p>
                 </div>
                 <div style={{display:"flex",gap:8}}>
-                  <button onClick={async()=>{await onVerifyJudge(claim,true);setClaimQueue(q=>q.filter(c=>c.judgeId!==claim.judgeId));}}
+                  <button onClick={async()=>{try{await onVerifyJudge(claim,true);setClaimQueue(q=>q.filter(c=>c.judgeId!==claim.judgeId));}catch{}}}
                     style={{padding:"7px 16px",borderRadius:100,border:"none",background:T.green,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
                     ✓ Approve
                   </button>
-                  <button onClick={async()=>{await onVerifyJudge(claim,false);setClaimQueue(q=>q.filter(c=>c.id!==claim.id));}}
+                  <button onClick={async()=>{try{await onVerifyJudge(claim,false);setClaimQueue(q=>q.filter(c=>c.id!==claim.id));}catch{}}}
                     style={{padding:"7px 16px",borderRadius:100,border:`1px solid ${T.red}`,background:"none",color:T.red,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
                     ✗ Reject
                   </button>
@@ -2010,20 +2010,24 @@ function AdminRoute({judges,reviews,bookings,user,patchJudge,saveJudges,saveRevi
         await saveReviews(reviews.filter(r=>r.id!==rid));
       }}
       onVerifyJudge={async(claim,approve)=>{
-        const {db}=await import("./firebase");
-        const {doc,updateDoc,collection,query,where,getDocs}=await import("firebase/firestore");
-        await updateDoc(doc(db,"claims",claim.id),{status:approve?"approved":"rejected"});
-        if(approve){
-          await updateDoc(doc(db,"judges",claim.judgeId),{verified:true,claimedBy:claim.userEmail});
-          patchJudge(claim.judgeId,{verified:true,claimedBy:claim.userEmail});
-          // Update user role — doc ID is the user's uid
-          await updateDoc(doc(db,"users",claim.userId),{role:"judge",judgeId:claim.judgeId});
-          // Auto-reject any other pending claims for the same judge
-          const otherClaims=await getDocs(query(collection(db,"claims"),where("judgeId","==",claim.judgeId)));
-          await Promise.all(otherClaims.docs
-            .filter(d=>d.id!==claim.id&&d.data().status==="pending")
-            .map(d=>updateDoc(d.ref,{status:"rejected"}))
-          );
+        try {
+          const {db}=await import("./firebase");
+          const {doc,updateDoc,collection,query,where,getDocs}=await import("firebase/firestore");
+          await updateDoc(doc(db,"claims",claim.id),{status:approve?"approved":"rejected"});
+          if(approve){
+            await updateDoc(doc(db,"judges",claim.judgeId),{verified:true,claimedBy:claim.userEmail});
+            patchJudge(claim.judgeId,{verified:true,claimedBy:claim.userEmail});
+            await updateDoc(doc(db,"users",claim.userId),{role:"judge",judgeId:claim.judgeId});
+            const otherClaims=await getDocs(query(collection(db,"claims"),where("judgeId","==",claim.judgeId)));
+            await Promise.all(otherClaims.docs
+              .filter(d=>d.id!==claim.id&&d.data().status==="pending")
+              .map(d=>updateDoc(d.ref,{status:"rejected"}))
+            );
+          }
+        } catch(e) {
+          console.error("onVerifyJudge failed:", e);
+          alert("Action failed: " + e.message);
+          throw e;
         }
       }}
     />
