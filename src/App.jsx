@@ -2191,7 +2191,7 @@ export default function App() {
       )}
 
       <Routes>
-        <Route path="/" element={user?.role==="judge"
+        <Route path="/" element={user?.role==="judge" && !search.trim()
           ? <JudgeDashboard
               user={user}
               judge={judges.find(j=>j.id===user.judgeId)}
