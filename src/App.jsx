@@ -2292,26 +2292,42 @@ export default function App() {
   const location=useLocation();
 
   useEffect(()=>{
+    const BATCH=200;
     (async()=>{
-      try {
-        const {db} = await import("./firebase");
-        const {collection, getDocs} = await import("firebase/firestore");
-        const snap = await getDocs(collection(db,"judges"));
-        const firestoreJudges = snap.docs.map(d=>({...d.data(),id:d.id}));
-        setJudges(firestoreJudges);
-      } catch(e) {
-        console.error("Failed to load judges from Firestore:", e);
-        const sj = await sGet(K.judges,SEED_JUDGES);
-        setJudges(sj);
-      }
+      // Load reviews + bookings (small, local)
       const sr=await sGet(K.reviews,null);
       const sb=await sGet(K.bookings,null);
       if(!sr){await sSet(K.reviews,[]);setReviews([]);}else setReviews(sr);
       if(!sb){await sSet(K.bookings,[]);setBookings([]);}else setBookings(sb);
-      setLoading(false);
+
+      try {
+        const {db}=await import("./firebase");
+        const {collection,query,orderBy,limit,startAfter,getDocs}=await import("firebase/firestore");
+
+        // First batch — unblock the UI immediately
+        const q0=query(collection(db,"judges"),orderBy("name"),limit(BATCH));
+        const snap0=await getDocs(q0);
+        setJudges(snap0.docs.map(d=>({...d.data(),id:d.id})));
+        setLoading(false);
+
+        // Remaining batches in the background
+        let last=snap0.docs[snap0.docs.length-1];
+        while(last&&snap0.docs.length===BATCH){
+          const qN=query(collection(db,"judges"),orderBy("name"),startAfter(last),limit(BATCH));
+          const snapN=await getDocs(qN);
+          if(!snapN.docs.length) break;
+          setJudges(jj=>[...jj,...snapN.docs.map(d=>({...d.data(),id:d.id}))]);
+          if(snapN.docs.length<BATCH) break;
+          last=snapN.docs[snapN.docs.length-1];
+        }
+      } catch(e){
+        console.error("Failed to load judges:",e);
+        setJudges(await sGet(K.judges,SEED_JUDGES));
+        setLoading(false);
+      }
     })();
-    const unsub = onAuthChange(u=>setUser(u));
-    return ()=>unsub();
+    const unsub=onAuthChange(u=>setUser(u));
+    return()=>unsub();
   },[]);
 
   useEffect(()=>{
@@ -2428,6 +2444,7 @@ export default function App() {
       `}</style>
 
       <ScrollToTop/>
+      <div style={{display:"flex",flexDirection:"column",minHeight:"100vh"}}>
 
       {/* Nav */}
       <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:isMobile?"0 12px":"0 20px",display:"flex",alignItems:"center",gap:isMobile?8:0,justifyContent:"space-between",height:64,position:"sticky",top:0,zIndex:200}}>
@@ -2549,7 +2566,7 @@ export default function App() {
         </>
       )}
 
-      <Routes>
+      <div style={{flex:1}}><Routes>
         <Route path="/" element={user?.role==="judge" && !search.trim()
           ? <JudgeDashboard
               user={user}
@@ -2633,9 +2650,10 @@ export default function App() {
         <Route path="/terms" element={<TermsOfService/>}/>
         <Route path="/cookies" element={<CookiePolicy/>}/>
         <Route path="*" element={<Navigate to="/" replace/>}/>
-      </Routes>
+      </Routes></div>
 
       {!["/admin","/messages"].some(p=>location.pathname.startsWith(p))&&<Footer onManageCookies={manageCookies}/>}
+      </div>
 
       {cookieConsent===null&&<CookieBanner onAccept={acceptCookies} onDecline={declineCookies}/>}
 
