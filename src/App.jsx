@@ -1685,6 +1685,12 @@ function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editPro
   const [modal,setModal]=useState(null);
   const judge=judges.find(j=>j.slug===slug||j.id===slug);
 
+  useEffect(()=>{
+    if(!judge) return;
+    document.title=`${judge.name} — Dog Show Judge Reviews | judge.dog`;
+    return()=>{ document.title="judge.dog — Know your judge before you enter"; };
+  },[judge?.name]);
+
   const handleContact=()=>{
     if(judge.claimedBy){
       if(!user){onRequestAuth();return;}
@@ -2196,6 +2202,7 @@ export default function App() {
   const [loading,setLoading]=useState(true); const [modal,setModal]=useState(null);
   const [unreadMsgCount,setUnreadMsgCount]=useState(0);
   const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all");
+  const [displayCount,setDisplayCount]=useState(48);
   const [isMobile,setIsMobile]=useState(window.innerWidth<640);
   const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
   const [cookieConsent,setCookieConsent]=useState(()=>localStorage.getItem("jyj_cookie_consent"));
@@ -2238,6 +2245,7 @@ export default function App() {
   useEffect(()=>{ if(user?.needsConsent) setModal("consent"); },[user?.needsConsent]);
 
   useEffect(()=>{ setMobileMenuOpen(false); },[location.pathname]);
+  useEffect(()=>{ setDisplayCount(48); },[search,orgFilter,sort]);
 
   useEffect(()=>{
     if(!user){setUnreadMsgCount(0);return;}
@@ -2499,9 +2507,21 @@ export default function App() {
                 <p style={{fontSize:16,fontWeight:300,color:T.textSub}}>No judges found for "{search}"</p>
               </div>
             ):(
-              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:12}}>
-                {filtered.map(j=><JudgeCard key={j.id} judge={j} reviews={reviews} onClick={()=>navigate("/judge/"+(j.slug||j.id))}/>)}
-              </div>
+              <>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:12}}>
+                  {filtered.slice(0,displayCount).map(j=><JudgeCard key={j.id} judge={j} reviews={reviews} onClick={()=>navigate("/judge/"+(j.slug||j.id))}/>)}
+                </div>
+                {filtered.length>displayCount&&(
+                  <div style={{textAlign:"center",marginTop:28}}>
+                    <button onClick={()=>setDisplayCount(n=>n+48)}
+                      style={{padding:"11px 28px",borderRadius:100,border:`1.5px solid ${T.border}`,background:T.bg,color:T.textSub,fontSize:14,fontWeight:500,cursor:"pointer",fontFamily:"inherit",transition:"background .15s"}}
+                      onMouseEnter={e=>e.currentTarget.style.background=T.surface}
+                      onMouseLeave={e=>e.currentTarget.style.background=T.bg}>
+                      Load more ({filtered.length-displayCount} remaining)
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
           )}/>
@@ -2523,7 +2543,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace/>}/>
       </Routes>
 
-      <Footer onManageCookies={manageCookies}/>
+      {!["/admin","/messages"].some(p=>location.pathname.startsWith(p))&&<Footer onManageCookies={manageCookies}/>}
 
       {cookieConsent===null&&<CookieBanner onAccept={acceptCookies} onDecline={declineCookies}/>}
 
