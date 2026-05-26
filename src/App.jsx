@@ -1032,6 +1032,19 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
   const hasReviewed=user&&rv.some(r=>r.userId===user.id);
   const canBook=user&&user.role==="organizer"&&judge.verified;
 
+  const [claimStatus,setClaimStatus]=useState(null);
+  useEffect(()=>{
+    if(!user||judge.claimedBy) return;
+    (async()=>{
+      try {
+        const {db}=await import("./firebase");
+        const {doc,getDoc}=await import("firebase/firestore");
+        const snap=await getDoc(doc(db,"claims",`${judge.id}__${user.uid}`));
+        if(snap.exists()) setClaimStatus(snap.data().status);
+      } catch(e){}
+    })();
+  },[user,judge.id,judge.claimedBy]);
+
   // Use the judge's primary discipline group for the rating breakdown
   const primaryGroup = judgeGroups(judge)[0];
   const breakdownDims = [...UNIVERSAL_DIMS, ...(GROUP_DIMS[primaryGroup]||GROUP_DIMS.A)];
@@ -1097,15 +1110,27 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
 
         {/* Is this you? banner — shown to everyone on unclaimed profiles */}
         {!judge.claimedBy&&(
-          <div style={{background:T.accentLight,border:`1px solid #c5d9f7`,borderRadius:T.r,padding:"14px 18px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
-            <div>
-              <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>Is this you?</p>
-              <p style={{margin:"2px 0 0",fontSize:13,color:T.textSub}}>Claim this profile to manage it, reply to reviews and receive messages.</p>
-            </div>
-            {user
-              ? <Btn onClick={onClaim} small>Claim profile</Btn>
-              : <Btn onClick={onRequestAuth} small>Sign in to claim</Btn>
-            }
+          <div style={{background:claimStatus==="pending"?"#fffbe6":T.accentLight,border:`1px solid ${claimStatus==="pending"?"#ffe58f":"#c5d9f7"}`,borderRadius:T.r,padding:"14px 18px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+            {claimStatus==="pending"?(
+              <>
+                <div>
+                  <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>Claim pending review</p>
+                  <p style={{margin:"2px 0 0",fontSize:13,color:T.textSub}}>We'll review your request and get back to you. You'll receive judge access once approved.</p>
+                </div>
+                <Chip bg="#fffbe6" color={T.amber}>⏳ Pending</Chip>
+              </>
+            ):(
+              <>
+                <div>
+                  <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>Is this you?</p>
+                  <p style={{margin:"2px 0 0",fontSize:13,color:T.textSub}}>Claim this profile to manage it, reply to reviews and receive messages.</p>
+                </div>
+                {user
+                  ? <Btn onClick={onClaim} small>Claim profile</Btn>
+                  : <Btn onClick={onRequestAuth} small>Sign in to claim</Btn>
+                }
+              </>
+            )}
           </div>
         )}
 
@@ -1287,12 +1312,14 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
       try {
         const {db} = await import("./firebase");
         const {collection,getDocs,query,where} = await import("firebase/firestore");
-        const [usersSnap,claimsSnap] = await Promise.all([
+        // Run independently so one failure doesn't kill the other
+        const [usersResult,claimsResult] = await Promise.allSettled([
           getDocs(collection(db,"users")),
           getDocs(query(collection(db,"claims"),where("status","==","pending"))),
         ]);
-        setAllUsers(usersSnap.docs.map(d=>({id:d.id,...d.data()})));
-        setClaimQueue(claimsSnap.docs.map(d=>({id:d.id,...d.data()})));
+        if(usersResult.status==="fulfilled") setAllUsers(usersResult.value.docs.map(d=>({id:d.id,...d.data()})));
+        if(claimsResult.status==="fulfilled") setClaimQueue(claimsResult.value.docs.map(d=>({id:d.id,...d.data()})));
+        else console.error("Claims load failed:",claimsResult.reason);
       } catch(e){ console.error(e); }
       setLoadingUsers(false);
     })();
@@ -1431,16 +1458,19 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
             ):claimQueue.map((claim,i)=>(
               <div key={claim.id} style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",borderBottom:i<claimQueue.length-1?`1px solid ${T.border}`:"none",flexWrap:"wrap"}}>
                 <div style={{flex:1,minWidth:0}}>
-                  <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>{claim.judgeName}</p>
-                  <p style={{margin:"2px 0 0",fontSize:12,color:T.textHint}}>Claimed by: <strong style={{color:T.text}}>{claim.userName}</strong> · {claim.userEmail}</p>
-                  <p style={{margin:"2px 0 0",fontSize:11,color:T.textHint}}>{new Date(claim.submittedAt).toLocaleString()}</p>
+                  <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>
+                    <span style={{color:T.accent}}>{claim.userName}</span>
+                    <span style={{color:T.textHint,fontWeight:400}}> claims to be </span>
+                    <span>{claim.judgeName}</span>
+                  </p>
+                  <p style={{margin:"2px 0 0",fontSize:12,color:T.textHint}}>{claim.userEmail} · {new Date(claim.submittedAt).toLocaleString()}</p>
                 </div>
                 <div style={{display:"flex",gap:8}}>
-                  <button onClick={()=>onVerifyJudge(claim,true)}
+                  <button onClick={async()=>{await onVerifyJudge(claim,true);setClaimQueue(q=>q.filter(c=>c.judgeId!==claim.judgeId));}}
                     style={{padding:"7px 16px",borderRadius:100,border:"none",background:T.green,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
                     ✓ Approve
                   </button>
-                  <button onClick={()=>onVerifyJudge(claim,false)}
+                  <button onClick={async()=>{await onVerifyJudge(claim,false);setClaimQueue(q=>q.filter(c=>c.id!==claim.id));}}
                     style={{padding:"7px 16px",borderRadius:100,border:`1px solid ${T.red}`,background:"none",color:T.red,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
                     ✗ Reject
                   </button>
@@ -1979,8 +2009,15 @@ function AdminRoute({judges,reviews,bookings,user,saveJudges,saveReviews}) {
         if(approve){
           await updateDoc(doc(db,"judges",claim.judgeId),{verified:true,claimedBy:claim.userEmail});
           await saveJudges(judges.map(j=>j.id===claim.judgeId?{...j,verified:true,claimedBy:claim.userEmail}:j));
+          // Update user role
           const usersSnap=await getDocs(query(collection(db,"users"),where("uid","==",claim.userId)));
           if(!usersSnap.empty) await updateDoc(usersSnap.docs[0].ref,{role:"judge",judgeId:claim.judgeId});
+          // Auto-reject any other pending claims for the same judge
+          const otherClaims=await getDocs(query(collection(db,"claims"),where("judgeId","==",claim.judgeId)));
+          await Promise.all(otherClaims.docs
+            .filter(d=>d.id!==claim.id&&d.data().status==="pending")
+            .map(d=>updateDoc(d.ref,{status:"rejected"}))
+          );
         }
       }}
     />
