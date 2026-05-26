@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from "react-router-dom";
-import { signInWithGoogle, firebaseSignOut, onAuthChange, trackPageView } from "./firebase";
+import { signInWithGoogle, firebaseSignOut, onAuthChange, trackPageView, initAnalytics, completeRegistration } from "./firebase";
+import { PrivacyPolicy, TermsOfService, CookiePolicy } from "./LegalPages";
 import { FCI_GROUP_NAMES, FCI_GROUP_BREEDS } from "../fci-groups.js";
 import QRCode from "qrcode";
 
@@ -314,21 +315,122 @@ const Modal = ({onClose,children,title,subtitle,wide,confirmClose}) => {
   );
 };
 
+// ── Cookie Banner ──────────────────────────────────────────────────────────────
+function CookieBanner({onAccept, onDecline}) {
+  return (
+    <div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:500,background:T.bg,borderTop:`1px solid ${T.border}`,padding:"14px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,flexWrap:"wrap",boxShadow:"0 -2px 12px rgba(60,64,67,.10)"}}>
+      <p style={{margin:0,fontSize:13,color:T.textSub,lineHeight:1.6,flex:1,minWidth:240}}>
+        We use analytics cookies to understand how people use judge.dog. Essential cookies are always active.{" "}
+        <a href="/cookies" style={{color:T.accent,textDecoration:"none",fontWeight:500}}>Cookie Policy</a>
+      </p>
+      <div style={{display:"flex",gap:8,flexShrink:0}}>
+        <button onClick={onDecline}
+          style={{padding:"8px 18px",borderRadius:100,border:`1.5px solid ${T.border}`,background:"none",color:T.textSub,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit",transition:"background .15s"}}
+          onMouseEnter={e=>e.currentTarget.style.background=T.surface} onMouseLeave={e=>e.currentTarget.style.background="none"}>
+          Decline
+        </button>
+        <button onClick={onAccept}
+          style={{padding:"8px 18px",borderRadius:100,border:"none",background:T.accent,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit",boxShadow:T.shadow}}>
+          Accept analytics
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Consent Modal (new user sign-up) ───────────────────────────────────────────
+function ConsentModal({user, onClose, onComplete}) {
+  const [agreed, setAgreed] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState("");
+
+  async function submit() {
+    if (!agreed) { setErr("You must agree to continue."); return; }
+    setSaving(true); setErr("");
+    try {
+      const full = await completeRegistration(user.uid, { name:user.name, email:user.email, photo:user.photo });
+      onComplete(full);
+    } catch(e) {
+      console.error(e);
+      setErr("Something went wrong — please try again.");
+    }
+    setSaving(false);
+  }
+
+  return (
+    <Modal onClose={onClose} title="One more step" subtitle="Please review and accept our terms before creating your account">
+      <div style={{padding:"14px 16px",background:T.surface,borderRadius:T.rsm,border:`1px solid ${T.border}`,marginBottom:20}}>
+        <p style={{margin:"0 0 4px",fontSize:14,fontWeight:500,color:T.text}}>Welcome to judge.dog</p>
+        <p style={{margin:0,fontSize:13,color:T.textSub,lineHeight:1.6}}>
+          You're signing in as <strong>{user.email}</strong>. Your account will be created
+          with the Exhibitor role. You can submit reviews, message judges, and request bookings.
+        </p>
+      </div>
+      <label style={{display:"flex",alignItems:"flex-start",gap:12,cursor:"pointer",marginBottom:20,userSelect:"none"}}>
+        <input type="checkbox" checked={agreed} onChange={e=>setAgreed(e.target.checked)}
+          style={{marginTop:2,width:16,height:16,accentColor:T.accent,flexShrink:0,cursor:"pointer"}}/>
+        <span style={{fontSize:14,color:T.text,lineHeight:1.65}}>
+          I have read and agree to the{" "}
+          <a href="/terms" target="_blank" rel="noreferrer" style={{color:T.accent,fontWeight:500}}>Terms of Service</a>
+          {" "}and{" "}
+          <a href="/privacy" target="_blank" rel="noreferrer" style={{color:T.accent,fontWeight:500}}>Privacy Policy</a>.
+          I understand that my name, email address, and profile photo will be stored to operate my account.
+        </span>
+      </label>
+      {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
+      <Btn fullWidth onClick={submit} disabled={saving||!agreed}>{saving?"Creating account…":"Create my account"}</Btn>
+      <p style={{margin:"14px 0 0",fontSize:12,color:T.textHint,textAlign:"center",lineHeight:1.6}}>
+        By continuing you also consent to receiving transactional emails (e.g. claim status updates) from judge.dog.
+      </p>
+    </Modal>
+  );
+}
+
+// ── Footer ─────────────────────────────────────────────────────────────────────
+function Footer({onManageCookies}) {
+  return (
+    <div style={{borderTop:`1px solid ${T.border}`,padding:"20px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12,background:T.surface}}>
+      <span style={{fontSize:12,color:T.textHint}}>© {new Date().getFullYear()} Lenis res, MB · judge.dog</span>
+      <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
+        {[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"]].map(([label,href])=>(
+          <a key={href} href={href} style={{fontSize:12,color:T.textHint,textDecoration:"none",transition:"color .15s"}}
+            onMouseEnter={e=>e.currentTarget.style.color=T.accent}
+            onMouseLeave={e=>e.currentTarget.style.color=T.textHint}>
+            {label}
+          </a>
+        ))}
+        <button onClick={onManageCookies}
+          style={{fontSize:12,color:T.textHint,background:"none",border:"none",cursor:"pointer",padding:0,fontFamily:"inherit",transition:"color .15s"}}
+          onMouseEnter={e=>e.currentTarget.style.color=T.accent}
+          onMouseLeave={e=>e.currentTarget.style.color=T.textHint}>
+          Manage cookies
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Auth Modal ─────────────────────────────────────────────────────────────────
 function AuthModal({onClose,onAuth}) {
   const [loading,setLoading]=useState(false);
   const [err,setErr]=useState("");
+  const [pendingUser,setPendingUser]=useState(null);
 
   async function handleGoogle() {
     setLoading(true); setErr("");
     try {
       const user = await signInWithGoogle();
-      onAuth(user); onClose();
+      if (user.needsConsent) { setPendingUser(user); }
+      else { onAuth(user); onClose(); }
     } catch(e) {
       setErr("Sign-in failed. Please try again.");
     }
     setLoading(false);
   }
+
+  if (pendingUser) return (
+    <ConsentModal user={pendingUser} onClose={onClose} onComplete={u=>{onAuth(u);onClose();}}/>
+  );
 
   return (
     <Modal onClose={onClose} title="Sign in to judge.dog" subtitle="Rate judges, write reviews, book talent">
@@ -2096,6 +2198,7 @@ export default function App() {
   const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all");
   const [isMobile,setIsMobile]=useState(window.innerWidth<640);
   const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
+  const [cookieConsent,setCookieConsent]=useState(()=>localStorage.getItem("jyj_cookie_consent"));
   const navigate=useNavigate();
   const location=useLocation();
 
@@ -2127,6 +2230,12 @@ export default function App() {
     window.addEventListener("resize",h);
     return()=>window.removeEventListener("resize",h);
   },[]);
+
+  // Init analytics if already consented
+  useEffect(()=>{ if(cookieConsent==="accepted") initAnalytics(); },[cookieConsent]);
+
+  // If onAuthChange detects a Firebase session with no profile doc, show consent modal
+  useEffect(()=>{ if(user?.needsConsent) setModal("consent"); },[user?.needsConsent]);
 
   useEffect(()=>{ setMobileMenuOpen(false); },[location.pathname]);
 
@@ -2162,6 +2271,9 @@ export default function App() {
     } catch(e){ console.error("Failed to save judges:", e); }
   };
   const saveReviews=async rr=>{setReviews(rr);await sSet(K.reviews,rr);};
+  const acceptCookies=()=>{ localStorage.setItem("jyj_cookie_consent","accepted"); setCookieConsent("accepted"); initAnalytics(); };
+  const declineCookies=()=>{ localStorage.setItem("jyj_cookie_consent","declined"); setCookieConsent("declined"); };
+  const manageCookies=()=>{ localStorage.removeItem("jyj_cookie_consent"); setCookieConsent(null); };
   const saveBookings=async bb=>{setBookings(bb);await sSet(K.bookings,bb);};
   const addReview=useCallback(async r=>{const u=[...reviews,r];await saveReviews(u);},[reviews]);
   const addBooking=useCallback(async b=>{const u=[...bookings,b];await saveBookings(u);},[bookings]);
@@ -2405,10 +2517,21 @@ export default function App() {
             patchJudge={(id,updates)=>setJudges(jj=>jj.map(j=>j.id===id?{...j,...updates}:j))}
             saveJudges={saveJudges} saveReviews={saveReviews}/>
         }/>
+        <Route path="/privacy" element={<PrivacyPolicy/>}/>
+        <Route path="/terms" element={<TermsOfService/>}/>
+        <Route path="/cookies" element={<CookiePolicy/>}/>
         <Route path="*" element={<Navigate to="/" replace/>}/>
       </Routes>
 
+      <Footer onManageCookies={manageCookies}/>
+
+      {cookieConsent===null&&<CookieBanner onAccept={acceptCookies} onDecline={declineCookies}/>}
+
       {modal==="auth"&&<AuthModal onClose={()=>setModal(null)} onAuth={u=>{setUser(u);setModal(null);}}/>}
+      {modal==="consent"&&user?.needsConsent&&(
+        <ConsentModal user={user} onClose={()=>{ firebaseSignOut(); setUser(null); setModal(null); }}
+          onComplete={u=>{ setUser(u); setModal(null); }}/>
+      )}
     </>
   );
 }
