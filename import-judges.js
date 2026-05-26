@@ -15,6 +15,24 @@ const db = admin.firestore();
 // These IDs are never deleted (hidden test/admin profiles)
 const PROTECTED_IDS = ["bogdan-karpovic", "j1","j2","j3","j4","j5","j6","j7","j8"];
 
+function toSlug(name) {
+  return name.toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function assignSlugs(judges) {
+  const counts = {};
+  judges.forEach(j => { const b = toSlug(j.name); counts[b] = (counts[b]||0)+1; });
+  const used = {};
+  return judges.map(j => {
+    const base = toSlug(j.name);
+    if (counts[base] === 1) return { ...j, slug: base };
+    used[base] = (used[base]||0)+1;
+    return { ...j, slug: `${base}-${used[base]}` };
+  });
+}
+
 async function importJudges() {
   console.log("🐕 FCI Judge Importer v3 starting...");
 
@@ -23,7 +41,14 @@ async function importJudges() {
   }
 
   const raw = JSON.parse(readFileSync("fci-full-raw.json", "utf8"));
-  const judges = raw.judges.filter(j => j && j.id && j.name);
+  const judges = assignSlugs(
+    raw.judges.filter(j => j && j.id && j.name).map(j => ({
+      ...j,
+      suspensions: (j.suspensions || []).map(cells =>
+        Array.isArray(cells) ? cells.filter(Boolean).join(" | ") : cells
+      ),
+    }))
+  );
   console.log(`📊 Loaded ${judges.length} judges from fci-full-raw.json`);
 
   // Show sample names for verification
