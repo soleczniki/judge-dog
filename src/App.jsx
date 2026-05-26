@@ -1483,9 +1483,15 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
         {/* Reviews moderation */}
         {tab==="reviews"&&(
           <div style={{background:T.bg,borderRadius:T.r,border:`1px solid ${T.border}`,overflow:"hidden"}}>
-            <div style={{padding:"16px 20px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between"}}>
+            <div style={{padding:"16px 20px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <span style={{fontSize:14,fontWeight:500,color:T.text}}>All reviews</span>
-              <span style={{fontSize:12,color:T.textHint}}>{reviews.length} total</span>
+              <div style={{display:"flex",alignItems:"center",gap:12}}>
+                <span style={{fontSize:12,color:T.textHint}}>{reviews.length} total</span>
+                {reviews.length>0&&<button onClick={()=>{if(window.confirm(`Remove all ${reviews.length} reviews?`)) onRemoveReview("__all__");}}
+                  style={{padding:"4px 12px",borderRadius:100,border:`1px solid ${T.red}`,background:"none",color:T.red,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>
+                  Remove all
+                </button>}
+              </div>
             </div>
             {reviews.slice().reverse().map((r,i)=>{
               const j=judges.find(jj=>jj.id===r.judgeId);
@@ -1999,6 +2005,7 @@ function AdminRoute({judges,reviews,bookings,user,saveJudges,saveReviews}) {
       judges={judges} reviews={reviews} bookings={bookings} user={user}
       onBack={()=>navigate("/")}
       onRemoveReview={async(rid)=>{
+        if(rid==="__all__") { await saveReviews([]); return; }
         if(!window.confirm("Remove this review?")) return;
         await saveReviews(reviews.filter(r=>r.id!==rid));
       }}
