@@ -478,11 +478,14 @@ function ClaimModal({judge,user,onClose}) {
     setSending(true); setErr("");
     try {
       const {db}=await import("./firebase");
-      const {collection,addDoc,query,where,getDocs}=await import("firebase/firestore");
-      // Prevent duplicate pending claims from same user
-      const existing=await getDocs(query(collection(db,"claims"),where("judgeId","==",judge.id),where("userId","==",user.uid),where("status","==","pending")));
-      if(!existing.empty){setErr("You already have a pending claim for this profile.");setSending(false);return;}
-      await addDoc(collection(db,"claims"),{
+      const {doc,setDoc,getDoc}=await import("firebase/firestore");
+      // Deterministic ID prevents duplicates without a composite index
+      const claimId=`${judge.id}__${user.uid}`;
+      const existing=await getDoc(doc(db,"claims",claimId));
+      if(existing.exists()&&existing.data().status==="pending"){
+        setErr("You already have a pending claim for this profile.");setSending(false);return;
+      }
+      await setDoc(doc(db,"claims",claimId),{
         judgeId:judge.id, judgeName:judge.name, judgeSlug:judge.slug||judge.id,
         userId:user.uid, userName:user.name, userEmail:user.email,
         status:"pending", submittedAt:new Date().toISOString(),
