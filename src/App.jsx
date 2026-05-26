@@ -881,9 +881,13 @@ function JudgeCard({judge,reviews,onClick}) {
         {breedSummary()}
       </div>
       <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:T.textHint,paddingTop:10,borderTop:`1px solid ${T.border}`}}>
-        <span>{rv.length} review{rv.length!==1?"s":""}</span>
-        {rv.length>0&&<span style={{color:T.green,fontWeight:500}}>{Math.round(wr/rv.length*100)}% would return</span>}
-        {rv.length===0&&<span style={{fontStyle:"italic"}}>No reviews yet</span>}
+        {rv.length===0
+          ? <span style={{fontStyle:"italic"}}>No reviews yet</span>
+          : <>
+              <span>{rv.length} review{rv.length!==1?"s":""}</span>
+              <span style={{color:T.green,fontWeight:500}}>{Math.round(wr/rv.length*100)}% would return</span>
+            </>
+        }
       </div>
     </div>
   );
