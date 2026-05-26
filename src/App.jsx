@@ -331,7 +331,7 @@ function CookieBanner({onAccept, onDecline}) {
         </button>
         <button onClick={onAccept}
           style={{padding:"8px 18px",borderRadius:100,border:"none",background:T.accent,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit",boxShadow:T.shadow}}>
-          Accept analytics
+          Accept cookies
         </button>
       </div>
     </div>
