@@ -1229,6 +1229,40 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
     })();
   },[user,judge.id,judge.claimedBy]);
 
+  // JSON-LD structured data for SEO
+  useEffect(()=>{
+    const profileUrl=`https://judge.dog/judge/${judge.slug||judge.id}`;
+    const orgsStr=judge.orgs?.map(o=>o.org).join(", ")||"";
+    const desc=judge.bio
+      ?judge.bio.slice(0,200)
+      :`Dog show judge from ${judge.country||""}${orgsStr?`, licensed by ${orgsStr}`:""}.`;
+    const ld={
+      "@context":"https://schema.org",
+      "@type":"Person",
+      "name":judge.name,
+      "url":profileUrl,
+      "jobTitle":"Dog Show Judge",
+      "description":desc,
+      ...(judge.country&&{"nationality":judge.country}),
+    };
+    if(rv.length>0){
+      const ratingVal=avg(rv.map(r=>r.overall)).toFixed(1);
+      ld.aggregateRating={
+        "@type":"AggregateRating",
+        "ratingValue":ratingVal,
+        "reviewCount":rv.length,
+        "bestRating":"5",
+        "worstRating":"1",
+      };
+    }
+    const s=document.createElement("script");
+    s.type="application/ld+json";
+    s.id="judge-ld-json";
+    s.text=JSON.stringify(ld);
+    document.head.appendChild(s);
+    return()=>{ document.getElementById("judge-ld-json")?.remove(); };
+  },[judge.id,rv.length]);
+
   // Use the judge's primary discipline group for the rating breakdown
   const primaryGroup = judgeGroups(judge)[0];
   const breakdownDims = [...UNIVERSAL_DIMS, ...(GROUP_DIMS[primaryGroup]||GROUP_DIMS.A)];

@@ -1,0 +1,59 @@
+name: Weekly Judge Sync
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"   # Every Monday at 03:00 UTC
+  workflow_dispatch:        # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360    # FCI scrape can take several hours
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 \
+            libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
+
+      - name: Run FCI scraper (new judges only)
+        run: |
+          # Read last processed ID from progress file if it exists
+          if [ -f fci-full-progress.json ]; then
+            LAST_ID=$(node -e "const p=require('./fci-full-progress.json'); console.log(p.lastId||0)")
+            echo "Resuming from ID $LAST_ID"
+            node scrape-fci-full.js --start-from=$((LAST_ID+1))
+          else
+            echo "No progress file found — running full scrape"
+            node scrape-fci-full.js
+          fi
+
+      - name: Sync to Firestore
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node sync-judges.js
+
+      - name: Regenerate sitemap
+        run: node generate-sitemap.js
+
+      - name: Commit updated data
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add fci-full-raw.json fci-full-progress.json public/sitemap.xml
+          git diff --staged --quiet || git commit -m "chore: weekly judge sync [skip ci]"
+          git push
