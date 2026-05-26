@@ -11,7 +11,7 @@ const firebaseConfig = {
   storageBucket: "judge-dog.firebasestorage.app",
   messagingSenderId: "585681431524",
   appId: "1:585681431524:web:c3f4fbd7b8839433f775f1",
-  measurementId: "G-WR1N7R6MZR"
+  measurementId: "G-0BXPLPM3LN"
 };
 
 const app = initializeApp(firebaseConfig);
