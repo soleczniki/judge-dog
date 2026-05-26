@@ -147,6 +147,41 @@ function forwardMessageHtml({ judgeName, judgeSlug, fromName, messageText }) {
 </html>`;
 }
 
+function contactNotifyHtml({ name, email, subject, message }) {
+  const safe = s => s.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f8f9fa;font-family:'Segoe UI',system-ui,sans-serif;color:#202124;">
+  <div style="max-width:520px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(60,64,67,.15);">
+    <div style="background:#1a73e8;padding:28px 32px;">
+      <span style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.5px;">judge<span style="font-weight:400;">.dog</span></span>
+    </div>
+    <div style="padding:32px;">
+      <p style="margin:0 0 8px;font-size:22px;font-weight:400;color:#202124;">New contact message</p>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px;">
+        <tr style="background:#f8f9fa;">
+          <td style="padding:8px 12px;color:#9aa0a6;width:80px;">From</td>
+          <td style="padding:8px 12px;color:#202124;">${safe(name)}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;color:#9aa0a6;">Email</td>
+          <td style="padding:8px 12px;color:#202124;"><a href="mailto:${email}" style="color:#1a73e8;">${safe(email)}</a></td>
+        </tr>
+        <tr style="background:#f8f9fa;">
+          <td style="padding:8px 12px;color:#9aa0a6;">Subject</td>
+          <td style="padding:8px 12px;color:#202124;">${safe(subject)}</td>
+        </tr>
+      </table>
+      <div style="background:#f8f9fa;border-left:3px solid #1a73e8;border-radius:4px;padding:16px 18px;font-size:14px;color:#202124;line-height:1.75;">
+        ${safe(message)}
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
 // ── Notify admin when a new claim is submitted ─────────────────────────────────
 exports.onClaimCreated = onDocumentCreated(
   { document: "claims/{claimId}", secrets: [RESEND_KEY] },
@@ -164,6 +199,23 @@ exports.onClaimCreated = onDocumentCreated(
         judgeName: claim.judgeName,
         judgeSlug: claim.judgeSlug,
       }),
+    });
+  }
+);
+
+// ── Notify admin when a contact form is submitted ─────────────────────────────
+exports.onContactCreated = onDocumentCreated(
+  { document: "contact/{contactId}", secrets: [RESEND_KEY] },
+  async (event) => {
+    const c = event.data.data();
+    if (!c) return;
+    const resend = new Resend(RESEND_KEY.value());
+    await resend.emails.send({
+      from: FROM,
+      to: ADMIN_EMAIL,
+      replyTo: c.email,
+      subject: `Contact: ${c.subject || "(no subject)"} — ${c.name}`,
+      html: contactNotifyHtml({ name: c.name, email: c.email, subject: c.subject, message: c.message }),
     });
   }
 );
