@@ -161,7 +161,7 @@ const SEED_REVIEWS = [
   { id:"r7", judgeId:"j7", userId:"u_s7", userName:"Anke V.", breed:"Keeshond", show:"Amsterdam Winner 2023", date:"2023-10-22", overall:5, breedKnowledge:5, consistency:5, ringManner:4, examinationThoroughness:5, punctuality:5, noviceFriendliness:4, handlerIndependence:5, critiqueQuality:5, wouldReturn:true, text:"Patricia is one of the most knowledgeable Dutch breed judges around. Thorough examination, clear in her reasoning. My Keeshond went BOB and she specifically called out his beautiful head and correct expression in the critique.", reply:null },
 ];
 
-const K = { judges:"jyj_v4_judges", reviews:"jyj_v4_reviews", users:"jyj_v4_users", session:"jyj_v4_session", bookings:"jyj_v4_bookings" };
+const K = { judges:"jyj_v5_judges", reviews:"jyj_v5_reviews", users:"jyj_v5_users", session:"jyj_v5_session", bookings:"jyj_v5_bookings" };
 async function sGet(k,fb){ try{ const r=await window.storage.get(k); return r?JSON.parse(r.value):fb; }catch{ return fb; } }
 async function sSet(k,v){ try{ await window.storage.set(k,JSON.stringify(v)); }catch{} }
 
@@ -1997,7 +1997,7 @@ function JudgeDashboard({user, judge, reviews, unreadMsgCount, onEditProfile, on
 }
 
 // ── Admin Route ────────────────────────────────────────────────────────────────
-function AdminRoute({judges,reviews,bookings,user,saveJudges,saveReviews}) {
+function AdminRoute({judges,reviews,bookings,user,patchJudge,saveJudges,saveReviews}) {
   const navigate=useNavigate();
   if(!user||user.role!=="admin") return <Navigate to="/"/>;
   return (
@@ -2015,10 +2015,9 @@ function AdminRoute({judges,reviews,bookings,user,saveJudges,saveReviews}) {
         await updateDoc(doc(db,"claims",claim.id),{status:approve?"approved":"rejected"});
         if(approve){
           await updateDoc(doc(db,"judges",claim.judgeId),{verified:true,claimedBy:claim.userEmail});
-          await saveJudges(judges.map(j=>j.id===claim.judgeId?{...j,verified:true,claimedBy:claim.userEmail}:j));
-          // Update user role
-          const usersSnap=await getDocs(query(collection(db,"users"),where("uid","==",claim.userId)));
-          if(!usersSnap.empty) await updateDoc(usersSnap.docs[0].ref,{role:"judge",judgeId:claim.judgeId});
+          patchJudge(claim.judgeId,{verified:true,claimedBy:claim.userEmail});
+          // Update user role — doc ID is the user's uid
+          await updateDoc(doc(db,"users",claim.userId),{role:"judge",judgeId:claim.judgeId});
           // Auto-reject any other pending claims for the same judge
           const otherClaims=await getDocs(query(collection(db,"claims"),where("judgeId","==",claim.judgeId)));
           await Promise.all(otherClaims.docs
@@ -2058,7 +2057,7 @@ export default function App() {
       }
       const sr=await sGet(K.reviews,null);
       const sb=await sGet(K.bookings,null);
-      if(!sr){await sSet(K.reviews,SEED_REVIEWS);setReviews(SEED_REVIEWS);}else setReviews(sr);
+      if(!sr){await sSet(K.reviews,[]);setReviews([]);}else setReviews(sr);
       if(!sb){await sSet(K.bookings,[]);setBookings([]);}else setBookings(sb);
       setLoading(false);
     })();
@@ -2346,6 +2345,7 @@ export default function App() {
         <Route path="/messages" element={<MessagesRoute user={user}/>}/>
         <Route path="/admin" element={
           <AdminRoute judges={judges} reviews={reviews} bookings={bookings} user={user}
+            patchJudge={(id,updates)=>setJudges(jj=>jj.map(j=>j.id===id?{...j,...updates}:j))}
             saveJudges={saveJudges} saveReviews={saveReviews}/>
         }/>
         <Route path="*" element={<Navigate to="/" replace/>}/>
