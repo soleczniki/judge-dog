@@ -1136,10 +1136,10 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
 
         {/* Actions */}
         <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:24}}>
-          {!isOwner&&!hasReviewed&&<Btn onClick={onReview}>{user?"Write a review":"Sign in to review"}</Btn>}
-          {!isOwner&&hasReviewed&&<Chip bg={T.greenLight} color={T.green}>✓ Reviewed</Chip>}
+          {!isOwner&&!claimStatus&&!hasReviewed&&<Btn onClick={onReview}>{user?"Write a review":"Sign in to review"}</Btn>}
+          {!isOwner&&!claimStatus&&hasReviewed&&<Chip bg={T.greenLight} color={T.green}>✓ Reviewed</Chip>}
           {canBook&&<Btn onClick={onBook} color={T.green} icon="📅">Request booking</Btn>}
-          {!isOwner&&<Btn onClick={onContact} variant="outlined">Contact</Btn>}
+          {!isOwner&&!claimStatus&&<Btn onClick={onContact} variant="outlined">Contact</Btn>}
           {isOwner&&<Btn onClick={onEditProfile} variant="outlined" icon="✏">Edit profile</Btn>}
         </div>
 
@@ -1461,7 +1461,7 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
                   <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>
                     <span style={{color:T.accent}}>{claim.userName}</span>
                     <span style={{color:T.textHint,fontWeight:400}}> claims to be </span>
-                    <span>{claim.judgeName}</span>
+                    <a href={`/judge/${claim.judgeSlug}`} target="_blank" rel="noreferrer" style={{color:T.text,textDecoration:"underline",textDecorationColor:T.border}}>{claim.judgeName}</a>
                   </p>
                   <p style={{margin:"2px 0 0",fontSize:12,color:T.textHint}}>{claim.userEmail} · {new Date(claim.submittedAt).toLocaleString()}</p>
                 </div>
