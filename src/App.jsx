@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from "react-router-dom";
-import { signInWithGoogle, firebaseSignOut, onAuthChange } from "./firebase";
+import { signInWithGoogle, firebaseSignOut, onAuthChange, trackPageView } from "./firebase";
 import { FCI_GROUP_NAMES, FCI_GROUP_BREEDS } from "../fci-groups.js";
 import QRCode from "qrcode";
 
@@ -1569,7 +1569,10 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
 // ── Scroll restoration ─────────────────────────────────────────────────────────
 function ScrollToTop() {
   const {pathname}=useLocation();
-  useEffect(()=>{ window.scrollTo(0,0); },[pathname]);
+  useEffect(()=>{
+    window.scrollTo(0,0);
+    trackPageView(pathname);
+  },[pathname]);
   return null;
 }
 

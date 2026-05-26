@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB4qLXRui9ZaOT5bF6Cd1EMuEbQwmDgUMA",
@@ -17,6 +18,11 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+export const analytics = getAnalytics(app);
+
+export function trackPageView(path) {
+  logEvent(analytics, "page_view", { page_path: path });
+}
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
