@@ -51,7 +51,8 @@ function rejectedHtml({ userName, judgeName }) {
       <p style="margin:0 0 8px;font-size:22px;font-weight:400;color:#202124;">Claim not approved</p>
       <p style="margin:0 0 24px;font-size:14px;color:#5f6368;line-height:1.6;">
         Hi ${userName}, we were unable to verify your claim for <strong>${judgeName}</strong>
-        at this time. If you believe this is an error, please reply to this email.
+        at this time. If you believe this is an error, contact us at
+        <a href="mailto:hi@judge.dog" style="color:#1a73e8;">hi@judge.dog</a>.
       </p>
       <a href="https://judge.dog" style="display:inline-block;padding:12px 24px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:100px;font-size:14px;font-weight:500;">Go to judge.dog</a>
     </div>

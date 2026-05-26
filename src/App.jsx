@@ -1308,6 +1308,8 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
   const [claimQueue,setClaimQueue]=useState([]);
   const [allClaims,setAllClaims]=useState([]);
   const [claimsFilter,setClaimsFilter]=useState("pending");
+  const [rejectingId,setRejectingId]=useState(null);
+  const [rejectNote,setRejectNote]=useState("");
 
   useEffect(()=>{
     (async()=>{
@@ -1475,8 +1477,10 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
               ):displayed.map((claim,i)=>{
                 const sc=statusColors[claim.status]||statusColors.pending;
                 const isPending=claim.status==="pending";
+                const isRejecting=rejectingId===claim.id;
                 return (
-                  <div key={claim.id} style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",borderBottom:i<displayed.length-1?`1px solid ${T.border}`:"none",flexWrap:"wrap",opacity:isPending?1:0.85}}>
+                  <div key={claim.id} style={{borderBottom:i<displayed.length-1?`1px solid ${T.border}`:"none"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",flexWrap:"wrap",opacity:isPending?1:0.85}}>
                     <div style={{flex:1,minWidth:0}}>
                       <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text,display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
                         <span style={{color:T.accent}}>{claim.userName}</span>
@@ -1486,18 +1490,37 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
                       </p>
                       <p style={{margin:"3px 0 0",fontSize:12,color:T.textHint}}>{claim.userEmail} · {new Date(claim.submittedAt).toLocaleString()}</p>
                     </div>
-                    {isPending&&(
+                    {isPending&&!isRejecting&&(
                       <div style={{display:"flex",gap:8,flexShrink:0}}>
-                        <button onClick={async()=>{try{await onVerifyJudge(claim,true);setAllClaims(a=>a.map(c=>c.judgeId===claim.judgeId&&c.status==="pending"?{...c,status:"approved"}:c));setClaimQueue(q=>q.filter(c=>c.judgeId!==claim.judgeId));}catch{}}}
+                        <button onClick={async()=>{try{await onVerifyJudge(claim,true,"");setAllClaims(a=>a.map(c=>c.judgeId===claim.judgeId&&c.status==="pending"?{...c,status:"approved"}:c));setClaimQueue(q=>q.filter(c=>c.judgeId!==claim.judgeId));}catch{}}}
                           style={{padding:"7px 16px",borderRadius:100,border:"none",background:T.green,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
                           ✓ Approve
                         </button>
-                        <button onClick={async()=>{try{await onVerifyJudge(claim,false);setAllClaims(a=>a.map(c=>c.id===claim.id?{...c,status:"rejected"}:c));setClaimQueue(q=>q.filter(c=>c.id!==claim.id));}catch{}}}
+                        <button onClick={()=>{setRejectingId(claim.id);setRejectNote("");}}
                           style={{padding:"7px 16px",borderRadius:100,border:`1px solid ${T.red}`,background:"none",color:T.red,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
                           ✗ Reject
                         </button>
                       </div>
                     )}
+                  </div>
+                  {isRejecting&&(
+                    <div style={{padding:"0 20px 16px",display:"flex",flexDirection:"column",gap:10}}>
+                      <textarea value={rejectNote} onChange={e=>setRejectNote(e.target.value)} rows={2}
+                        placeholder="Internal note (optional) — not shown to claimant"
+                        style={{padding:"9px 13px",border:`1.5px solid ${T.border}`,borderRadius:T.rsm,fontSize:13,fontFamily:"inherit",resize:"none",outline:"none",color:T.text,background:T.surface,lineHeight:1.5}}
+                        onFocus={e=>e.target.style.borderColor=T.accent} onBlur={e=>e.target.style.borderColor=T.border}/>
+                      <div style={{display:"flex",gap:8}}>
+                        <button onClick={()=>{setRejectingId(null);setRejectNote("");}}
+                          style={{padding:"7px 16px",borderRadius:100,border:`1px solid ${T.border}`,background:"none",color:T.textSub,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
+                          Cancel
+                        </button>
+                        <button onClick={async()=>{try{await onVerifyJudge(claim,false,rejectNote);setAllClaims(a=>a.map(c=>c.id===claim.id?{...c,status:"rejected",adminNote:rejectNote}:c));setClaimQueue(q=>q.filter(c=>c.id!==claim.id));setRejectingId(null);setRejectNote("");}catch{}}}
+                          style={{padding:"7px 16px",borderRadius:100,border:"none",background:T.red,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
+                          Confirm rejection
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   </div>
                 );
               })}
@@ -2034,11 +2057,13 @@ function AdminRoute({judges,reviews,bookings,user,patchJudge,saveJudges,saveRevi
         if(!window.confirm("Remove this review?")) return;
         await saveReviews(reviews.filter(r=>r.id!==rid));
       }}
-      onVerifyJudge={async(claim,approve)=>{
+      onVerifyJudge={async(claim,approve,note="")=>{
         try {
           const {db}=await import("./firebase");
           const {doc,updateDoc,collection,query,where,getDocs}=await import("firebase/firestore");
-          await updateDoc(doc(db,"claims",claim.id),{status:approve?"approved":"rejected"});
+          const update={status:approve?"approved":"rejected"};
+          if(!approve&&note.trim()) update.adminNote=note.trim();
+          await updateDoc(doc(db,"claims",claim.id),update);
           if(approve){
             await updateDoc(doc(db,"judges",claim.judgeId),{verified:true,claimedBy:claim.userEmail});
             patchJudge(claim.judgeId,{verified:true,claimedBy:claim.userEmail});
