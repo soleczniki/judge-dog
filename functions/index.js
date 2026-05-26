@@ -211,9 +211,10 @@ exports.onContactCreated = onDocumentCreated(
     const c = event.data.data();
     if (!c) return;
 
-    if (c.recaptchaToken) {
+    const secret = RECAPTCHA_SECRET.value();
+    if (c.recaptchaToken && secret && secret !== "NOT_CONFIGURED") {
       const verify = await fetch(
-        `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET.value()}&response=${c.recaptchaToken}`,
+        `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${c.recaptchaToken}`,
         { method: "POST" }
       );
       const result = await verify.json();

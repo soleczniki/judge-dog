@@ -1,23 +1,19 @@
-// ── FCI Judge Sync (diff/upsert) ───────────────────────────────────────────────
-// Reads fci-full-raw.json, compares with Firestore, adds/updates only what changed.
-// Does NOT delete judges that have disappeared (they may have reviews).
+// ── FCI Judge Sync (diff/upsert) ──────────────────────────────────────────────
+// Reads fci-full-raw.json, compares with Firestore, adds/updates changed judges.
+// Does NOT delete existing judges (they may have reviews/claims attached).
 // Run: node sync-judges.js
-// CI:  set FIREBASE_SERVICE_ACCOUNT env var with service account JSON contents
 
 import { readFileSync, existsSync, writeFileSync } from "fs";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-const admin = require("firebase-admin");
 
-// Auth: prefer env var (CI), fall back to local file
-const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
-  ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-  : JSON.parse(readFileSync("./serviceAccount.json", "utf8"));
+const admin = require("firebase-admin");
+const serviceAccount = JSON.parse(readFileSync("./serviceAccount.json", "utf8"));
 
 admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 const db = admin.firestore();
 
-const PROTECTED_IDS = ["bogdan-karpovic","j1","j2","j3","j4","j5","j6","j7","j8"];
+const PROTECTED_IDS = ["bogdan-karpovic", "j1","j2","j3","j4","j5","j6","j7","j8"];
 
 function toSlug(name) {
   return name.toLowerCase()
@@ -37,13 +33,18 @@ function assignSlugs(judges) {
   });
 }
 
-function fieldsChanged(existing, incoming) {
-  const watched = ["name","country","flag","breeds","groupNames","allBreedJudge","orgs",
-    "fciLicenceId","fciLicenceCountry","birthYear","licensedYear","suspensions","disciplines"];
-  return watched.some(k => JSON.stringify(existing[k]) !== JSON.stringify(incoming[k]));
+// Fields to compare for change detection (skip user-editable fields like bio/social/verified)
+const TRACKED_FIELDS = [
+  "name","country","flag","fciLicenceCountry","fciLicenceId","fciLicenceDate",
+  "breeds","allBreedJudge","groupNames","authorizedBreeds","disciplines",
+  "disciplineGroups","suspensions","birthYear","licensedYear","kennelClub","status",
+];
+
+function hasChanged(existing, incoming) {
+  return TRACKED_FIELDS.some(f => JSON.stringify(existing[f]) !== JSON.stringify(incoming[f]));
 }
 
-async function sync() {
+async function syncJudges() {
   console.log("🔄 FCI Judge Sync starting...");
 
   if (!existsSync("fci-full-raw.json")) {
@@ -61,56 +62,87 @@ async function sync() {
   );
   console.log(`📊 ${incoming.length} judges in fci-full-raw.json`);
 
-  // Fetch all current Firestore judge IDs + data
-  console.log("📥 Fetching current Firestore judges...");
-  const snap = await db.collection("judges").get();
-  const existing = {};
-  snap.docs.forEach(d => { existing[d.id] = d.data(); });
-  console.log(`📊 ${Object.keys(existing).length} judges currently in Firestore`);
+  // Fetch all existing Firestore judges
+  console.log("📥 Fetching existing Firestore judges...");
+  const existing = await db.collection("judges").get();
+  const existingMap = {};
+  existing.docs.forEach(d => { existingMap[d.id] = d.data(); });
+  console.log(`   ${existing.size} judges currently in Firestore`);
 
   const toAdd = [];
   const toUpdate = [];
 
   for (const judge of incoming) {
     if (PROTECTED_IDS.includes(judge.id)) continue;
-    if (!existing[judge.id]) {
+    if (!existingMap[judge.id]) {
       toAdd.push(judge);
-    } else if (fieldsChanged(existing[judge.id], judge)) {
-      // Preserve user-added fields (bio, profilePhoto, social, etc.)
-      toUpdate.push({ ...existing[judge.id], ...judge });
+    } else if (hasChanged(existingMap[judge.id], judge)) {
+      // Merge: keep user-editable fields (bio, social, verified, claimedBy, etc.)
+      toUpdate.push({ ...existingMap[judge.id], ...judge,
+        bio: existingMap[judge.id].bio || judge.bio || "",
+        social: existingMap[judge.id].social || {},
+        verified: existingMap[judge.id].verified || false,
+        claimedBy: existingMap[judge.id].claimedBy || null,
+        profilePhoto: existingMap[judge.id].profilePhoto || null,
+        highlights: existingMap[judge.id].highlights || [],
+        headline: existingMap[judge.id].headline || "",
+        lastUpdated: new Date().toISOString(),
+      });
     }
   }
 
-  console.log(`\n📋 Changes: ${toAdd.length} new, ${toUpdate.length} updated, ${Object.keys(existing).length - toUpdate.length - toAdd.length} unchanged`);
+  console.log(`\n📋 Summary:`);
+  console.log(`   New judges:     ${toAdd.length}`);
+  console.log(`   Updated judges: ${toUpdate.length}`);
+  console.log(`   Unchanged:      ${incoming.length - toAdd.length - toUpdate.length}`);
 
-  const BATCH_SIZE = 400;
   const allChanges = [...toAdd, ...toUpdate];
-
   if (allChanges.length === 0) {
-    console.log("✅ Nothing to sync — Firestore is up to date.");
+    console.log("\n✅ Nothing to sync — Firestore is up to date.");
     process.exit(0);
   }
 
+  // Write in batches of 400
+  const BATCH_SIZE = 400;
+  let written = 0;
   for (let i = 0; i < allChanges.length; i += BATCH_SIZE) {
     const batch = db.batch();
     allChanges.slice(i, i + BATCH_SIZE).forEach(j => {
       batch.set(db.collection("judges").doc(j.id), j, { merge: true });
     });
     await batch.commit();
-    console.log(`  ✅ ${Math.min(i + BATCH_SIZE, allChanges.length)}/${allChanges.length} written`);
+    written += Math.min(BATCH_SIZE, allChanges.length - i);
+    console.log(`   📤 ${written}/${allChanges.length} written...`);
   }
 
-  console.log(`\n🎉 Sync complete: ${toAdd.length} added, ${toUpdate.length} updated.`);
+  // Regenerate sitemap
+  const BASE = "https://judge.dog";
+  const TODAY = new Date().toISOString().slice(0, 10);
+  const staticPages = [
+    { url:"/",        priority:"1.0", changefreq:"daily" },
+    { url:"/privacy", priority:"0.3", changefreq:"monthly" },
+    { url:"/terms",   priority:"0.3", changefreq:"monthly" },
+    { url:"/cookies", priority:"0.3", changefreq:"monthly" },
+  ];
+  const judgeUrls = incoming.map(j => ({ url:`/judge/${j.slug}`, priority:"0.8", changefreq:"weekly" }));
+  const allUrls = [...staticPages, ...judgeUrls];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allUrls.map(({url,priority,changefreq})=>`  <url>
+    <loc>${BASE}${url}</loc>
+    <lastmod>${TODAY}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`).join("\n")}
+</urlset>`;
+  writeFileSync("public/sitemap.xml", xml);
+  console.log(`\n🗺️  Sitemap updated: ${allUrls.length} URLs`);
 
-  // Write summary for GitHub Actions step output
-  if (process.env.GITHUB_OUTPUT) {
-    writeFileSync(process.env.GITHUB_OUTPUT,
-      `added=${toAdd.length}\nupdated=${toUpdate.length}\n`,
-      { flag: "a" }
-    );
-  }
-
+  console.log(`\n🎉 Sync complete! ${toAdd.length} added, ${toUpdate.length} updated.`);
   process.exit(0);
 }
 
-sync().catch(e => { console.error("❌", e.message); process.exit(1); });
+syncJudges().catch(e => {
+  console.error("❌ Error:", e.message);
+  process.exit(1);
+});
