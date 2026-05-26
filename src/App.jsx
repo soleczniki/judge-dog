@@ -469,18 +469,45 @@ function BookingModal({judge,user,onClose,onSubmit}) {
 }
 
 // ── Claim Modal ────────────────────────────────────────────────────────────────
-function ClaimModal({judge,user,onClose,onClaim}) {
-  const [input,setInput]=useState(""); const [err,setErr]=useState("");
+function ClaimModal({judge,user,onClose}) {
+  const [sending,setSending]=useState(false);
+  const [done,setDone]=useState(false);
+  const [err,setErr]=useState("");
+
   async function submit() {
-    if (!judge.orgs.map(o=>o.id.toLowerCase()).includes(input.trim().toLowerCase())) { setErr("License number doesn't match our records."); return; }
-    await onClaim(); onClose();
+    setSending(true); setErr("");
+    try {
+      const {db}=await import("./firebase");
+      const {collection,addDoc,query,where,getDocs}=await import("firebase/firestore");
+      // Prevent duplicate pending claims from same user
+      const existing=await getDocs(query(collection(db,"claims"),where("judgeId","==",judge.id),where("userId","==",user.uid),where("status","==","pending")));
+      if(!existing.empty){setErr("You already have a pending claim for this profile.");setSending(false);return;}
+      await addDoc(collection(db,"claims"),{
+        judgeId:judge.id, judgeName:judge.name, judgeSlug:judge.slug||judge.id,
+        userId:user.uid, userName:user.name, userEmail:user.email,
+        status:"pending", submittedAt:new Date().toISOString(),
+      });
+      setDone(true);
+    } catch(e){setErr("Failed to submit — please try again.");}
+    setSending(false);
   }
+
+  if(done) return (
+    <Modal onClose={onClose} title="Claim submitted">
+      <div style={{textAlign:"center",padding:"12px 0 8px"}}>
+        <div style={{width:60,height:60,borderRadius:"50%",background:T.greenLight,display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,margin:"0 auto 16px"}}>✓</div>
+        <p style={{fontSize:15,fontWeight:500,color:T.text,margin:"0 0 8px"}}>Request received</p>
+        <p style={{fontSize:13,color:T.textSub,margin:"0 0 24px",lineHeight:1.6}}>We'll review your claim and approve it shortly. Once approved you'll have full access to your profile.</p>
+        <Btn onClick={onClose}>Done</Btn>
+      </div>
+    </Modal>
+  );
+
   return (
-    <Modal onClose={onClose} title="Claim this profile" subtitle="Verify your identity to manage this profile">
-      <p style={{fontSize:13,color:T.textSub,lineHeight:1.7,margin:"0 0 16px"}}>Enter one of your official license numbers — e.g. <code style={{background:T.surface,padding:"1px 6px",borderRadius:4,fontSize:12}}>{judge.orgs[0]?.id}</code></p>
-      <Field label="License number" value={input} onChange={e=>setInput(e.target.value)} placeholder={judge.orgs[0]?.id} style={{marginBottom:16}}/>
+    <Modal onClose={onClose} title="Claim this profile" subtitle={`Are you ${judge.name}?`}>
+      <p style={{fontSize:13,color:T.textSub,lineHeight:1.7,margin:"0 0 20px"}}>Once approved you'll be able to manage your profile, reply to reviews, and receive messages directly from exhibitors and show organisers.</p>
       {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
-      <Btn fullWidth onClick={submit}>Verify & claim</Btn>
+      <Btn fullWidth onClick={submit} disabled={sending}>{sending?"Submitting…":"Submit claim request"}</Btn>
     </Modal>
   );
 }
@@ -999,7 +1026,7 @@ function QRSection({judge}) {
 }
 
 // ── Judge Page ─────────────────────────────────────────────────────────────────
-function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProfile,onContact,onSaveReply}) {
+function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProfile,onContact,onSaveReply,onRequestAuth}) {
   const [modal,setModal]=useState(null); const [replyTarget,setReplyTarget]=useState(null);
   const rv=reviews.filter(r=>r.judgeId===judge.id).sort((a,b)=>b.date.localeCompare(a.date));
   const wr=rv.filter(r=>r.wouldReturn).length;
@@ -1070,15 +1097,27 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
           <QRSection judge={judge}/>
         </div>
 
+        {/* Is this you? banner — shown to everyone on unclaimed profiles */}
+        {!judge.claimedBy&&(
+          <div style={{background:T.accentLight,border:`1px solid #c5d9f7`,borderRadius:T.r,padding:"14px 18px",marginBottom:20,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+            <div>
+              <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>Is this you?</p>
+              <p style={{margin:"2px 0 0",fontSize:13,color:T.textSub}}>Claim this profile to manage it, reply to reviews and receive messages.</p>
+            </div>
+            {user
+              ? <Btn onClick={onClaim} small>Claim profile</Btn>
+              : <Btn onClick={onRequestAuth} small>Sign in to claim</Btn>
+            }
+          </div>
+        )}
+
         {/* Actions */}
         <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:24}}>
           {!isOwner&&!hasReviewed&&<Btn onClick={onReview}>{user?"Write a review":"Sign in to review"}</Btn>}
           {!isOwner&&hasReviewed&&<Chip bg={T.greenLight} color={T.green}>✓ Reviewed</Chip>}
           {canBook&&<Btn onClick={onBook} color={T.green} icon="📅">Request booking</Btn>}
           {!isOwner&&<Btn onClick={onContact} variant="outlined">Contact</Btn>}
-          {!judge.verified&&user&&user.role==="judge"&&!judge.claimedBy&&<Btn onClick={onClaim} variant="outlined">Claim profile</Btn>}
           {isOwner&&<Btn onClick={onEditProfile} variant="outlined" icon="✏">Edit profile</Btn>}
-          {!canBook&&user&&user.role==="organizer"&&!judge.verified&&<span style={{fontSize:13,color:T.textHint,alignSelf:"center"}}>Judge hasn't claimed their profile — bookings unavailable</span>}
         </div>
 
         {/* Official Details */}
@@ -1246,21 +1285,20 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
   const [claimQueue,setClaimQueue]=useState([]);
 
   useEffect(()=>{
-    // Load all users from Firestore
     (async()=>{
       try {
         const {db} = await import("./firebase");
-        const {collection,getDocs} = await import("firebase/firestore");
-        const snap = await getDocs(collection(db,"users"));
-        const users = snap.docs.map(d=>({id:d.id,...d.data()}));
-        setAllUsers(users);
+        const {collection,getDocs,query,where} = await import("firebase/firestore");
+        const [usersSnap,claimsSnap] = await Promise.all([
+          getDocs(collection(db,"users")),
+          getDocs(query(collection(db,"claims"),where("status","==","pending"))),
+        ]);
+        setAllUsers(usersSnap.docs.map(d=>({id:d.id,...d.data()})));
+        setClaimQueue(claimsSnap.docs.map(d=>({id:d.id,...d.data()})));
       } catch(e){ console.error(e); }
       setLoadingUsers(false);
     })();
-    // Find judges with pending claims (verified=false but claimedBy set)
-    const pending = judges.filter(j=>j.claimedBy&&!j.verified);
-    setClaimQueue(pending);
-  },[judges]);
+  },[]);
 
   async function changeRole(uid,newRole){
     try {
@@ -1388,24 +1426,23 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
         {tab==="claims"&&(
           <div style={{background:T.bg,borderRadius:T.r,border:`1px solid ${T.border}`,overflow:"hidden"}}>
             <div style={{padding:"16px 20px",borderBottom:`1px solid ${T.border}`}}>
-              <span style={{fontSize:14,fontWeight:500,color:T.text}}>Judge profile claims awaiting verification</span>
+              <span style={{fontSize:14,fontWeight:500,color:T.text}}>Pending profile claims</span>
             </div>
             {claimQueue.length===0?(
               <div style={{padding:48,textAlign:"center",color:T.textHint,fontSize:13}}>No pending claims</div>
-            ):claimQueue.map((j,i)=>(
-              <div key={j.id} style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",borderBottom:i<claimQueue.length-1?`1px solid ${T.border}`:"none",flexWrap:"wrap"}}>
-                <Avatar label={j.photo} size={40}/>
+            ):claimQueue.map((claim,i)=>(
+              <div key={claim.id} style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",borderBottom:i<claimQueue.length-1?`1px solid ${T.border}`:"none",flexWrap:"wrap"}}>
                 <div style={{flex:1,minWidth:0}}>
-                  <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>{j.flag} {j.name}</p>
-                  <p style={{margin:0,fontSize:12,color:T.textHint}}>{j.country} · {j.orgs.map(o=>o.id).join(", ")}</p>
-                  <p style={{margin:"3px 0 0",fontSize:12,color:T.accent}}>Claimed by: {j.claimedBy}</p>
+                  <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>{claim.judgeName}</p>
+                  <p style={{margin:"2px 0 0",fontSize:12,color:T.textHint}}>Claimed by: <strong style={{color:T.text}}>{claim.userName}</strong> · {claim.userEmail}</p>
+                  <p style={{margin:"2px 0 0",fontSize:11,color:T.textHint}}>{new Date(claim.submittedAt).toLocaleString()}</p>
                 </div>
                 <div style={{display:"flex",gap:8}}>
-                  <button onClick={()=>onVerifyJudge(j.id,true)}
+                  <button onClick={()=>onVerifyJudge(claim,true)}
                     style={{padding:"7px 16px",borderRadius:100,border:"none",background:T.green,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
                     ✓ Approve
                   </button>
-                  <button onClick={()=>onVerifyJudge(j.id,false)}
+                  <button onClick={()=>onVerifyJudge(claim,false)}
                     style={{padding:"7px 16px",borderRadius:100,border:`1px solid ${T.red}`,background:"none",color:T.red,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
                     ✗ Reject
                   </button>
@@ -1486,10 +1523,11 @@ function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editPro
         onClaim={()=>setModal("claim")}
         onContact={handleContact}
         onEditProfile={()=>setModal("editProfile")}
-        onSaveReply={saveReply}/>
+        onSaveReply={saveReply}
+        onRequestAuth={onRequestAuth}/>
       {modal==="review"&&user&&<ReviewModal judge={judge} user={user} onClose={()=>setModal(null)} onSubmit={addReview}/>}
       {modal==="booking"&&user&&<BookingModal judge={judge} user={user} onClose={()=>setModal(null)} onSubmit={addBooking}/>}
-      {modal==="claim"&&user&&<ClaimModal judge={judge} user={user} onClose={()=>setModal(null)} onClaim={()=>claimJudge(judge.id)}/>}
+      {modal==="claim"&&user&&<ClaimModal judge={judge} user={user} onClose={()=>setModal(null)}/>}
       {modal==="contact"&&<ContactModal judge={judge} user={user} onClose={()=>setModal(null)}/>}
       {modal==="startConv"&&user&&<StartConvModal judge={judge} user={user} onClose={()=>setModal(null)} onCreated={()=>navigate("/messages")}/>}
       {modal==="editProfile"&&<EditProfileModal judge={judge} onClose={()=>setModal(null)} onSave={editProfile}/>}
@@ -1936,8 +1974,16 @@ function AdminRoute({judges,reviews,bookings,user,saveJudges,saveReviews}) {
         if(!window.confirm("Remove this review?")) return;
         await saveReviews(reviews.filter(r=>r.id!==rid));
       }}
-      onVerifyJudge={async(jid,approve)=>{
-        await saveJudges(judges.map(j=>j.id===jid?{...j,verified:approve,claimedBy:approve?j.claimedBy:null}:j));
+      onVerifyJudge={async(claim,approve)=>{
+        const {db}=await import("./firebase");
+        const {doc,updateDoc,collection,query,where,getDocs}=await import("firebase/firestore");
+        await updateDoc(doc(db,"claims",claim.id),{status:approve?"approved":"rejected"});
+        if(approve){
+          await updateDoc(doc(db,"judges",claim.judgeId),{verified:true,claimedBy:claim.userEmail});
+          await saveJudges(judges.map(j=>j.id===claim.judgeId?{...j,verified:true,claimedBy:claim.userEmail}:j));
+          const usersSnap=await getDocs(query(collection(db,"users"),where("uid","==",claim.userId)));
+          if(!usersSnap.empty) await updateDoc(usersSnap.docs[0].ref,{role:"judge",judgeId:claim.judgeId});
+        }
       }}
     />
   );
