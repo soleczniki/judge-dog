@@ -478,20 +478,15 @@ function ClaimModal({judge,user,onClose}) {
     setSending(true); setErr("");
     try {
       const {db}=await import("./firebase");
-      const {doc,setDoc,getDoc}=await import("firebase/firestore");
-      // Deterministic ID prevents duplicates without a composite index
-      const claimId=`${judge.id}__${user.uid}`;
-      const existing=await getDoc(doc(db,"claims",claimId));
-      if(existing.exists()&&existing.data().status==="pending"){
-        setErr("You already have a pending claim for this profile.");setSending(false);return;
-      }
-      await setDoc(doc(db,"claims",claimId),{
+      const {doc,setDoc}=await import("firebase/firestore");
+      // Deterministic ID: one claim per user per judge, setDoc overwrites if re-submitted
+      await setDoc(doc(db,"claims",`${judge.id}__${user.uid}`),{
         judgeId:judge.id, judgeName:judge.name, judgeSlug:judge.slug||judge.id,
         userId:user.uid, userName:user.name, userEmail:user.email,
         status:"pending", submittedAt:new Date().toISOString(),
       });
       setDone(true);
-    } catch(e){setErr("Failed to submit — please try again.");}
+    } catch(e){console.error(e);setErr("Failed to submit — please try again.");}
     setSending(false);
   }
 
