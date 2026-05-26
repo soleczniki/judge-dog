@@ -7,6 +7,7 @@ const { Resend } = require("resend");
 if (!getApps().length) initializeApp();
 
 const RESEND_KEY = defineSecret("RESEND_API_KEY");
+const RECAPTCHA_SECRET = defineSecret("RECAPTCHA_SECRET_KEY");
 const FROM = "judge.dog <noreply@judge.dog>";
 const ADMIN_EMAIL = "hi@judge.dog";
 
@@ -205,10 +206,20 @@ exports.onClaimCreated = onDocumentCreated(
 
 // ── Notify admin when a contact form is submitted ─────────────────────────────
 exports.onContactCreated = onDocumentCreated(
-  { document: "contact/{contactId}", secrets: [RESEND_KEY] },
+  { document: "contact/{contactId}", secrets: [RESEND_KEY, RECAPTCHA_SECRET] },
   async (event) => {
     const c = event.data.data();
     if (!c) return;
+
+    if (c.recaptchaToken) {
+      const verify = await fetch(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET.value()}&response=${c.recaptchaToken}`,
+        { method: "POST" }
+      );
+      const result = await verify.json();
+      if (!result.success || result.score < 0.5) return;
+    }
+
     const resend = new Resend(RESEND_KEY.value());
     await resend.emails.send({
       from: FROM,

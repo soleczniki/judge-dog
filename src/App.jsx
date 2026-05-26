@@ -387,18 +387,37 @@ function ConsentModal({user, onClose, onComplete}) {
 }
 
 // ── Contact Page ──────────────────────────────────────────────────────────────
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
+function useRecaptcha() {
+  useEffect(()=>{
+    if(!RECAPTCHA_SITE_KEY||document.getElementById("recaptcha-script")) return;
+    const s=document.createElement("script");
+    s.id="recaptcha-script";
+    s.src=`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+    document.head.appendChild(s);
+  },[]);
+  return async(action)=>{
+    if(!RECAPTCHA_SITE_KEY) return null;
+    await new Promise(r=>{ if(window.grecaptcha?.ready) window.grecaptcha.ready(r); else setTimeout(r,1500); });
+    return window.grecaptcha.execute(RECAPTCHA_SITE_KEY,{action});
+  };
+}
+
 function ContactPage({user}) {
   const [f,setF]=useState({name:user?.name||"",email:user?.email||"",subject:"",message:""});
   const [sending,setSending]=useState(false);
   const [done,setDone]=useState(false);
   const [err,setErr]=useState("");
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
+  const getToken=useRecaptcha();
 
   async function submit(e) {
     e.preventDefault();
     if(!f.name.trim()||!f.email.trim()||!f.message.trim()){setErr("Please fill in all required fields.");return;}
     setSending(true);setErr("");
     try {
+      const token=await getToken("contact");
       const {db}=await import("./firebase");
       const {collection,addDoc}=await import("firebase/firestore");
       await addDoc(collection(db,"contact"),{
@@ -407,6 +426,7 @@ function ContactPage({user}) {
         message:f.message.trim(),
         sentAt:new Date().toISOString(),
         userId:user?.uid||null,
+        recaptchaToken:token||null,
       });
       setDone(true);
     } catch(e){setErr("Failed to send — please try again.");}
@@ -418,7 +438,6 @@ function ContactPage({user}) {
       <h1 style={{margin:"0 0 6px",fontSize:28,fontWeight:400,color:T.text,letterSpacing:-0.5}}>Contact us</h1>
       <p style={{margin:"0 0 36px",fontSize:14,color:T.textSub,lineHeight:1.6}}>
         Questions, feedback, or issues with a profile — we read every message.
-        You can also reach us at <a href="mailto:hi@judge.dog" style={{color:T.accent,textDecoration:"none"}}>hi@judge.dog</a>.
       </p>
 
       {done?(
@@ -437,6 +456,12 @@ function ContactPage({user}) {
           <Field label="Message *" multiline rows={6} value={f.message} onChange={e=>set("message",e.target.value)} placeholder="What's on your mind?"/>
           {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red}}>{err}</div>}
           <Btn fullWidth onClick={submit} disabled={sending}>{sending?"Sending…":"Send message"}</Btn>
+          <p style={{margin:0,fontSize:11,color:T.textHint,textAlign:"center",lineHeight:1.6}}>
+            Protected by reCAPTCHA ·{" "}
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer" style={{color:T.textHint}}>Privacy</a>
+            {" · "}
+            <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer" style={{color:T.textHint}}>Terms</a>
+          </p>
         </form>
       )}
     </div>
