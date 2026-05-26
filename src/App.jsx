@@ -1306,6 +1306,8 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
   const [allUsers,setAllUsers]=useState([]);
   const [loadingUsers,setLoadingUsers]=useState(true);
   const [claimQueue,setClaimQueue]=useState([]);
+  const [allClaims,setAllClaims]=useState([]);
+  const [claimsFilter,setClaimsFilter]=useState("pending");
 
   useEffect(()=>{
     (async()=>{
@@ -1315,11 +1317,15 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
         // Run independently so one failure doesn't kill the other
         const [usersResult,claimsResult] = await Promise.allSettled([
           getDocs(collection(db,"users")),
-          getDocs(query(collection(db,"claims"),where("status","==","pending"))),
+          getDocs(collection(db,"claims")),
         ]);
         if(usersResult.status==="fulfilled") setAllUsers(usersResult.value.docs.map(d=>({id:d.id,...d.data()})));
-        if(claimsResult.status==="fulfilled") setClaimQueue(claimsResult.value.docs.map(d=>({id:d.id,...d.data()})));
-        else console.error("Claims load failed:",claimsResult.reason);
+        if(claimsResult.status==="fulfilled") {
+          const all = claimsResult.value.docs.map(d=>({id:d.id,...d.data()}))
+            .sort((a,b)=>(b.submittedAt||"").localeCompare(a.submittedAt||""));
+          setAllClaims(all);
+          setClaimQueue(all.filter(c=>c.status==="pending"));
+        } else console.error("Claims load failed:",claimsResult.reason);
       } catch(e){ console.error(e); }
       setLoadingUsers(false);
     })();
@@ -1447,38 +1453,57 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
           </div>
         )}
 
-        {/* Claims queue */}
-        {tab==="claims"&&(
-          <div style={{background:T.bg,borderRadius:T.r,border:`1px solid ${T.border}`,overflow:"hidden"}}>
-            <div style={{padding:"16px 20px",borderBottom:`1px solid ${T.border}`}}>
-              <span style={{fontSize:14,fontWeight:500,color:T.text}}>Pending profile claims</span>
-            </div>
-            {claimQueue.length===0?(
-              <div style={{padding:48,textAlign:"center",color:T.textHint,fontSize:13}}>No pending claims</div>
-            ):claimQueue.map((claim,i)=>(
-              <div key={claim.id} style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",borderBottom:i<claimQueue.length-1?`1px solid ${T.border}`:"none",flexWrap:"wrap"}}>
-                <div style={{flex:1,minWidth:0}}>
-                  <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text}}>
-                    <span style={{color:T.accent}}>{claim.userName}</span>
-                    <span style={{color:T.textHint,fontWeight:400}}> claims to be </span>
-                    <a href={`/judge/${claim.judgeSlug}`} target="_blank" rel="noreferrer" style={{color:T.text,textDecoration:"underline",textDecorationColor:T.border}}>{claim.judgeName}</a>
-                  </p>
-                  <p style={{margin:"2px 0 0",fontSize:12,color:T.textHint}}>{claim.userEmail} · {new Date(claim.submittedAt).toLocaleString()}</p>
-                </div>
-                <div style={{display:"flex",gap:8}}>
-                  <button onClick={async()=>{try{await onVerifyJudge(claim,true);setClaimQueue(q=>q.filter(c=>c.judgeId!==claim.judgeId));}catch{}}}
-                    style={{padding:"7px 16px",borderRadius:100,border:"none",background:T.green,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
-                    ✓ Approve
-                  </button>
-                  <button onClick={async()=>{try{await onVerifyJudge(claim,false);setClaimQueue(q=>q.filter(c=>c.id!==claim.id));}catch{}}}
-                    style={{padding:"7px 16px",borderRadius:100,border:`1px solid ${T.red}`,background:"none",color:T.red,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
-                    ✗ Reject
-                  </button>
+        {/* Claims */}
+        {tab==="claims"&&(()=>{
+          const statusColors={pending:{bg:"#fffbe6",color:T.amber},approved:{bg:T.greenLight,color:T.green},rejected:{bg:T.redLight,color:T.red},cancelled:{bg:T.surface,color:T.textHint}};
+          const displayed = claimsFilter==="all" ? allClaims : allClaims.filter(c=>c.status===claimsFilter);
+          return (
+            <div style={{background:T.bg,borderRadius:T.r,border:`1px solid ${T.border}`,overflow:"hidden"}}>
+              <div style={{padding:"14px 20px",borderBottom:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+                <span style={{fontSize:14,fontWeight:500,color:T.text}}>Profile claims</span>
+                <div style={{display:"flex",gap:4}}>
+                  {["pending","approved","rejected","all"].map(s=>(
+                    <button key={s} onClick={()=>setClaimsFilter(s)}
+                      style={{padding:"5px 13px",borderRadius:100,border:`1px solid ${claimsFilter===s?T.accent:T.border}`,background:claimsFilter===s?T.accentLight:T.bg,color:claimsFilter===s?T.accent:T.textSub,fontSize:12,fontWeight:500,cursor:"pointer",fontFamily:"inherit",textTransform:"capitalize"}}>
+                      {s}{s!=="all"&&` (${allClaims.filter(c=>c.status===s).length})`}
+                    </button>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+              {displayed.length===0?(
+                <div style={{padding:48,textAlign:"center",color:T.textHint,fontSize:13}}>No {claimsFilter==="all"?"":claimsFilter} claims</div>
+              ):displayed.map((claim,i)=>{
+                const sc=statusColors[claim.status]||statusColors.pending;
+                const isPending=claim.status==="pending";
+                return (
+                  <div key={claim.id} style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",borderBottom:i<displayed.length-1?`1px solid ${T.border}`:"none",flexWrap:"wrap",opacity:isPending?1:0.85}}>
+                    <div style={{flex:1,minWidth:0}}>
+                      <p style={{margin:0,fontSize:14,fontWeight:500,color:T.text,display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                        <span style={{color:T.accent}}>{claim.userName}</span>
+                        <span style={{color:T.textHint,fontWeight:400}}>claims to be</span>
+                        <a href={`/judge/${claim.judgeSlug}`} target="_blank" rel="noreferrer" style={{color:T.text,textDecoration:"underline",textDecorationColor:T.border}}>{claim.judgeName}</a>
+                        <span style={{display:"inline-flex",padding:"1px 9px",borderRadius:100,background:sc.bg,color:sc.color,fontSize:11,fontWeight:600,border:`1px solid ${sc.color}30`}}>{claim.status}</span>
+                      </p>
+                      <p style={{margin:"3px 0 0",fontSize:12,color:T.textHint}}>{claim.userEmail} · {new Date(claim.submittedAt).toLocaleString()}</p>
+                    </div>
+                    {isPending&&(
+                      <div style={{display:"flex",gap:8,flexShrink:0}}>
+                        <button onClick={async()=>{try{await onVerifyJudge(claim,true);setAllClaims(a=>a.map(c=>c.judgeId===claim.judgeId&&c.status==="pending"?{...c,status:"approved"}:c));setClaimQueue(q=>q.filter(c=>c.judgeId!==claim.judgeId));}catch{}}}
+                          style={{padding:"7px 16px",borderRadius:100,border:"none",background:T.green,color:"#fff",fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
+                          ✓ Approve
+                        </button>
+                        <button onClick={async()=>{try{await onVerifyJudge(claim,false);setAllClaims(a=>a.map(c=>c.id===claim.id?{...c,status:"rejected"}:c));setClaimQueue(q=>q.filter(c=>c.id!==claim.id));}catch{}}}
+                          style={{padding:"7px 16px",borderRadius:100,border:`1px solid ${T.red}`,background:"none",color:T.red,fontSize:13,fontWeight:500,cursor:"pointer",fontFamily:"inherit"}}>
+                          ✗ Reject
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
 
         {/* Reviews moderation */}
         {tab==="reviews"&&(
