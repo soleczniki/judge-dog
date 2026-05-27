@@ -141,6 +141,13 @@ const reviewDims = r => {
   ].filter(d=>r[d.key]);
 };
 
+// ── Slug utilities ─────────────────────────────────────────────────────────────
+function toSlug(name) {
+  return name.toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
 const SEED_JUDGES = [
   { id:"j1", slug:"margaret-thornton", name:"Margaret Thornton", country:"USA", flag:"🇺🇸", breeds:["Golden Retriever","Labrador Retriever","Flat-Coated Retriever"], group:"Sporting", licensed:1994, orgs:[{org:"AKC",id:"AKC-28841"},{org:"FCI",id:"FCI-00412"}], verified:true, claimedBy:"judge1@example.com", bio:"Forty years in Goldens. I've bred 23 champions and judged on five continents. I judge for correct movement and coat texture above all else. An honest critique is the best thing I can give you.", social:{instagram:"@margaret_thornton_goldens",facebook:"MargaretThorntonGoldens",linkedin:""}, photo:"MT" },
   { id:"j2", slug:"hans-werner-keller", name:"Hans-Werner Keller", country:"Germany", flag:"🇩🇪", breeds:["German Shepherd Dog","Rottweiler","Doberman Pinscher"], group:"Herding / Working", licensed:1988, orgs:[{org:"FCI",id:"FCI-00089"},{org:"KC",id:"KC-JG-1102"}], verified:true, claimedBy:"hw.keller@example.com", bio:"Former SV breed warden. I've judged the WUSV World Championship four times. What I look for: correct rear drive, solid nerves, and a head that screams the breed.", social:{instagram:"",facebook:"HWKellerJudge",linkedin:"hans-werner-keller"}, photo:"HK" },
@@ -697,21 +704,20 @@ function ClaimModal({judge,user,onClose}) {
 // ── Contact Modal ─────────────────────────────────────────────────────────────
 function ContactModal({judge,user,onClose}) {
   const [name,setName]=useState(user?.name||"");
-  const [email,setEmail]=useState(user?.email||"");
   const [message,setMessage]=useState("");
   const [sending,setSending]=useState(false);
   const [sent,setSent]=useState(false);
   const [err,setErr]=useState("");
 
   const send=async()=>{
-    if(!name.trim()||!email.trim()||!message.trim()){setErr("Please fill in all fields.");return;}
+    if(!name.trim()||!message.trim()){setErr("Please fill in all fields.");return;}
     setSending(true); setErr("");
     try {
       const {db}=await import("./firebase");
       const {collection,addDoc}=await import("firebase/firestore");
       await addDoc(collection(db,"messages"),{
         judgeId:judge.id, judgeName:judge.name, judgeSlug:judge.slug||judge.id,
-        fromName:name.trim(), fromEmail:email.trim(),
+        fromName:name.trim(),
         message:message.trim(), sentAt:new Date().toISOString(),
         read:false, claimed:!!judge.claimedBy,
       });
@@ -738,10 +744,7 @@ function ContactModal({judge,user,onClose}) {
   return (
     <Modal onClose={onClose} title={`Contact ${judge.name}`}
       subtitle={judge.claimedBy?"The judge will receive your message.":"This judge hasn't joined judge.dog yet — we'll forward your message to their registered email."}>
-      <div className="form-row" style={{marginBottom:10}}>
-        <Field label="Your name" value={name} onChange={e=>setName(e.target.value)}/>
-        <Field label="Your email" value={email} onChange={e=>setEmail(e.target.value)} type="email"/>
-      </div>
+      <Field label="Your name" value={name} onChange={e=>setName(e.target.value)} style={{marginBottom:10}}/>
       <Field label="Message" multiline rows={5} value={message} onChange={e=>setMessage(e.target.value)}
         placeholder={`Write your message to ${judge.name}…`} style={{marginBottom:16}}/>
       {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
@@ -1799,7 +1802,17 @@ function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editPro
   const {slug}=useParams();
   const navigate=useNavigate();
   const [modal,setModal]=useState(null);
-  const judge=judges.find(j=>j.slug===slug||j.id===slug);
+  // Check canonical slug, doc id, and any historical slug aliases
+  const judge=judges.find(j=>j.slug===slug||j.id===slug||j.slugAliases?.includes(slug));
+
+  // Redirect alias URLs to the canonical slug (preserves QR codes / old links)
+  useEffect(()=>{
+    if(!judge) return;
+    const canonical=judge.slug||judge.id;
+    if(slug!==canonical&&slug!==judge.id){
+      navigate(`/judge/${canonical}`,{replace:true});
+    }
+  },[judge?.id,slug]);
 
   useEffect(()=>{
     if(!judge) return;
@@ -2428,11 +2441,21 @@ export default function App() {
   },[judges,user]);
 
   const editProfile=useCallback(async upd=>{
+    // If name changed, regenerate slug and archive the old one
+    const prev=judges.find(j=>j.id===upd.id);
+    if(prev&&upd.name&&upd.name!==prev.name){
+      const newSlug=toSlug(upd.name);
+      const oldSlug=prev.slug||prev.id;
+      const existing=prev.slugAliases||[];
+      upd={...upd,slug:newSlug,
+        slugAliases:oldSlug&&oldSlug!==newSlug&&!existing.includes(oldSlug)
+          ?[...existing,oldSlug]:existing};
+    }
     setJudges(jj=>jj.map(j=>j.id===upd.id?upd:j));
     const {db}=await import("./firebase");
     const {doc,setDoc}=await import("firebase/firestore");
     await setDoc(doc(db,"judges",upd.id),upd);
-  },[]);
+  },[judges]);
 
   const saveReply=useCallback(async(rid,text)=>{
     await saveReviews(reviews.map(r=>r.id===rid?{...r,reply:text}:r));

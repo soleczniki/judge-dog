@@ -74,20 +74,36 @@ async function syncJudges() {
 
   for (const judge of incoming) {
     if (PROTECTED_IDS.includes(judge.id)) continue;
-    if (!existingMap[judge.id]) {
-      toAdd.push(judge);
-    } else if (hasChanged(existingMap[judge.id], judge)) {
-      // Merge: keep user-editable fields (bio, social, verified, claimedBy, etc.)
-      toUpdate.push({ ...existingMap[judge.id], ...judge,
-        bio: existingMap[judge.id].bio || judge.bio || "",
-        social: existingMap[judge.id].social || {},
-        verified: existingMap[judge.id].verified || false,
-        claimedBy: existingMap[judge.id].claimedBy || null,
-        profilePhoto: existingMap[judge.id].profilePhoto || null,
-        highlights: existingMap[judge.id].highlights || [],
-        headline: existingMap[judge.id].headline || "",
-        lastUpdated: new Date().toISOString(),
-      });
+    const ex = existingMap[judge.id];
+
+    if (!ex) {
+      toAdd.push({ ...judge, slugAliases: [] });
+    } else {
+      // Archive old slug if it changed (so old URLs / QR codes keep working)
+      const oldSlug = ex.slug;
+      const newSlug = judge.slug;
+      const existingAliases = ex.slugAliases || [];
+      const slugAliases = oldSlug && oldSlug !== newSlug && !existingAliases.includes(oldSlug)
+        ? [...existingAliases, oldSlug]
+        : existingAliases;
+
+      if (hasChanged(ex, judge)) {
+        // Merge: keep user-editable fields (bio, social, verified, claimedBy, etc.)
+        toUpdate.push({ ...ex, ...judge,
+          slugAliases,
+          bio:          ex.bio          || judge.bio || "",
+          social:       ex.social       || {},
+          verified:     ex.verified     || false,
+          claimedBy:    ex.claimedBy    || null,
+          profilePhoto: ex.profilePhoto || null,
+          highlights:   ex.highlights   || [],
+          headline:     ex.headline     || "",
+          lastUpdated:  new Date().toISOString(),
+        });
+      } else if (slugAliases.length !== existingAliases.length) {
+        // Slug changed but no other tracked fields changed — still need to save aliases
+        toUpdate.push({ ...ex, slugAliases, lastUpdated: new Date().toISOString() });
+      }
     }
   }
 
