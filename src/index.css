@@ -1,0 +1,33 @@
+/* ── Responsive form rows ─────────────────────────────────────────────────────
+   Use .form-row instead of a hard "1fr 1fr" grid for two-column form fields.
+   On mobile (≤ 520px) columns stack automatically.
+   Usage: <div className="form-row"> <Field/> <Field/> </div>
+   ────────────────────────────────────────────────────────────────────────── */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.form-row > * {
+  flex: 1 1 180px;   /* side-by-side when ≥ ~380px total width, else stack */
+  min-width: 0;       /* prevent overflow */
+}
+
+@media (max-width: 520px) {
+  .form-row > * {
+    flex: 1 1 100%;   /* always full width on small phones */
+  }
+}
+
+/* ── Responsive dashboard 2-col layout ───────────────────────────────────── */
+.dash-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+@media (max-width: 640px) {
+  .dash-2col {
+    grid-template-columns: 1fr;
+  }
+}

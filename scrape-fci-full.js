@@ -12,10 +12,14 @@ import { FCI_GROUP_NAMES, FCI_GROUP_BREEDS } from "./fci-groups.js";
 const args = process.argv.slice(2);
 const startFrom = parseInt(args.find(a=>a.startsWith("--start-from="))?.split("=")[1] || "1");
 const maxId     = parseInt(args.find(a=>a.startsWith("--max-id="))?.split("=")[1]     || "99999");
-const MAX_EMPTY = 300;
-const DELAY_MS  = 1200;
+const MAX_EMPTY = parseInt(args.find(a=>a.startsWith("--max-empty="))?.split("=")[1]  || "300");
+const DELAY_MS  = parseInt(args.find(a=>a.startsWith("--delay="))?.split("=")[1]      || "1200");
+// --backfill=827-1126  → ignore progress file, scrape only that ID range, save to fci-backfill-raw.json
+const backfillArg = args.find(a=>a.startsWith("--backfill="))?.split("=")[1];
+const BACKFILL_MODE = !!backfillArg;
+const [bfStart, bfEnd] = backfillArg ? backfillArg.split("-").map(Number) : [null, null];
 const SAVE_EVERY = 50;
-const OUTPUT    = "fci-full-raw.json";
+const OUTPUT    = BACKFILL_MODE ? "fci-backfill-raw.json" : "fci-full-raw.json";
 const PROGRESS  = "fci-full-progress.json";
 
 const FLAGS = {
@@ -128,15 +132,27 @@ async function scrapeJudge(page, id) {
         const inp = document.getElementById(`ContentPlaceHolder1_LanguesCheckBoxList_${idx}`);
         if (inp && inp.checked) fciLanguages.push(lang);
       }
-      // Other languages — in a table after the h3
+      // Other languages — in table inside right column of Languages section
       const otherLanguages = [];
-      const otherLangSection = document.querySelector(".col-md-6:last-child .table");
-      if (otherLangSection) {
-        otherLangSection.querySelectorAll("td").forEach(td => {
+      document.querySelectorAll(".col-md-6").forEach(col => {
+        const h = col.querySelector("h3, h4, strong, b");
+        if (!h || !h.innerText.toLowerCase().includes("other language")) return;
+        col.querySelectorAll("td").forEach(td => {
           const t = td.innerText.trim();
           if (t) otherLanguages.push(t);
         });
-      }
+      });
+      // Kennel names — col-md-4 label / col-md-8 value row pattern
+      const kennelNames = [];
+      document.querySelectorAll(".row").forEach(row => {
+        const label = row.querySelector(".col-md-4");
+        const value = row.querySelector(".col-md-8");
+        if (!label || !value) return;
+        if (label.innerText.trim().toLowerCase() === "kennel name") {
+          const val = value.innerText.trim();
+          if (val) kennelNames.push(val);
+        }
+      });
 
       // ── Disciplines + 1st auth dates ────────────────────────────────────
       const disciplines = [];
@@ -212,7 +228,7 @@ async function scrapeJudge(page, id) {
 
       return {
         rawName, birthYear, kennelClub, kennelClubCountry, countryOfResidence,
-        fciLanguages, otherLanguages, disciplines, disciplineFirstAuth,
+        fciLanguages, otherLanguages, kennelNames, disciplines, disciplineFirstAuth,
         allBreedJudge, bisJudge, groupJudge, authorizedBreeds, suspensions,
         contact: { email, phone, address }
       };
@@ -300,6 +316,7 @@ async function scrapeJudge(page, id) {
 
       fciLanguages: data.fciLanguages,
       otherLanguages: data.otherLanguages,
+      kennelName: data.kennelNames?.[0] || null,
 
       disciplines: data.disciplines,
       disciplineFirstAuth: data.disciplineFirstAuth,
@@ -351,7 +368,10 @@ async function main() {
   // Load checkpoint
   let judges = [];
   let resumeFrom = startFrom;
-  if (fs.existsSync(PROGRESS) && fs.existsSync(OUTPUT)) {
+  if (BACKFILL_MODE) {
+    resumeFrom = bfStart;
+    console.log(`🔄 Backfill mode: IDs ${bfStart}–${bfEnd} → ${OUTPUT}`);
+  } else if (fs.existsSync(PROGRESS) && fs.existsSync(OUTPUT)) {
     const prog = JSON.parse(fs.readFileSync(PROGRESS,"utf8"));
     judges = JSON.parse(fs.readFileSync(OUTPUT,"utf8")).judges || [];
     resumeFrom = prog.lastId + 1;
@@ -381,7 +401,8 @@ async function main() {
   let consecutive = 0;
   let i = resumeFrom;
 
-  while (i <= maxId) {
+  const loopMax = BACKFILL_MODE ? bfEnd : maxId;
+  while (i <= loopMax) {
     const judge = await scrapeJudge(page, i);
 
     if (judge) {

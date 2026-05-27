@@ -448,7 +448,7 @@ function ContactPage({user}) {
         </div>
       ):(
         <form onSubmit={submit} style={{display:"flex",flexDirection:"column",gap:14}}>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+          <div className="form-row">
             <Field label="Name *" value={f.name} onChange={e=>set("name",e.target.value)} placeholder="Your name"/>
             <Field label="Email *" type="email" value={f.email} onChange={e=>set("email",e.target.value)} placeholder="you@example.com"/>
           </div>
@@ -586,7 +586,7 @@ function ReviewModal({judge,user,onClose,onSubmit}) {
         </div>
       )}
 
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
+      <div className="form-row" style={{marginBottom:16}}>
         <Field label={labels.entry} value={f.breed} onChange={e=>set("breed",e.target.value)} placeholder={selGroup==="A"?"e.g. Golden Retriever":"e.g. Max / Open class"}/>
         <Field label={labels.event} value={f.show} onChange={e=>set("show",e.target.value)} placeholder={selGroup==="A"?"e.g. Crufts 2024":"e.g. National Championship 2024"}/>
       </div>
@@ -636,7 +636,7 @@ function BookingModal({judge,user,onClose,onSubmit}) {
   );
   return (
     <Modal onClose={onClose} title="Request booking" subtitle={`Send a booking inquiry to ${judge.name}`} wide>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
+      <div className="form-row" style={{marginBottom:12}}>
         <Field label="Show name *" value={f.showName} onChange={e=>set("showName",e.target.value)}/>
         <Field label="Date *" type="date" value={f.date} onChange={e=>set("date",e.target.value)}/>
         <Field label="City / Venue *" value={f.location} onChange={e=>set("location",e.target.value)}/>
@@ -738,7 +738,7 @@ function ContactModal({judge,user,onClose}) {
   return (
     <Modal onClose={onClose} title={`Contact ${judge.name}`}
       subtitle={judge.claimedBy?"The judge will receive your message.":"This judge hasn't joined judge.dog yet — we'll forward your message to their registered email."}>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
+      <div className="form-row" style={{marginBottom:10}}>
         <Field label="Your name" value={name} onChange={e=>setName(e.target.value)}/>
         <Field label="Your email" value={email} onChange={e=>setEmail(e.target.value)} type="email"/>
       </div>
@@ -852,7 +852,7 @@ function EditProfileModal({judge,onClose,onSave}) {
 
       {/* Social */}
       <p style={{fontSize:12,fontWeight:600,color:T.textSub,letterSpacing:.4,textTransform:"uppercase",margin:"0 0 10px"}}>Social & web</p>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:22}}>
+      <div className="form-row" style={{marginBottom:22}}>
         <Field label="Instagram" value={ig} onChange={mark(e=>setIg(e.target.value))} placeholder="@handle"/>
         <Field label="Website" value={web} onChange={mark(e=>setWeb(e.target.value))} placeholder="https://"/>
         <Field label="Facebook" value={fb} onChange={mark(e=>setFb(e.target.value))} placeholder="Page or username"/>
@@ -2168,7 +2168,7 @@ function JudgeDashboard({user, judge, reviews, unreadMsgCount, onEditProfile, on
         <p style={{margin:0,fontSize:14,color:T.textSub}}>Here's your judge.dog overview</p>
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16}}>
+      <div className="dash-2col">
 
         {/* Profile card */}
         <Card>
