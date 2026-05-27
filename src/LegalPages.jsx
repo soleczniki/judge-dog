@@ -418,3 +418,86 @@ export function CookiePolicy() {
     </LegalLayout>
   );
 }
+
+// ── Review Guidelines ──────────────────────────────────────────────────────────
+export function ReviewGuidelines() {
+  return (
+    <LegalLayout title="Review Guidelines">
+      <P><em>Effective date: 27 May 2026</em></P>
+      <P>
+        judge.dog is built on honest, first-hand reviews from people who have
+        actually been judged. These guidelines exist to keep reviews useful,
+        fair, and respectful — for judges, for readers, and for the community.
+      </P>
+      <P>
+        By submitting a review you confirm that you have read and agree to
+        these guidelines. We reserve the right to remove any review that
+        violates them.
+      </P>
+
+      <H2>1. Write from your own experience</H2>
+      <P>
+        Only review a judge you have personally competed or shown under. Do not
+        relay stories you heard from others, repeat rumours, or review based on
+        a judge's general reputation. If you were not in the ring yourself,
+        don't submit a review.
+      </P>
+
+      <H2>2. Be specific and factual</H2>
+      <P>
+        Describe what you actually observed — how the ring was run, what the
+        judge prioritised, how they interacted with exhibitors and dogs. Vague
+        praise or vague criticism is not helpful to anyone. Concrete detail is.
+      </P>
+
+      <H2>3. Critique the judging, not the person</H2>
+      <P>
+        You may disagree with a judge's decisions. That is legitimate and
+        welcome. What is not acceptable: personal attacks, comments about
+        appearance, nationality, age, gender, or private life. Review the
+        judging, not the human being.
+      </P>
+
+      <H2>4. No harassment or bullying</H2>
+      <P>
+        Reviews that are abusive, threatening, or intended to harm a judge's
+        reputation rather than inform other exhibitors will be removed
+        immediately. Repeated violations may result in account suspension.
+      </P>
+
+      <H2>5. Declare conflicts of interest</H2>
+      <P>
+        Do not review a judge who is a close family member, your personal
+        handler, a business partner, or anyone with whom you have a significant
+        personal or financial relationship. Both positive and negative reviews
+        with hidden conflicts of interest undermine the platform.
+      </P>
+
+      <H2>6. One honest review per event</H2>
+      <P>
+        Submit one review per judge per event. Duplicate reviews, coordinated
+        review campaigns, and fake accounts are not permitted and will be
+        removed.
+      </P>
+
+      <H2>7. No unverifiable claims</H2>
+      <P>
+        Do not make allegations — of misconduct, corruption, or wrongdoing —
+        that you cannot substantiate. If you have a serious complaint about a
+        judge, the correct route is through your national kennel club or
+        the relevant governing body. judge.dog is not the place for unverified
+        accusations.
+      </P>
+
+      <H2>Reporting a review</H2>
+      <P>
+        If you believe a review violates these guidelines, contact us at{" "}
+        <A href="mailto:hi@judge.dog">hi@judge.dog</A> with the judge's name
+        and a brief explanation. We review all reports and respond within 5
+        business days.
+      </P>
+
+      <ContactBlock/>
+    </LegalLayout>
+  );
+}

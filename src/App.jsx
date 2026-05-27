@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from "react-router-dom";
 import { signInWithGoogle, firebaseSignOut, onAuthChange, trackPageView, initAnalytics, completeRegistration } from "./firebase";
-import { PrivacyPolicy, TermsOfService, CookiePolicy } from "./LegalPages";
+import { PrivacyPolicy, TermsOfService, CookiePolicy, ReviewGuidelines } from "./LegalPages";
 import { FCI_GROUP_NAMES, FCI_GROUP_BREEDS } from "../fci-groups.js";
 import QRCode from "qrcode";
 
@@ -481,7 +481,7 @@ function Footer({onManageCookies}) {
     <div style={{borderTop:`1px solid ${T.border}`,padding:"20px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12,background:T.surface}}>
       <span style={{fontSize:12,color:T.textHint}}>© {new Date().getFullYear()} Lenis res, MB · judge.dog</span>
       <div style={{display:"flex",gap:16,flexWrap:"wrap"}}>
-        {[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"]].map(([label,href])=>(
+        {[["Privacy Policy","/privacy"],["Terms of Service","/terms"],["Cookie Policy","/cookies"],["Review Guidelines","/review-guidelines"]].map(([label,href])=>(
           <a key={href} href={href} style={{fontSize:12,color:T.textHint,textDecoration:"none",transition:"color .15s"}}
             onMouseEnter={e=>e.currentTarget.style.color=T.accent}
             onMouseLeave={e=>e.currentTarget.style.color=T.textHint}>
@@ -547,6 +547,7 @@ function ReviewModal({judge,user,onClose,onSubmit}) {
   const [selGroup,setSelGroup]=useState(groups[0]);
   const [f,setF]=useState({breed:"",show:"",wouldReturn:null,text:"",...EMPTY_RATINGS});
   const [err,setErr]=useState("");
+  const [agreedToGuidelines,setAgreedToGuidelines]=useState(false);
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
 
   const specificDims = GROUP_DIMS[selGroup]||GROUP_DIMS.A;
@@ -560,6 +561,7 @@ function ReviewModal({judge,user,onClose,onSubmit}) {
     if (missing.length) { setErr(`Please rate: ${missing.map(d=>d.label).join(", ")}.`); return; }
     if (f.wouldReturn===null) { setErr("Please indicate if you'd compete/show under them again."); return; }
     if (!f.text.trim()) { setErr("Please write a review."); return; }
+    if (!agreedToGuidelines) { setErr("Please confirm you agree to the Review Guidelines before submitting."); return; }
     await onSubmit({id:uid(),judgeId:judge.id,userId:user.id,userName:user.name,
       date:new Date().toISOString().slice(0,10),reply:null,disciplineGroup:selGroup,...f});
     onClose();
@@ -615,6 +617,22 @@ function ReviewModal({judge,user,onClose,onSubmit}) {
       </div>
 
       <Field label="Your review" multiline rows={5} value={f.text} onChange={e=>set("text",e.target.value)} placeholder="Describe the judging style, what they prioritised, how they ran the ring…" style={{marginBottom:16}}/>
+
+      {/* Guidelines agreement */}
+      <label style={{display:"flex",alignItems:"flex-start",gap:10,cursor:"pointer",marginBottom:16,padding:"12px 14px",background:agreedToGuidelines?T.accentLight:T.surface,border:`1.5px solid ${agreedToGuidelines?T.accent:T.border}`,borderRadius:T.rsm,transition:"all .15s"}}>
+        <input type="checkbox" checked={agreedToGuidelines} onChange={e=>setAgreedToGuidelines(e.target.checked)}
+          style={{marginTop:2,width:15,height:15,accentColor:T.accent,flexShrink:0,cursor:"pointer"}}/>
+        <span style={{fontSize:13,color:T.textSub,lineHeight:1.5}}>
+          I confirm this is my honest first-hand experience and I agree to the{" "}
+          <a href="/review-guidelines" target="_blank" rel="noreferrer"
+            style={{color:T.accent,textDecoration:"none",fontWeight:500}}
+            onMouseEnter={e=>e.currentTarget.style.textDecoration="underline"}
+            onMouseLeave={e=>e.currentTarget.style.textDecoration="none"}>
+            Review Guidelines ↗
+          </a>
+        </span>
+      </label>
+
       {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
       <Btn fullWidth onClick={submit}>Submit review</Btn>
     </Modal>
@@ -997,7 +1015,7 @@ function BreedList({breeds, label, provisionalSet}) {
           const isProv = provisionalSet?.has(b);
           return (
             <span key={b} style={{display:"inline-flex",alignItems:"center",gap:2}}>
-              <Chip small>{b}</Chip>
+              <Chip small>{tc(b)}</Chip>
               {isProv&&<span title="Provisional approval" style={{fontSize:9,fontWeight:700,color:"#b45309",background:"#fef3c7",border:"1px solid #fcd34d",borderRadius:4,padding:"0 3px",lineHeight:"14px",letterSpacing:.3}}>PROV</span>}
             </span>
           );
@@ -2792,6 +2810,7 @@ export default function App() {
         <Route path="/privacy" element={<PrivacyPolicy/>}/>
         <Route path="/terms" element={<TermsOfService/>}/>
         <Route path="/cookies" element={<CookiePolicy/>}/>
+        <Route path="/review-guidelines" element={<ReviewGuidelines/>}/>
         <Route path="*" element={<Navigate to="/" replace/>}/>
       </Routes></div>
 
