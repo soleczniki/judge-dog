@@ -1,7 +1,7 @@
 // ── FCI Judge Full Scraper v2 ──────────────────────────────────────────────────
-// Enumerates ?id=1 → auto-stop after 300 consecutive empty
+// Enumerates ?id=1 → auto-stop after N consecutive empty
 // Run:    node scrape-fci-full.js
-// Resume: node scrape-fci-full.js --start-from=5000
+// Resume: node scrape-fci-full.js   (auto-resumes from checkpoint)
 //
 // Output: fci-full-raw.json + fci-full-progress.json
 
@@ -18,6 +18,8 @@ const DELAY_MS  = parseInt(args.find(a=>a.startsWith("--delay="))?.split("=")[1]
 const backfillArg = args.find(a=>a.startsWith("--backfill="))?.split("=")[1];
 const BACKFILL_MODE = !!backfillArg;
 const [bfStart, bfEnd] = backfillArg ? backfillArg.split("-").map(Number) : [null, null];
+// Restart browser every N IDs to prevent session expiry / popup re-appearance
+const RESTART_EVERY = parseInt(args.find(a=>a.startsWith("--restart-every="))?.split("=")[1] || "400");
 const SAVE_EVERY = 50;
 const OUTPUT    = BACKFILL_MODE ? "fci-backfill-raw.json" : "fci-full-raw.json";
 const PROGRESS  = "fci-full-progress.json";
@@ -81,13 +83,84 @@ function toTitleCase(str) {
   }).join(" ");
 }
 
-async function scrapeJudge(page, id) {
+// How often to run a session health-check when hitting consecutive empty pages.
+// After HEALTH_CHECK_EVERY empty pages in a row, navigate to a known-good judge
+// ID to verify the session is still alive. If dead → restart + rewind those IDs.
+const HEALTH_CHECK_EVERY = parseInt(
+  args.find(a=>a.startsWith("--health-check="))?.split("=")[1] || "30"
+);
+
+// ── Browser management ────────────────────────────────────────────────────────
+let browser = null;
+let page    = null;
+
+async function dismissPopup() {
+  try {
+    const clicked = await page.evaluate(() => {
+      // FCI uses a cookie/GDPR popup with a "Close" button
+      const btn = Array.from(document.querySelectorAll("button,a"))
+        .find(x => x.innerText?.trim() === "Close");
+      if (btn) { btn.click(); return true; }
+      return false;
+    });
+    if (clicked) await sleep(800);
+  } catch(e) {}
+}
+
+async function initBrowser(label = "") {
+  if (browser) {
+    try { await browser.close(); } catch(e) {}
+    browser = null; page = null;
+  }
+  browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"],
+    defaultViewport: { width: 1280, height: 900 }
+  });
+  page = await browser.newPage();
+  await page.setUserAgent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  );
+
+  // Prime session + dismiss popup on the listing page
+  try {
+    await page.goto("https://www.fci.be/en/judges", { waitUntil:"networkidle2", timeout:20000 });
+    await sleep(1500);
+    await dismissPopup();
+    console.log(`✅ Browser ready${label ? " (" + label + ")" : ""}`);
+  } catch(e) {
+    console.log(`⚠️  Session prime failed${label ? " (" + label + ")" : ""}: ${e.message}`);
+  }
+}
+
+// ── Session health check ──────────────────────────────────────────────────────
+// Navigate to a previously-confirmed judge page and verify h3.pink is present.
+// Used after N consecutive empty pages to distinguish real gaps from expiry.
+async function isSessionAlive(knownGoodId) {
+  try {
+    const resp = await page.goto(
+      `https://www.fci.be/en/judges/Judge.aspx?id=${knownGoodId}`,
+      { waitUntil: "networkidle2", timeout: 20000 }
+    );
+    if (!resp || resp.status() === 404) return false;
+    const found = await page.evaluate(() => !!document.querySelector("h3.pink"));
+    return found;
+  } catch(e) {
+    return false;
+  }
+}
+
+// ── Scrape a single judge page ────────────────────────────────────────────────
+async function scrapeJudge(id) {
   try {
     const resp = await page.goto(
       `https://www.fci.be/en/judges/Judge.aspx?id=${id}`,
-      { waitUntil: "networkidle2", timeout: 20000 }
+      { waitUntil: "networkidle2", timeout: 25000 }
     );
     if (!resp || resp.status() === 404) return null;
+
+    // Always try to dismiss popup — it may have reappeared
+    await dismissPopup();
 
     const data = await page.evaluate(() => {
       // ── Detect valid judge page ──────────────────────────────────────────
@@ -97,7 +170,6 @@ async function scrapeJudge(page, id) {
       if (!rawName || rawName.length < 3) return null;
 
       // ── Birth year ───────────────────────────────────────────────────────
-      // Sits in col-md-11 vcenter next to birthday cake icon
       let birthYear = null;
       const bCols = document.querySelectorAll(".col-md-11.vcenter");
       for (const col of bCols) {
@@ -115,7 +187,6 @@ async function scrapeJudge(page, id) {
         const label = h3.innerText.trim();
         const value = val.innerText.trim();
         if (label.includes("National Canine")) {
-          // "Real Sociedad Canina de España (SPAIN)"
           const m = value.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
           if (m) { kennelClub = m[1].trim(); kennelClubCountry = m[2].trim(); }
           else kennelClub = value;
@@ -132,7 +203,6 @@ async function scrapeJudge(page, id) {
         const inp = document.getElementById(`ContentPlaceHolder1_LanguesCheckBoxList_${idx}`);
         if (inp && inp.checked) fciLanguages.push(lang);
       }
-      // Other languages — in table inside right column of Languages section
       const otherLanguages = [];
       document.querySelectorAll(".col-md-6").forEach(col => {
         const h = col.querySelector("h3, h4, strong, b");
@@ -142,7 +212,6 @@ async function scrapeJudge(page, id) {
           if (t) otherLanguages.push(t);
         });
       });
-      // Kennel names — col-md-4 label / col-md-8 value row pattern
       const kennelNames = [];
       document.querySelectorAll(".row").forEach(row => {
         const label = row.querySelector(".col-md-4");
@@ -183,9 +252,8 @@ async function scrapeJudge(page, id) {
       const groupJudge = [];
       document.querySelectorAll("[id*='BogCheckBox']").forEach(cb => {
         if (cb.checked) {
-          // ID format: ContentPlaceHolder1_AutorisationsControl_GroupesRepeater_BogCheckBox_0
           const m = cb.id.match(/_(\d+)$/);
-          if (m) groupJudge.push(parseInt(m[1]) + 1); // 0-indexed → group 1-10
+          if (m) groupJudge.push(parseInt(m[1]) + 1);
         }
       });
 
@@ -196,7 +264,6 @@ async function scrapeJudge(page, id) {
           const label = document.querySelector(`label[for="${cb.id}"]`);
           if (label) {
             const txt = label.innerText.trim();
-            // Format: "AKITA (255)" or "SAMOYED (212)"
             const m = txt.match(/^(.+?)\s*\((\d+)\)\s*$/);
             if (m) {
               authorizedBreeds.push({ name: m[1].trim(), fciNumber: parseInt(m[2]) });
@@ -221,7 +288,7 @@ async function scrapeJudge(page, id) {
       });
 
       // ── Contact ──────────────────────────────────────────────────────────
-      let email = null, phone = null, address = null;
+      let email = null;
       const bodyText = document.body.innerText;
       const emailMatch = bodyText.match(/[\w.+-]+@[\w-]+\.[a-z]{2,}/i);
       if (emailMatch && !bodyText.includes("(private)")) email = emailMatch[0];
@@ -230,40 +297,32 @@ async function scrapeJudge(page, id) {
         rawName, birthYear, kennelClub, kennelClubCountry, countryOfResidence,
         fciLanguages, otherLanguages, kennelNames, disciplines, disciplineFirstAuth,
         allBreedJudge, bisJudge, groupJudge, authorizedBreeds, suspensions,
-        contact: { email, phone, address }
+        contact: { email, phone: null, address: null }
       };
     });
 
     if (!data) return null;
 
     // ── Post-process in Node ──────────────────────────────────────────────
-    // Parse name: "AZABAL VAZQUEZ M. (ES300)" or "KAZLAUSKAITE, RAMUNE (Ms) (LT9)"
     let lastName = "", firstName = "", title = "", fciLicenceId = "";
     const raw = data.rawName;
 
-    // Extract licence ID — last parenthesized token that matches country+number
     const licMatch = raw.match(/\(([A-Z]{2,3}\d+)\)\s*$/);
     if (licMatch) fciLicenceId = licMatch[1];
 
-    // Extract title (Ms/Mr/Mrs/Dr) if present
     const titleMatch = raw.match(/\((Ms|Mr|Mrs|Dr|Prof)\)/i);
     if (titleMatch) title = titleMatch[1];
 
-    // Remove both parenthesized parts to get the name core
     const nameCore = raw
       .replace(/\([A-Z]{2,3}\d+\)/g, "")
       .replace(/\((Ms|Mr|Mrs|Dr|Prof)\)/gi, "")
       .trim();
 
-    // Two formats:
-    // "LASTNAME, FIRSTNAME" (comma separated)
-    // "LASTNAME INITIAL." (no comma, just last name + initial)
     if (nameCore.includes(",")) {
       const parts = nameCore.split(",").map(s=>s.trim());
       lastName  = parts[0];
       firstName = parts[1] || "";
     } else {
-      // "AZABAL VAZQUEZ M." — last word(s) before the initial = last name, initial = first
       const parts = nameCore.trim().split(/\s+/);
       const initials = parts.filter(p => /^[A-Z]\.?$/.test(p));
       const lastParts = parts.filter(p => !/^[A-Z]\.?$/.test(p));
@@ -364,6 +423,7 @@ async function scrapeJudge(page, id) {
 async function main() {
   console.log(`🐕 FCI Full Scraper v2 — starting from ID ${startFrom}`);
   console.log(`   Auto-stop after ${MAX_EMPTY} consecutive empty | delay ${DELAY_MS}ms`);
+  console.log(`   Browser restart every ${RESTART_EVERY} IDs | Session health check every ${HEALTH_CHECK_EVERY} empties`);
 
   // Load checkpoint
   let judges = [];
@@ -378,34 +438,31 @@ async function main() {
     console.log(`📂 Resuming from ID ${resumeFrom} — ${judges.length} judges loaded`);
   }
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"],
-    defaultViewport: { width: 1280, height: 900 }
-  });
-  const page = await browser.newPage();
-  await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-
-  // Close popup once
-  try {
-    await page.goto("https://www.fci.be/en/judges", { waitUntil:"networkidle2", timeout:20000 });
-    await sleep(1500);
-    await page.evaluate(()=>{
-      const b = Array.from(document.querySelectorAll("button,a")).find(x=>x.innerText?.trim()==="Close");
-      if(b) b.click();
-    });
-    await sleep(800);
-    console.log("✅ Popup handled");
-  } catch(e) {}
+  await initBrowser("initial");
 
   let consecutive = 0;
   let i = resumeFrom;
+  let idsSinceRestart = 0;
+  // ID of first successfully scraped judge — used for health checks.
+  // Seed from loaded judges if resuming, otherwise set on first find.
+  let healthCheckId = judges.length > 0 ? judges[0].fciUrlId : null;
 
   const loopMax = BACKFILL_MODE ? bfEnd : maxId;
   while (i <= loopMax) {
-    const judge = await scrapeJudge(page, i);
+
+    // Periodic browser restart to prevent session/popup issues
+    if (idsSinceRestart > 0 && idsSinceRestart % RESTART_EVERY === 0) {
+      console.log(`♻️  Restarting browser at ID ${i} (${idsSinceRestart} IDs since last restart)...`);
+      await initBrowser(`restart at id=${i}`);
+      idsSinceRestart = 0;
+    }
+
+    const judge = await scrapeJudge(i);
+    let rewound = false;
 
     if (judge) {
+      // Record first good ID for health checks
+      if (!healthCheckId) healthCheckId = i;
       judges.push(judge);
       consecutive = 0;
       const total = judges.length;
@@ -414,12 +471,35 @@ async function main() {
       }
     } else {
       consecutive++;
-      if (consecutive % 100 === 0) {
-        console.log(`⬜ ${consecutive} empty in a row (id=${i}) | judges found: ${judges.length}`);
+
+      // ── Session health check ───────────────────────────────────────────────
+      // Every HEALTH_CHECK_EVERY consecutive empties, verify the session is live.
+      // If dead (session expired), restart browser and rewind to the first empty
+      // ID in this streak — those IDs may actually have judges we missed.
+      if (healthCheckId && consecutive % HEALTH_CHECK_EVERY === 0) {
+        console.log(`🔍 Health check after ${consecutive} empties (id=${i}, checking id=${healthCheckId})...`);
+        const alive = await isSessionAlive(healthCheckId);
+        if (!alive) {
+          const rewindTo = i - consecutive + 1;
+          console.log(`⚠️  Session expired! Restarting + rewinding ${consecutive} IDs → resuming from id=${rewindTo}`);
+          await initBrowser(`expired-restart at id=${i}`);
+          i = rewindTo;
+          consecutive = 0;
+          idsSinceRestart = 0;
+          rewound = true;
+        } else {
+          console.log(`✅ Session alive — ids ${i - consecutive + 1}..${i} are genuinely empty`);
+        }
       }
-      if (consecutive >= MAX_EMPTY) {
-        console.log(`\n🏁 Stopping — ${MAX_EMPTY} consecutive empty pages. Last id: ${i}`);
-        break;
+
+      if (!rewound) {
+        if (consecutive % 100 === 0) {
+          console.log(`⬜ ${consecutive} empty in a row (id=${i}) | judges found: ${judges.length}`);
+        }
+        if (consecutive >= MAX_EMPTY) {
+          console.log(`\n🏁 Stopping — ${MAX_EMPTY} consecutive empty pages. Last id: ${i}`);
+          break;
+        }
       }
     }
 
@@ -431,7 +511,10 @@ async function main() {
     }
 
     await sleep(DELAY_MS);
-    i++;
+    if (!rewound) {
+      i++;
+      idsSinceRestart++;
+    }
   }
 
   // Final save

@@ -1,0 +1,6552 @@
+{
+  "count": 50,
+  "judges": [
+    {
+      "id": "fci_1",
+      "fciUrlId": 1,
+      "fciLicenceId": "FI37",
+      "fciLicenceCountry": "FI",
+      "fciLicenceNumber": 37,
+      "name": "Tapio Eerola",
+      "lastName": "Eerola",
+      "firstName": "Tapio",
+      "title": null,
+      "photo": "TE",
+      "birthYear": 1957,
+      "licensedDate": "1993-11-02",
+      "licensedYear": 1993,
+      "country": "Finland",
+      "flag": "🇫🇮",
+      "kennelClub": "Suomen Kennelliitto - Finska Kennelklubben",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "02-11-1993"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": true,
+      "bisJudge": true,
+      "groupJudge": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "groupNames": [
+        {
+          "group": 1,
+          "name": "Sheepdogs and Cattle Dogs"
+        },
+        {
+          "group": 2,
+          "name": "Pinscher, Schnauzer, Molossoid and Swiss Mountain Dogs"
+        },
+        {
+          "group": 3,
+          "name": "Terriers"
+        },
+        {
+          "group": 4,
+          "name": "Dachshunds"
+        },
+        {
+          "group": 5,
+          "name": "Spitz and Primitive Types"
+        },
+        {
+          "group": 6,
+          "name": "Scent Hounds and Related Breeds"
+        },
+        {
+          "group": 7,
+          "name": "Pointing Dogs"
+        },
+        {
+          "group": 8,
+          "name": "Retrievers, Flushing Dogs and Water Dogs"
+        },
+        {
+          "group": 9,
+          "name": "Companion and Toy Dogs"
+        },
+        {
+          "group": 10,
+          "name": "Sighthounds"
+        }
+      ],
+      "authorizedBreeds": [],
+      "breeds": [
+        "All breeds"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "FI37"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=1",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:26:48.239Z"
+    },
+    {
+      "id": "fci_2",
+      "fciUrlId": 2,
+      "fciLicenceId": "NO169",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 169,
+      "name": "Hjørdis Espeland",
+      "lastName": "Espeland",
+      "firstName": "Hjørdis",
+      "title": null,
+      "photo": "HE",
+      "birthYear": 1930,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO169"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=2",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:26:54.068Z"
+    },
+    {
+      "id": "fci_3",
+      "fciUrlId": 3,
+      "fciLicenceId": "NO68",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 68,
+      "name": "Trygve Heyerdahl",
+      "lastName": "Heyerdahl",
+      "firstName": "Trygve",
+      "title": null,
+      "photo": "TH",
+      "birthYear": 1939,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        4,
+        6,
+        7
+      ],
+      "groupNames": [
+        {
+          "group": 4,
+          "name": "Dachshunds"
+        },
+        {
+          "group": 6,
+          "name": "Scent Hounds and Related Breeds"
+        },
+        {
+          "group": 7,
+          "name": "Pointing Dogs"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "AMERICAN COCKER SPANIEL",
+          "fciNumber": 167
+        },
+        {
+          "name": "AMERICAN WATER SPANIEL",
+          "fciNumber": 301
+        },
+        {
+          "name": "CLUMBER SPANIEL",
+          "fciNumber": 109
+        },
+        {
+          "name": "ENGLISH COCKER SPANIEL",
+          "fciNumber": 5
+        },
+        {
+          "name": "ENGLISH SPRINGER SPANIEL",
+          "fciNumber": 125
+        },
+        {
+          "name": "FIELD SPANIEL",
+          "fciNumber": 123
+        },
+        {
+          "name": "FLAT COATED RETRIEVER",
+          "fciNumber": 121
+        },
+        {
+          "name": "FRENCH WATER DOG",
+          "fciNumber": 105
+        },
+        {
+          "name": "GERMAN SPANIEL",
+          "fciNumber": 104
+        },
+        {
+          "name": "IRISH WATER SPANIEL",
+          "fciNumber": 124
+        },
+        {
+          "name": "NEDERLANDSE KOOIKERHONDJE",
+          "fciNumber": 314
+        },
+        {
+          "name": "NOVA SCOTIA DUCK TOLLING RETRIEVER",
+          "fciNumber": 312
+        },
+        {
+          "name": "PORTUGUESE WATER DOG",
+          "fciNumber": 37
+        },
+        {
+          "name": "ROMAGNA WATER DOG",
+          "fciNumber": 298
+        },
+        {
+          "name": "SPANISH WATER DOG",
+          "fciNumber": 336
+        },
+        {
+          "name": "SUSSEX SPANIEL",
+          "fciNumber": 127
+        },
+        {
+          "name": "WELSH SPRINGER SPANIEL",
+          "fciNumber": 126
+        },
+        {
+          "name": "WETTERHOUN",
+          "fciNumber": 221
+        }
+      ],
+      "breeds": [
+        "Dachshund",
+        "Dachshund (Miniature Long-haired)",
+        "Dachshund (Miniature Smooth-haired)",
+        "Dachshund (Miniature Wire-haired)",
+        "Dachshund (Rabbit Long-haired)",
+        "Dachshund (Rabbit Smooth-haired)",
+        "Dachshund (Rabbit Wire-haired)",
+        "Dachshund (Standard Long-haired)",
+        "Dachshund (Standard Smooth-haired)",
+        "Dachshund (Standard Wire-haired)",
+        "Artois Hound",
+        "Basset Artésien Normand",
+        "Basset Bleu De Gascogne",
+        "Basset Fauve De Bretagne",
+        "Basset Griffon Vendéen (Grand)",
+        "Basset Griffon Vendéen (Petit)",
+        "Basset Hound",
+        "Bavarian Mountain Scent Hound",
+        "Beagle",
+        "Billy",
+        "Black and Tan Coonhound",
+        "Bloodhound",
+        "Blue Gascony Basset",
+        "Bleu De Gascogne (Grand)",
+        "Bleu De Gascogne (Petit)",
+        "Briquet Griffon Vendéen",
+        "Bruno Du Jura",
+        "Dalmatian",
+        "Drever",
+        "Dunker",
+        "English Foxhound",
+        "Finnish Hound",
+        "Foxhound (American)",
+        "Grand Anglo-Francais Blanc Et Noir",
+        "Grand Anglo-Francais Blanc Et Orange",
+        "Grand Anglo-Francais Tricolore",
+        "Grand Griffon Vendéen",
+        "Haldenstövare",
+        "Hamiltonstövare",
+        "Harrier",
+        "Hygenhund",
+        "Otterhound",
+        "Plott Hound",
+        "Poitevin",
+        "Polish Hound",
+        "Porcelaine",
+        "Rhodesian Ridgeback",
+        "Schillerstövare",
+        "Schweizer Laufhund",
+        "Schwarzwild Bracke",
+        "Slovenský Kopov",
+        "Smälandsstövare",
+        "Steinbracke",
+        "Styrian Coarse-haired Hound",
+        "Tirolean Hound",
+        "Transylvanian Hound",
+        "Bracco Italiano",
+        "Braque D'Auvergne",
+        "Braque Du Bourbonnais",
+        "Braque Francais (Gascogne)",
+        "Braque Francais (Pyrénées)",
+        "Braque Saint-Germain",
+        "Brittany",
+        "Burgos Pointer",
+        "Czech Fousek",
+        "Drentse Patrijshond",
+        "English Setter",
+        "French Spaniel",
+        "German Longhaired Pointer",
+        "German Shorthaired Pointer",
+        "German Wirehaired Pointer",
+        "Gordon Setter",
+        "Hungarian Wirehaired Vizsla",
+        "Irish Red and White Setter",
+        "Irish Setter",
+        "Istrian Coarse-Haired Hound",
+        "Italian Spinone",
+        "Korthals Griffon",
+        "Large Munsterlander",
+        "Old Danish Pointer",
+        "Perdigueiro Portugues",
+        "Perdiguero De Burgos",
+        "Picardy Spaniel",
+        "Pointer",
+        "Portuguese Pointer",
+        "Pudelpointer",
+        "Punta Griffon Korthals",
+        "Setter Gordon",
+        "Slovakian Wirehaired Pointer",
+        "Small Munsterlander",
+        "Spanish Pointer",
+        "Stabyhoun",
+        "Vizsla",
+        "Weimaraner",
+        "Wirehaired Pointing Griffon",
+        "American Cocker Spaniel",
+        "American Water Spaniel",
+        "Clumber Spaniel",
+        "English Cocker Spaniel",
+        "English Springer Spaniel",
+        "Field Spaniel",
+        "Flat Coated Retriever",
+        "French Water Dog",
+        "German Spaniel",
+        "Irish Water Spaniel",
+        "Nederlandse Kooikerhondje",
+        "Nova Scotia Duck Tolling Retriever",
+        "Portuguese Water Dog",
+        "Romagna Water Dog",
+        "Spanish Water Dog",
+        "Sussex Spaniel",
+        "Welsh Springer Spaniel",
+        "Wetterhoun"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO68"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=3",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:00.542Z"
+    },
+    {
+      "id": "fci_4",
+      "fciUrlId": 4,
+      "fciLicenceId": "NO21",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 21,
+      "name": "Niels Brandstrup",
+      "lastName": "Brandstrup",
+      "firstName": "Niels",
+      "title": null,
+      "photo": "NB",
+      "birthYear": 1942,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        4,
+        6,
+        7
+      ],
+      "groupNames": [
+        {
+          "group": 4,
+          "name": "Dachshunds"
+        },
+        {
+          "group": 6,
+          "name": "Scent Hounds and Related Breeds"
+        },
+        {
+          "group": 7,
+          "name": "Pointing Dogs"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "BASENJI",
+          "fciNumber": 43
+        },
+        {
+          "name": "AMERICAN COCKER SPANIEL",
+          "fciNumber": 167
+        },
+        {
+          "name": "AMERICAN WATER SPANIEL",
+          "fciNumber": 301
+        },
+        {
+          "name": "CLUMBER SPANIEL",
+          "fciNumber": 109
+        },
+        {
+          "name": "ENGLISH COCKER SPANIEL",
+          "fciNumber": 5
+        },
+        {
+          "name": "ENGLISH SPRINGER SPANIEL",
+          "fciNumber": 125
+        },
+        {
+          "name": "FIELD SPANIEL",
+          "fciNumber": 123
+        },
+        {
+          "name": "FLAT COATED RETRIEVER",
+          "fciNumber": 121
+        },
+        {
+          "name": "FRENCH WATER DOG",
+          "fciNumber": 105
+        },
+        {
+          "name": "GERMAN SPANIEL",
+          "fciNumber": 104
+        },
+        {
+          "name": "GOLDEN RETRIEVER",
+          "fciNumber": 111
+        },
+        {
+          "name": "IRISH WATER SPANIEL",
+          "fciNumber": 124
+        },
+        {
+          "name": "NEDERLANDSE KOOIKERHONDJE",
+          "fciNumber": 314
+        },
+        {
+          "name": "PORTUGUESE WATER DOG",
+          "fciNumber": 37
+        },
+        {
+          "name": "ROMAGNA WATER DOG",
+          "fciNumber": 298
+        },
+        {
+          "name": "SPANISH WATER DOG",
+          "fciNumber": 336
+        },
+        {
+          "name": "SUSSEX SPANIEL",
+          "fciNumber": 127
+        },
+        {
+          "name": "WELSH SPRINGER SPANIEL",
+          "fciNumber": 126
+        },
+        {
+          "name": "WETTERHOUN",
+          "fciNumber": 221
+        }
+      ],
+      "breeds": [
+        "Dachshund",
+        "Dachshund (Miniature Long-haired)",
+        "Dachshund (Miniature Smooth-haired)",
+        "Dachshund (Miniature Wire-haired)",
+        "Dachshund (Rabbit Long-haired)",
+        "Dachshund (Rabbit Smooth-haired)",
+        "Dachshund (Rabbit Wire-haired)",
+        "Dachshund (Standard Long-haired)",
+        "Dachshund (Standard Smooth-haired)",
+        "Dachshund (Standard Wire-haired)",
+        "Artois Hound",
+        "Basset Artésien Normand",
+        "Basset Bleu De Gascogne",
+        "Basset Fauve De Bretagne",
+        "Basset Griffon Vendéen (Grand)",
+        "Basset Griffon Vendéen (Petit)",
+        "Basset Hound",
+        "Bavarian Mountain Scent Hound",
+        "Beagle",
+        "Billy",
+        "Black and Tan Coonhound",
+        "Bloodhound",
+        "Blue Gascony Basset",
+        "Bleu De Gascogne (Grand)",
+        "Bleu De Gascogne (Petit)",
+        "Briquet Griffon Vendéen",
+        "Bruno Du Jura",
+        "Dalmatian",
+        "Drever",
+        "Dunker",
+        "English Foxhound",
+        "Finnish Hound",
+        "Foxhound (American)",
+        "Grand Anglo-Francais Blanc Et Noir",
+        "Grand Anglo-Francais Blanc Et Orange",
+        "Grand Anglo-Francais Tricolore",
+        "Grand Griffon Vendéen",
+        "Haldenstövare",
+        "Hamiltonstövare",
+        "Harrier",
+        "Hygenhund",
+        "Otterhound",
+        "Plott Hound",
+        "Poitevin",
+        "Polish Hound",
+        "Porcelaine",
+        "Rhodesian Ridgeback",
+        "Schillerstövare",
+        "Schweizer Laufhund",
+        "Schwarzwild Bracke",
+        "Slovenský Kopov",
+        "Smälandsstövare",
+        "Steinbracke",
+        "Styrian Coarse-haired Hound",
+        "Tirolean Hound",
+        "Transylvanian Hound",
+        "Bracco Italiano",
+        "Braque D'Auvergne",
+        "Braque Du Bourbonnais",
+        "Braque Francais (Gascogne)",
+        "Braque Francais (Pyrénées)",
+        "Braque Saint-Germain",
+        "Brittany",
+        "Burgos Pointer",
+        "Czech Fousek",
+        "Drentse Patrijshond",
+        "English Setter",
+        "French Spaniel",
+        "German Longhaired Pointer",
+        "German Shorthaired Pointer",
+        "German Wirehaired Pointer",
+        "Gordon Setter",
+        "Hungarian Wirehaired Vizsla",
+        "Irish Red and White Setter",
+        "Irish Setter",
+        "Istrian Coarse-Haired Hound",
+        "Italian Spinone",
+        "Korthals Griffon",
+        "Large Munsterlander",
+        "Old Danish Pointer",
+        "Perdigueiro Portugues",
+        "Perdiguero De Burgos",
+        "Picardy Spaniel",
+        "Pointer",
+        "Portuguese Pointer",
+        "Pudelpointer",
+        "Punta Griffon Korthals",
+        "Setter Gordon",
+        "Slovakian Wirehaired Pointer",
+        "Small Munsterlander",
+        "Spanish Pointer",
+        "Stabyhoun",
+        "Vizsla",
+        "Weimaraner",
+        "Wirehaired Pointing Griffon",
+        "Basenji",
+        "American Cocker Spaniel",
+        "American Water Spaniel",
+        "Clumber Spaniel",
+        "English Cocker Spaniel",
+        "English Springer Spaniel",
+        "Field Spaniel",
+        "Flat Coated Retriever",
+        "French Water Dog",
+        "German Spaniel",
+        "Golden Retriever",
+        "Irish Water Spaniel",
+        "Nederlandse Kooikerhondje",
+        "Portuguese Water Dog",
+        "Romagna Water Dog",
+        "Spanish Water Dog",
+        "Sussex Spaniel",
+        "Welsh Springer Spaniel",
+        "Wetterhoun"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO21"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=4",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:04.582Z"
+    },
+    {
+      "id": "fci_5",
+      "fciUrlId": 5,
+      "fciLicenceId": "NO185",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 185,
+      "name": "Mimi Lønnum",
+      "lastName": "Lønnum",
+      "firstName": "Mimi",
+      "title": null,
+      "photo": "ML",
+      "birthYear": 1927,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "French",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO185"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=5",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:09.143Z"
+    },
+    {
+      "id": "fci_6",
+      "fciUrlId": 6,
+      "fciLicenceId": "NO81",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 81,
+      "name": "Bjørg Foss",
+      "lastName": "Foss",
+      "firstName": "Bjørg",
+      "title": null,
+      "photo": "BF",
+      "birthYear": 1946,
+      "licensedDate": "1987-01-01",
+      "licensedYear": 1987,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "01-01-1987"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        10
+      ],
+      "groupNames": [
+        {
+          "group": 10,
+          "name": "Sighthounds"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "AMERICAN STAFFORDSHIRE TERRIER",
+          "fciNumber": 286
+        },
+        {
+          "name": "BORDER TERRIER",
+          "fciNumber": 10
+        },
+        {
+          "name": "BULL TERRIER",
+          "fciNumber": 11
+        },
+        {
+          "name": "CZECH TERRIER",
+          "fciNumber": 246
+        },
+        {
+          "name": "DANDIE DINMONT TERRIER",
+          "fciNumber": 168
+        },
+        {
+          "name": "IRISH GLEN OF IMAAL TERRIER",
+          "fciNumber": 302
+        },
+        {
+          "name": "IRISH SOFT COATED WHEATEN TERRIER",
+          "fciNumber": 40
+        },
+        {
+          "name": "IRISH TERRIER",
+          "fciNumber": 139
+        },
+        {
+          "name": "KERRY BLUE TERRIER",
+          "fciNumber": 3
+        },
+        {
+          "name": "MINIATURE BULL TERRIER",
+          "fciNumber": 359
+        },
+        {
+          "name": "SCOTTISH TERRIER",
+          "fciNumber": 73
+        },
+        {
+          "name": "SKYE TERRIER",
+          "fciNumber": 75
+        },
+        {
+          "name": "STAFFORDSHIRE BULL TERRIER",
+          "fciNumber": 76
+        },
+        {
+          "name": "WEST HIGHLAND WHITE TERRIER",
+          "fciNumber": 85
+        },
+        {
+          "name": "CANARIAN WARREN HOUND",
+          "fciNumber": 329
+        },
+        {
+          "name": "CIRNECO DELL'ETNA",
+          "fciNumber": 199
+        },
+        {
+          "name": "IBIZAN PODENCO",
+          "fciNumber": 89
+        },
+        {
+          "name": "PHARAOH HOUND",
+          "fciNumber": 248
+        },
+        {
+          "name": "PORTUGUESE WARREN HOUND-PORTUGUESE PODENGO",
+          "fciNumber": 94
+        }
+      ],
+      "breeds": [
+        "Afghan Hound",
+        "Azawakh",
+        "Borzoi",
+        "Deerhound",
+        "Greyhound",
+        "Hungarian Greyhound",
+        "Irish Wolfhound",
+        "Italian Greyhound",
+        "Magyar Agár",
+        "Polish Greyhound",
+        "Saluki",
+        "Scottish Deerhound",
+        "Sloughi",
+        "Spanish Greyhound",
+        "Whippet",
+        "American Staffordshire Terrier",
+        "Border Terrier",
+        "Bull Terrier",
+        "Czech Terrier",
+        "Dandie Dinmont Terrier",
+        "Irish Glen Of Imaal Terrier",
+        "Irish Soft Coated Wheaten Terrier",
+        "Irish Terrier",
+        "Kerry Blue Terrier",
+        "Miniature Bull Terrier",
+        "Scottish Terrier",
+        "Skye Terrier",
+        "Staffordshire Bull Terrier",
+        "West Highland White Terrier",
+        "Canarian Warren Hound",
+        "Cirneco Dell'etna",
+        "Ibizan Podenco",
+        "Pharaoh Hound",
+        "Portuguese Warren Hound-portuguese Podengo"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO81"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=6",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:13.407Z"
+    },
+    {
+      "id": "fci_7",
+      "fciUrlId": 7,
+      "fciLicenceId": "NO108",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 108,
+      "name": "Jan Myrvold",
+      "lastName": "Myrvold",
+      "firstName": "Jan",
+      "title": null,
+      "photo": "JM",
+      "birthYear": 1943,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "ALPINE DACHSBRACKE",
+          "fciNumber": 254
+        },
+        {
+          "name": "AMERICAN FOXHOUND",
+          "fciNumber": 303
+        },
+        {
+          "name": "ARIEGEOIS",
+          "fciNumber": 20
+        },
+        {
+          "name": "ARTOIS HOUND",
+          "fciNumber": 28
+        },
+        {
+          "name": "AUSTRIAN BLACK AND TAN HOUND",
+          "fciNumber": 63
+        },
+        {
+          "name": "BAVARIAN MOUNTAIN SCENT HOUND",
+          "fciNumber": 217
+        },
+        {
+          "name": "BEAGLE",
+          "fciNumber": 161
+        },
+        {
+          "name": "BEAGLE HARRIER",
+          "fciNumber": 290
+        },
+        {
+          "name": "BILLY",
+          "fciNumber": 25
+        },
+        {
+          "name": "BLUE GASCONY GRIFFON",
+          "fciNumber": 32
+        },
+        {
+          "name": "BOSNIAN BROKEN-HAIRED HOUND - CALLED BARAK",
+          "fciNumber": 155
+        },
+        {
+          "name": "BRIQUET GRIFFON VENDEEN",
+          "fciNumber": 19
+        },
+        {
+          "name": "COARSE-HAIRED STYRIAN HOUND",
+          "fciNumber": 62
+        },
+        {
+          "name": "DREVER",
+          "fciNumber": 130
+        },
+        {
+          "name": "ENGLISH FOXHOUND",
+          "fciNumber": 159
+        },
+        {
+          "name": "ESTONIAN HOUND",
+          "fciNumber": 366
+        },
+        {
+          "name": "FAWN BRITTANY GRIFFON",
+          "fciNumber": 66
+        },
+        {
+          "name": "FINNISH HOUND",
+          "fciNumber": 51
+        },
+        {
+          "name": "FRENCH TRICOLOUR HOUND",
+          "fciNumber": 219
+        },
+        {
+          "name": "FRENCH WHITE & BLACK HOUND",
+          "fciNumber": 220
+        },
+        {
+          "name": "FRENCH WHITE AND ORANGE HOUND",
+          "fciNumber": 316
+        },
+        {
+          "name": "GASCON SAINTONGEOIS",
+          "fciNumber": 21
+        },
+        {
+          "name": "GERMAN HOUND",
+          "fciNumber": 299
+        },
+        {
+          "name": "GRAND GRIFFON VENDEEN",
+          "fciNumber": 282
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH TRICOLOUR HOUND",
+          "fciNumber": 322
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH WHITE & ORANGE HOUND",
+          "fciNumber": 324
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH WHITE AND BLACK HOUND",
+          "fciNumber": 323
+        },
+        {
+          "name": "GREAT GASCONY BLUE",
+          "fciNumber": 22
+        },
+        {
+          "name": "GRIFFON NIVERNAIS",
+          "fciNumber": 17
+        },
+        {
+          "name": "HALDEN HOUND",
+          "fciNumber": 267
+        },
+        {
+          "name": "HAMILTONSTÖVARE",
+          "fciNumber": 132
+        },
+        {
+          "name": "HANOVERIAN SCENT HOUND",
+          "fciNumber": 213
+        },
+        {
+          "name": "HARRIER",
+          "fciNumber": 295
+        },
+        {
+          "name": "HELLENIC HOUND",
+          "fciNumber": 214
+        },
+        {
+          "name": "HUNGARIAN HOUND - TRANSYLVANIAN SCENT HOUND",
+          "fciNumber": 241
+        },
+        {
+          "name": "HYGEN HOUND",
+          "fciNumber": 266
+        },
+        {
+          "name": "ISTRIAN SHORT-HAIRED HOUND",
+          "fciNumber": 151
+        },
+        {
+          "name": "ISTRIAN WIRE-HAIRED HOUND",
+          "fciNumber": 152
+        },
+        {
+          "name": "ITALIAN ROUGH-HAIRED SEGUGIO",
+          "fciNumber": 198
+        },
+        {
+          "name": "ITALIAN SHORT-HAIRED SEGUGIO",
+          "fciNumber": 337
+        },
+        {
+          "name": "MEDIUM-SIZED ANGLO-FRENCH HOUND",
+          "fciNumber": 325
+        },
+        {
+          "name": "MONTENEGRIN MOUNTAIN HOUND",
+          "fciNumber": 279
+        },
+        {
+          "name": "NORWEGIAN HOUND",
+          "fciNumber": 203
+        },
+        {
+          "name": "POITEVIN",
+          "fciNumber": 24
+        },
+        {
+          "name": "POLISH HOUND",
+          "fciNumber": 52
+        },
+        {
+          "name": "PORCELAINE",
+          "fciNumber": 30
+        },
+        {
+          "name": "POSAVATZ HOUND",
+          "fciNumber": 154
+        },
+        {
+          "name": "SCHILLERSTÖVARE",
+          "fciNumber": 131
+        },
+        {
+          "name": "SEGUGIO MAREMMANO",
+          "fciNumber": 361
+        },
+        {
+          "name": "SERBIAN HOUND",
+          "fciNumber": 150
+        },
+        {
+          "name": "SERBIAN TRICOLOUR HOUND",
+          "fciNumber": 229
+        },
+        {
+          "name": "SLOVAKIAN HOUND",
+          "fciNumber": 244
+        },
+        {
+          "name": "SMÅLANDSSTÖVARE",
+          "fciNumber": 129
+        },
+        {
+          "name": "SMALL BLUE GASCONY",
+          "fciNumber": 31
+        },
+        {
+          "name": "SMALL SWISS HOUND",
+          "fciNumber": 60
+        },
+        {
+          "name": "SPANISH HOUND",
+          "fciNumber": 204
+        },
+        {
+          "name": "SWISS HOUND",
+          "fciNumber": 59
+        },
+        {
+          "name": "TYROLEAN HOUND",
+          "fciNumber": 68
+        },
+        {
+          "name": "WESTPHALIAN DACHSBRACKE",
+          "fciNumber": 100
+        }
+      ],
+      "breeds": [
+        "Alpine Dachsbracke",
+        "American Foxhound",
+        "Ariegeois",
+        "Artois Hound",
+        "Austrian Black And Tan Hound",
+        "Bavarian Mountain Scent Hound",
+        "Beagle",
+        "Beagle Harrier",
+        "Billy",
+        "Blue Gascony Griffon",
+        "Bosnian Broken-haired Hound - Called Barak",
+        "Briquet Griffon Vendeen",
+        "Coarse-haired Styrian Hound",
+        "Drever",
+        "English Foxhound",
+        "Estonian Hound",
+        "Fawn Brittany Griffon",
+        "Finnish Hound",
+        "French Tricolour Hound",
+        "French White & Black Hound",
+        "French White And Orange Hound",
+        "Gascon Saintongeois",
+        "German Hound",
+        "Grand Griffon Vendeen",
+        "Great Anglo-french Tricolour Hound",
+        "Great Anglo-french White & Orange Hound",
+        "Great Anglo-french White And Black Hound",
+        "Great Gascony Blue",
+        "Griffon Nivernais",
+        "Halden Hound",
+        "Hamiltonstövare",
+        "Hanoverian Scent Hound",
+        "Harrier",
+        "Hellenic Hound",
+        "Hungarian Hound - Transylvanian Scent Hound",
+        "Hygen Hound",
+        "Istrian Short-haired Hound",
+        "Istrian Wire-haired Hound",
+        "Italian Rough-haired Segugio",
+        "Italian Short-haired Segugio",
+        "Medium-sized Anglo-french Hound",
+        "Montenegrin Mountain Hound",
+        "Norwegian Hound",
+        "Poitevin",
+        "Polish Hound",
+        "Porcelaine",
+        "Posavatz Hound",
+        "Schillerstövare",
+        "Segugio Maremmano",
+        "Serbian Hound",
+        "Serbian Tricolour Hound",
+        "Slovakian Hound",
+        "Smålandsstövare",
+        "Small Blue Gascony",
+        "Small Swiss Hound",
+        "Spanish Hound",
+        "Swiss Hound",
+        "Tyrolean Hound",
+        "Westphalian Dachsbracke"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO108"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=7",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:17.559Z"
+    },
+    {
+      "id": "fci_8",
+      "fciUrlId": 8,
+      "fciLicenceId": "SE313",
+      "fciLicenceCountry": "SE",
+      "fciLicenceNumber": 313,
+      "name": "Annika Ulltveit-moe",
+      "lastName": "Ulltveit-moe",
+      "firstName": "Annika",
+      "title": null,
+      "photo": "AU",
+      "birthYear": 1950,
+      "licensedDate": "1984-01-01",
+      "licensedYear": 1984,
+      "country": "Sweden",
+      "flag": "🇸🇪",
+      "kennelClub": "Svenska Kennelklubben",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "01-01-1984"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "SE313"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=8",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:22.669Z"
+    },
+    {
+      "id": "fci_9",
+      "fciUrlId": 9,
+      "fciLicenceId": "NO47",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 47,
+      "name": "Per Iversen",
+      "lastName": "Iversen",
+      "firstName": "Per",
+      "title": null,
+      "photo": "PI",
+      "birthYear": 1950,
+      "licensedDate": "1978-12-31",
+      "licensedYear": 1978,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "31-12-1978"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": true,
+      "groupJudge": [
+        3,
+        4,
+        6,
+        7,
+        8,
+        10
+      ],
+      "groupNames": [
+        {
+          "group": 3,
+          "name": "Terriers"
+        },
+        {
+          "group": 4,
+          "name": "Dachshunds"
+        },
+        {
+          "group": 6,
+          "name": "Scent Hounds and Related Breeds"
+        },
+        {
+          "group": 7,
+          "name": "Pointing Dogs"
+        },
+        {
+          "group": 8,
+          "name": "Retrievers, Flushing Dogs and Water Dogs"
+        },
+        {
+          "group": 10,
+          "name": "Sighthounds"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "WELSH CORGI (CARDIGAN)",
+          "fciNumber": 38
+        },
+        {
+          "name": "WELSH CORGI (PEMBROKE)",
+          "fciNumber": 39
+        },
+        {
+          "name": "CANARIAN WARREN HOUND",
+          "fciNumber": 329
+        },
+        {
+          "name": "CIRNECO DELL'ETNA",
+          "fciNumber": 199
+        },
+        {
+          "name": "EAST SIBERIAN LAIKA",
+          "fciNumber": 305
+        },
+        {
+          "name": "IBIZAN PODENCO",
+          "fciNumber": 89
+        },
+        {
+          "name": "JÄMTHUND",
+          "fciNumber": 42
+        },
+        {
+          "name": "KARELIAN BEAR DOG",
+          "fciNumber": 48
+        },
+        {
+          "name": "NORWEGIAN BUHUND",
+          "fciNumber": 237
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND BLACK",
+          "fciNumber": 268
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND GREY",
+          "fciNumber": 242
+        },
+        {
+          "name": "PHARAOH HOUND",
+          "fciNumber": 248
+        },
+        {
+          "name": "PORTUGUESE WARREN HOUND-PORTUGUESE PODENGO",
+          "fciNumber": 94
+        },
+        {
+          "name": "RUSSIAN-EUROPEAN LAIKA",
+          "fciNumber": 304
+        },
+        {
+          "name": "WEST SIBERIAN LAIKA",
+          "fciNumber": 306
+        },
+        {
+          "name": "CAVALIER KING CHARLES SPANIEL",
+          "fciNumber": 136
+        },
+        {
+          "name": "KING CHARLES SPANIEL",
+          "fciNumber": 128
+        }
+      ],
+      "breeds": [
+        "Airedale Terrier",
+        "Australian Terrier",
+        "Bedlington Terrier",
+        "Border Terrier",
+        "Bull Terrier",
+        "Bull Terrier Miniature",
+        "Cairn Terrier",
+        "Cesky Terrier",
+        "Dandie Dinmont Terrier",
+        "Fox Terrier (Smooth)",
+        "Fox Terrier (Wire)",
+        "Glen Of Imaal Terrier",
+        "Irish Glen Of Imaal Terrier",
+        "Irish Soft Coated Wheaten Terrier",
+        "Irish Terrier",
+        "Jack Russell Terrier",
+        "Kerry Blue Terrier",
+        "Lakeland Terrier",
+        "Manchester Terrier",
+        "Norfolk Terrier",
+        "Norwich Terrier",
+        "Parson Russell Terrier",
+        "Scottish Terrier",
+        "Sealyham Terrier",
+        "Skye Terrier",
+        "Welsh Terrier",
+        "West Highland White Terrier",
+        "Yorkshire Terrier",
+        "Dachshund",
+        "Dachshund (Miniature Long-haired)",
+        "Dachshund (Miniature Smooth-haired)",
+        "Dachshund (Miniature Wire-haired)",
+        "Dachshund (Rabbit Long-haired)",
+        "Dachshund (Rabbit Smooth-haired)",
+        "Dachshund (Rabbit Wire-haired)",
+        "Dachshund (Standard Long-haired)",
+        "Dachshund (Standard Smooth-haired)",
+        "Dachshund (Standard Wire-haired)",
+        "Artois Hound",
+        "Basset Artésien Normand",
+        "Basset Bleu De Gascogne",
+        "Basset Fauve De Bretagne",
+        "Basset Griffon Vendéen (Grand)",
+        "Basset Griffon Vendéen (Petit)",
+        "Basset Hound",
+        "Bavarian Mountain Scent Hound",
+        "Beagle",
+        "Billy",
+        "Black and Tan Coonhound",
+        "Bloodhound",
+        "Blue Gascony Basset",
+        "Bleu De Gascogne (Grand)",
+        "Bleu De Gascogne (Petit)",
+        "Briquet Griffon Vendéen",
+        "Bruno Du Jura",
+        "Dalmatian",
+        "Drever",
+        "Dunker",
+        "English Foxhound",
+        "Finnish Hound",
+        "Foxhound (American)",
+        "Grand Anglo-Francais Blanc Et Noir",
+        "Grand Anglo-Francais Blanc Et Orange",
+        "Grand Anglo-Francais Tricolore",
+        "Grand Griffon Vendéen",
+        "Haldenstövare",
+        "Hamiltonstövare",
+        "Harrier",
+        "Hygenhund",
+        "Otterhound",
+        "Plott Hound",
+        "Poitevin",
+        "Polish Hound",
+        "Porcelaine",
+        "Rhodesian Ridgeback",
+        "Schillerstövare",
+        "Schweizer Laufhund",
+        "Schwarzwild Bracke",
+        "Slovenský Kopov",
+        "Smälandsstövare",
+        "Steinbracke",
+        "Styrian Coarse-haired Hound",
+        "Tirolean Hound",
+        "Transylvanian Hound",
+        "Bracco Italiano",
+        "Braque D'Auvergne",
+        "Braque Du Bourbonnais",
+        "Braque Francais (Gascogne)",
+        "Braque Francais (Pyrénées)",
+        "Braque Saint-Germain",
+        "Brittany",
+        "Burgos Pointer",
+        "Czech Fousek",
+        "Drentse Patrijshond",
+        "English Setter",
+        "French Spaniel",
+        "German Longhaired Pointer",
+        "German Shorthaired Pointer",
+        "German Wirehaired Pointer",
+        "Gordon Setter",
+        "Hungarian Wirehaired Vizsla",
+        "Irish Red and White Setter",
+        "Irish Setter",
+        "Istrian Coarse-Haired Hound",
+        "Italian Spinone",
+        "Korthals Griffon",
+        "Large Munsterlander",
+        "Old Danish Pointer",
+        "Perdigueiro Portugues",
+        "Perdiguero De Burgos",
+        "Picardy Spaniel",
+        "Pointer",
+        "Portuguese Pointer",
+        "Pudelpointer",
+        "Punta Griffon Korthals",
+        "Setter Gordon",
+        "Slovakian Wirehaired Pointer",
+        "Small Munsterlander",
+        "Spanish Pointer",
+        "Stabyhoun",
+        "Vizsla",
+        "Weimaraner",
+        "Wirehaired Pointing Griffon",
+        "American Cocker Spaniel",
+        "American Water Spaniel",
+        "Barbet",
+        "Boykin Spaniel",
+        "Chesapeake Bay Retriever",
+        "Clumber Spaniel",
+        "Curly Coated Retriever",
+        "English Cocker Spaniel",
+        "English Springer Spaniel",
+        "Field Spaniel",
+        "Flat Coated Retriever",
+        "French Water Dog",
+        "German Spaniel",
+        "Golden Retriever",
+        "Irish Water Spaniel",
+        "Labrador Retriever",
+        "Nederlandse Kooikerhondje",
+        "Nova Scotia Duck Tolling Retriever",
+        "Portuguese Water Dog",
+        "Romagna Water Dog",
+        "Spanish Water Dog",
+        "Sussex Spaniel",
+        "Welsh Springer Spaniel",
+        "Wetterhoun",
+        "Afghan Hound",
+        "Azawakh",
+        "Borzoi",
+        "Deerhound",
+        "Greyhound",
+        "Hungarian Greyhound",
+        "Irish Wolfhound",
+        "Italian Greyhound",
+        "Magyar Agár",
+        "Polish Greyhound",
+        "Saluki",
+        "Scottish Deerhound",
+        "Sloughi",
+        "Spanish Greyhound",
+        "Whippet",
+        "Welsh Corgi (cardigan)",
+        "Welsh Corgi (pembroke)",
+        "Canarian Warren Hound",
+        "Cirneco Dell'etna",
+        "East Siberian Laika",
+        "Ibizan Podenco",
+        "Jämthund",
+        "Karelian Bear Dog",
+        "Norwegian Buhund",
+        "Norwegian Elkhound Black",
+        "Norwegian Elkhound Grey",
+        "Pharaoh Hound",
+        "Portuguese Warren Hound-portuguese Podengo",
+        "Russian-european Laika",
+        "West Siberian Laika",
+        "Cavalier King Charles Spaniel",
+        "King Charles Spaniel"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO47"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=9",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:27.044Z"
+    },
+    {
+      "id": "fci_10",
+      "fciUrlId": 10,
+      "fciLicenceId": "NO174",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 174,
+      "name": "Grethe Bergendahl",
+      "lastName": "Bergendahl",
+      "firstName": "Grethe",
+      "title": null,
+      "photo": "GB",
+      "birthYear": 1936,
+      "licensedDate": "1972-01-01",
+      "licensedYear": 1972,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "01-01-1972"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO174"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=10",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:31.266Z"
+    },
+    {
+      "id": "fci_11",
+      "fciUrlId": 11,
+      "fciLicenceId": "NO206",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 206,
+      "name": "Ingebjørg Tove Stenhaugen",
+      "lastName": "Stenhaugen",
+      "firstName": "Ingebjørg Tove",
+      "title": null,
+      "photo": "IT",
+      "birthYear": 1937,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO206"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=11",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:34.949Z"
+    },
+    {
+      "id": "fci_12",
+      "fciUrlId": 12,
+      "fciLicenceId": "NO177",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 177,
+      "name": "Bjørn Stang",
+      "lastName": "Stang",
+      "firstName": "Bjørn",
+      "title": null,
+      "photo": "BS",
+      "birthYear": 1935,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "French",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO177"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=12",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:38.545Z"
+    },
+    {
+      "id": "fci_13",
+      "fciUrlId": 13,
+      "fciLicenceId": "NO184",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 184,
+      "name": "Odd Harald Liland",
+      "lastName": "Liland",
+      "firstName": "Odd Harald",
+      "title": null,
+      "photo": "OH",
+      "birthYear": 1941,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO184"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=13",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:42.219Z"
+    },
+    {
+      "id": "fci_14",
+      "fciUrlId": 14,
+      "fciLicenceId": "NO26",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 26,
+      "name": "Freddy Sten Christensen",
+      "lastName": "Christensen",
+      "firstName": "Freddy Sten",
+      "title": null,
+      "photo": "FS",
+      "birthYear": 1945,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "AUSTRALIAN SHEPHERD",
+          "fciNumber": 342
+        },
+        {
+          "name": "BELGIAN SHEPHERD DOG",
+          "fciNumber": 15
+        },
+        {
+          "name": "BOUVIER DES FLANDRES",
+          "fciNumber": 191
+        },
+        {
+          "name": "BRIARD",
+          "fciNumber": 113
+        },
+        {
+          "name": "DUTCH SCHAPENDOES",
+          "fciNumber": 313
+        },
+        {
+          "name": "DUTCH SHEPHERD DOG",
+          "fciNumber": 223
+        },
+        {
+          "name": "GERMAN SHEPHERD DOG",
+          "fciNumber": 166
+        },
+        {
+          "name": "SHETLAND SHEEPDOG",
+          "fciNumber": 88
+        },
+        {
+          "name": "WELSH CORGI (CARDIGAN)",
+          "fciNumber": 38
+        },
+        {
+          "name": "WELSH CORGI (PEMBROKE)",
+          "fciNumber": 39
+        },
+        {
+          "name": "WHITE SWISS SHEPHERD DOG",
+          "fciNumber": 347
+        },
+        {
+          "name": "BERNESE MOUNTAIN DOG",
+          "fciNumber": 45
+        },
+        {
+          "name": "BOXER",
+          "fciNumber": 144
+        },
+        {
+          "name": "BULLMASTIFF",
+          "fciNumber": 157
+        },
+        {
+          "name": "DOBERMANN",
+          "fciNumber": 143
+        },
+        {
+          "name": "GIANT SCHNAUZER",
+          "fciNumber": 181
+        },
+        {
+          "name": "GREAT SWISS MOUNTAIN DOG",
+          "fciNumber": 58
+        },
+        {
+          "name": "HOVAWART",
+          "fciNumber": 190
+        },
+        {
+          "name": "MINIATURE SCHNAUZER",
+          "fciNumber": 183
+        },
+        {
+          "name": "NEWFOUNDLAND",
+          "fciNumber": 50
+        },
+        {
+          "name": "ROTTWEILER",
+          "fciNumber": 147
+        },
+        {
+          "name": "RUSSIAN BLACK TERRIER",
+          "fciNumber": 327
+        },
+        {
+          "name": "SCHNAUZER",
+          "fciNumber": 182
+        },
+        {
+          "name": "ST. BERNARD",
+          "fciNumber": 61
+        }
+      ],
+      "breeds": [
+        "Australian Shepherd",
+        "Belgian Shepherd Dog",
+        "Bouvier Des Flandres",
+        "Briard",
+        "Dutch Schapendoes",
+        "Dutch Shepherd Dog",
+        "German Shepherd Dog",
+        "Shetland Sheepdog",
+        "Welsh Corgi (cardigan)",
+        "Welsh Corgi (pembroke)",
+        "White Swiss Shepherd Dog",
+        "Bernese Mountain Dog",
+        "Boxer",
+        "Bullmastiff",
+        "Dobermann",
+        "Giant Schnauzer",
+        "Great Swiss Mountain Dog",
+        "Hovawart",
+        "Miniature Schnauzer",
+        "Newfoundland",
+        "Rottweiler",
+        "Russian Black Terrier",
+        "Schnauzer",
+        "St. Bernard"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO26"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=14",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:48.213Z"
+    },
+    {
+      "id": "fci_15",
+      "fciUrlId": 15,
+      "fciLicenceId": "NO167",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 167,
+      "name": "Oddbjørn Winther",
+      "lastName": "Winther",
+      "firstName": "Oddbjørn",
+      "title": null,
+      "photo": "OW",
+      "birthYear": 1946,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "GERMAN SHEPHERD DOG",
+          "fciNumber": 166
+        }
+      ],
+      "breeds": [
+        "German Shepherd Dog"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO167"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=15",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:55.424Z"
+    },
+    {
+      "id": "fci_16",
+      "fciUrlId": 16,
+      "fciLicenceId": "NO10",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 10,
+      "name": "Rodi Hübenthal",
+      "lastName": "Hübenthal",
+      "firstName": "Rodi",
+      "title": null,
+      "photo": "RH",
+      "birthYear": 1946,
+      "licensedDate": "1969-01-01",
+      "licensedYear": 1969,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "01-01-1969"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": true,
+      "bisJudge": true,
+      "groupJudge": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "groupNames": [
+        {
+          "group": 1,
+          "name": "Sheepdogs and Cattle Dogs"
+        },
+        {
+          "group": 2,
+          "name": "Pinscher, Schnauzer, Molossoid and Swiss Mountain Dogs"
+        },
+        {
+          "group": 3,
+          "name": "Terriers"
+        },
+        {
+          "group": 4,
+          "name": "Dachshunds"
+        },
+        {
+          "group": 5,
+          "name": "Spitz and Primitive Types"
+        },
+        {
+          "group": 6,
+          "name": "Scent Hounds and Related Breeds"
+        },
+        {
+          "group": 7,
+          "name": "Pointing Dogs"
+        },
+        {
+          "group": 8,
+          "name": "Retrievers, Flushing Dogs and Water Dogs"
+        },
+        {
+          "group": 9,
+          "name": "Companion and Toy Dogs"
+        },
+        {
+          "group": 10,
+          "name": "Sighthounds"
+        }
+      ],
+      "authorizedBreeds": [],
+      "breeds": [
+        "All breeds"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO10"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=16",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:27:58.954Z"
+    },
+    {
+      "id": "fci_17",
+      "fciUrlId": 17,
+      "fciLicenceId": "NO11",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 11,
+      "name": "Wera Hübenthal",
+      "lastName": "Hübenthal",
+      "firstName": "Wera",
+      "title": null,
+      "photo": "WH",
+      "birthYear": 1947,
+      "licensedDate": "1984-08-01",
+      "licensedYear": 1984,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "01-08-1984"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": true,
+      "bisJudge": true,
+      "groupJudge": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "groupNames": [
+        {
+          "group": 1,
+          "name": "Sheepdogs and Cattle Dogs"
+        },
+        {
+          "group": 2,
+          "name": "Pinscher, Schnauzer, Molossoid and Swiss Mountain Dogs"
+        },
+        {
+          "group": 3,
+          "name": "Terriers"
+        },
+        {
+          "group": 4,
+          "name": "Dachshunds"
+        },
+        {
+          "group": 5,
+          "name": "Spitz and Primitive Types"
+        },
+        {
+          "group": 6,
+          "name": "Scent Hounds and Related Breeds"
+        },
+        {
+          "group": 7,
+          "name": "Pointing Dogs"
+        },
+        {
+          "group": 8,
+          "name": "Retrievers, Flushing Dogs and Water Dogs"
+        },
+        {
+          "group": 9,
+          "name": "Companion and Toy Dogs"
+        },
+        {
+          "group": 10,
+          "name": "Sighthounds"
+        }
+      ],
+      "authorizedBreeds": [],
+      "breeds": [
+        "All breeds"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO11"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=17",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:01.802Z"
+    },
+    {
+      "id": "fci_18",
+      "fciUrlId": 18,
+      "fciLicenceId": "NO178",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 178,
+      "name": "Eivind Mjærum",
+      "lastName": "Mjærum",
+      "firstName": "Eivind",
+      "title": null,
+      "photo": "EM",
+      "birthYear": 1940,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO178"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=18",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:05.493Z"
+    },
+    {
+      "id": "fci_19",
+      "fciUrlId": 19,
+      "fciLicenceId": "NO212",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 212,
+      "name": "Steinar Sørlie",
+      "lastName": "Sørlie",
+      "firstName": "Steinar",
+      "title": null,
+      "photo": "SS",
+      "birthYear": 1936,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO212"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=19",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:09.655Z"
+    },
+    {
+      "id": "fci_20",
+      "fciUrlId": 20,
+      "fciLicenceId": "NO213",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 213,
+      "name": "Jan Brenden",
+      "lastName": "Brenden",
+      "firstName": "Jan",
+      "title": null,
+      "photo": "JB",
+      "birthYear": 1938,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO213"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=20",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:13.916Z"
+    },
+    {
+      "id": "fci_21",
+      "fciUrlId": 21,
+      "fciLicenceId": "NO214",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 214,
+      "name": "Karl Storholm",
+      "lastName": "Storholm",
+      "firstName": "Karl",
+      "title": null,
+      "photo": "KS",
+      "birthYear": 1930,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO214"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=21",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:17.895Z"
+    },
+    {
+      "id": "fci_22",
+      "fciUrlId": 22,
+      "fciLicenceId": "NO95",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 95,
+      "name": "Jul Hamlot",
+      "lastName": "Hamlot",
+      "firstName": "Jul",
+      "title": null,
+      "photo": "JH",
+      "birthYear": 1943,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        3
+      ],
+      "groupNames": [
+        {
+          "group": 3,
+          "name": "Terriers"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "GIANT SCHNAUZER",
+          "fciNumber": 181
+        },
+        {
+          "name": "MINIATURE SCHNAUZER",
+          "fciNumber": 183
+        },
+        {
+          "name": "SCHNAUZER",
+          "fciNumber": 182
+        },
+        {
+          "name": "RUSSIAN TOY",
+          "fciNumber": 352
+        },
+        {
+          "name": "IRISH WOLFHOUND",
+          "fciNumber": 160
+        }
+      ],
+      "breeds": [
+        "Airedale Terrier",
+        "Australian Terrier",
+        "Bedlington Terrier",
+        "Border Terrier",
+        "Bull Terrier",
+        "Bull Terrier Miniature",
+        "Cairn Terrier",
+        "Cesky Terrier",
+        "Dandie Dinmont Terrier",
+        "Fox Terrier (Smooth)",
+        "Fox Terrier (Wire)",
+        "Glen Of Imaal Terrier",
+        "Irish Glen Of Imaal Terrier",
+        "Irish Soft Coated Wheaten Terrier",
+        "Irish Terrier",
+        "Jack Russell Terrier",
+        "Kerry Blue Terrier",
+        "Lakeland Terrier",
+        "Manchester Terrier",
+        "Norfolk Terrier",
+        "Norwich Terrier",
+        "Parson Russell Terrier",
+        "Scottish Terrier",
+        "Sealyham Terrier",
+        "Skye Terrier",
+        "Welsh Terrier",
+        "West Highland White Terrier",
+        "Yorkshire Terrier",
+        "Giant Schnauzer",
+        "Miniature Schnauzer",
+        "Schnauzer",
+        "Russian Toy",
+        "Irish Wolfhound"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO95"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=22",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:22.012Z"
+    },
+    {
+      "id": "fci_23",
+      "fciUrlId": 23,
+      "fciLicenceId": "NO59",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 59,
+      "name": "Mona K. Selbach",
+      "lastName": "Selbach",
+      "firstName": "Mona K.",
+      "title": null,
+      "photo": "MK",
+      "birthYear": 1943,
+      "licensedDate": "1982-01-01",
+      "licensedYear": 1982,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "01-01-1982"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        3,
+        5,
+        9
+      ],
+      "groupNames": [
+        {
+          "group": 3,
+          "name": "Terriers"
+        },
+        {
+          "group": 5,
+          "name": "Spitz and Primitive Types"
+        },
+        {
+          "group": 9,
+          "name": "Companion and Toy Dogs"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "BOUVIER DES FLANDRES",
+          "fciNumber": 191
+        },
+        {
+          "name": "COLLIE ROUGH",
+          "fciNumber": 156
+        },
+        {
+          "name": "COLLIE SMOOTH",
+          "fciNumber": 296
+        },
+        {
+          "name": "DUTCH SCHAPENDOES",
+          "fciNumber": 313
+        },
+        {
+          "name": "DUTCH SHEPHERD DOG",
+          "fciNumber": 223
+        },
+        {
+          "name": "POLISH LOWLAND SHEEPDOG",
+          "fciNumber": 251
+        },
+        {
+          "name": "SCHIPPERKE",
+          "fciNumber": 83
+        },
+        {
+          "name": "SHETLAND SHEEPDOG",
+          "fciNumber": 88
+        },
+        {
+          "name": "WELSH CORGI (CARDIGAN)",
+          "fciNumber": 38
+        },
+        {
+          "name": "WELSH CORGI (PEMBROKE)",
+          "fciNumber": 39
+        },
+        {
+          "name": "AFFENPINSCHER",
+          "fciNumber": 186
+        },
+        {
+          "name": "AUSTRIAN PINSCHER",
+          "fciNumber": 64
+        },
+        {
+          "name": "BULLDOG",
+          "fciNumber": 149
+        },
+        {
+          "name": "DANISH-SWEDISH FARMDOG",
+          "fciNumber": 356
+        },
+        {
+          "name": "DOGO ARGENTINO",
+          "fciNumber": 292
+        },
+        {
+          "name": "DOGUE DE BORDEAUX",
+          "fciNumber": 116
+        },
+        {
+          "name": "DUTCH SMOUSHOND",
+          "fciNumber": 308
+        },
+        {
+          "name": "FILA BRASILEIRO",
+          "fciNumber": 225
+        },
+        {
+          "name": "GERMAN PINSCHER",
+          "fciNumber": 184
+        },
+        {
+          "name": "GIANT SCHNAUZER",
+          "fciNumber": 181
+        },
+        {
+          "name": "HOVAWART",
+          "fciNumber": 190
+        },
+        {
+          "name": "ITALIAN CANE CORSO",
+          "fciNumber": 343
+        },
+        {
+          "name": "MAJORCA MASTIFF",
+          "fciNumber": 249
+        },
+        {
+          "name": "MASTIFF",
+          "fciNumber": 264
+        },
+        {
+          "name": "MINIATURE PINSCHER",
+          "fciNumber": 185
+        },
+        {
+          "name": "MINIATURE SCHNAUZER",
+          "fciNumber": 183
+        },
+        {
+          "name": "RUSSIAN BLACK TERRIER",
+          "fciNumber": 327
+        },
+        {
+          "name": "SCHNAUZER",
+          "fciNumber": 182
+        },
+        {
+          "name": "SHAR PEI",
+          "fciNumber": 309
+        },
+        {
+          "name": "AMERICAN FOXHOUND",
+          "fciNumber": 303
+        },
+        {
+          "name": "ARIEGEOIS",
+          "fciNumber": 20
+        },
+        {
+          "name": "ARTOIS HOUND",
+          "fciNumber": 28
+        },
+        {
+          "name": "AUSTRIAN BLACK AND TAN HOUND",
+          "fciNumber": 63
+        },
+        {
+          "name": "BEAGLE",
+          "fciNumber": 161
+        },
+        {
+          "name": "BEAGLE HARRIER",
+          "fciNumber": 290
+        },
+        {
+          "name": "BILLY",
+          "fciNumber": 25
+        },
+        {
+          "name": "BLUE GASCONY GRIFFON",
+          "fciNumber": 32
+        },
+        {
+          "name": "BOSNIAN BROKEN-HAIRED HOUND - CALLED BARAK",
+          "fciNumber": 155
+        },
+        {
+          "name": "BRIQUET GRIFFON VENDEEN",
+          "fciNumber": 19
+        },
+        {
+          "name": "COARSE-HAIRED STYRIAN HOUND",
+          "fciNumber": 62
+        },
+        {
+          "name": "DREVER",
+          "fciNumber": 130
+        },
+        {
+          "name": "ENGLISH FOXHOUND",
+          "fciNumber": 159
+        },
+        {
+          "name": "ESTONIAN HOUND",
+          "fciNumber": 366
+        },
+        {
+          "name": "FAWN BRITTANY GRIFFON",
+          "fciNumber": 66
+        },
+        {
+          "name": "FINNISH HOUND",
+          "fciNumber": 51
+        },
+        {
+          "name": "FRENCH TRICOLOUR HOUND",
+          "fciNumber": 219
+        },
+        {
+          "name": "FRENCH WHITE & BLACK HOUND",
+          "fciNumber": 220
+        },
+        {
+          "name": "FRENCH WHITE AND ORANGE HOUND",
+          "fciNumber": 316
+        },
+        {
+          "name": "GASCON SAINTONGEOIS",
+          "fciNumber": 21
+        },
+        {
+          "name": "GERMAN HOUND",
+          "fciNumber": 299
+        },
+        {
+          "name": "GRAND GRIFFON VENDEEN",
+          "fciNumber": 282
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH TRICOLOUR HOUND",
+          "fciNumber": 322
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH WHITE & ORANGE HOUND",
+          "fciNumber": 324
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH WHITE AND BLACK HOUND",
+          "fciNumber": 323
+        },
+        {
+          "name": "GREAT GASCONY BLUE",
+          "fciNumber": 22
+        },
+        {
+          "name": "GRIFFON NIVERNAIS",
+          "fciNumber": 17
+        },
+        {
+          "name": "HALDEN HOUND",
+          "fciNumber": 267
+        },
+        {
+          "name": "HAMILTONSTÖVARE",
+          "fciNumber": 132
+        },
+        {
+          "name": "HARRIER",
+          "fciNumber": 295
+        },
+        {
+          "name": "HELLENIC HOUND",
+          "fciNumber": 214
+        },
+        {
+          "name": "HUNGARIAN HOUND - TRANSYLVANIAN SCENT HOUND",
+          "fciNumber": 241
+        },
+        {
+          "name": "HYGEN HOUND",
+          "fciNumber": 266
+        },
+        {
+          "name": "ISTRIAN SHORT-HAIRED HOUND",
+          "fciNumber": 151
+        },
+        {
+          "name": "ISTRIAN WIRE-HAIRED HOUND",
+          "fciNumber": 152
+        },
+        {
+          "name": "ITALIAN ROUGH-HAIRED SEGUGIO",
+          "fciNumber": 198
+        },
+        {
+          "name": "ITALIAN SHORT-HAIRED SEGUGIO",
+          "fciNumber": 337
+        },
+        {
+          "name": "MEDIUM-SIZED ANGLO-FRENCH HOUND",
+          "fciNumber": 325
+        },
+        {
+          "name": "MONTENEGRIN MOUNTAIN HOUND",
+          "fciNumber": 279
+        },
+        {
+          "name": "NORWEGIAN HOUND",
+          "fciNumber": 203
+        },
+        {
+          "name": "POITEVIN",
+          "fciNumber": 24
+        },
+        {
+          "name": "POLISH HOUND",
+          "fciNumber": 52
+        },
+        {
+          "name": "PORCELAINE",
+          "fciNumber": 30
+        },
+        {
+          "name": "POSAVATZ HOUND",
+          "fciNumber": 154
+        },
+        {
+          "name": "SCHILLERSTÖVARE",
+          "fciNumber": 131
+        },
+        {
+          "name": "SEGUGIO MAREMMANO",
+          "fciNumber": 361
+        },
+        {
+          "name": "SERBIAN HOUND",
+          "fciNumber": 150
+        },
+        {
+          "name": "SERBIAN TRICOLOUR HOUND",
+          "fciNumber": 229
+        },
+        {
+          "name": "SLOVAKIAN HOUND",
+          "fciNumber": 244
+        },
+        {
+          "name": "SMÅLANDSSTÖVARE",
+          "fciNumber": 129
+        },
+        {
+          "name": "SMALL BLUE GASCONY",
+          "fciNumber": 31
+        },
+        {
+          "name": "SMALL SWISS HOUND",
+          "fciNumber": 60
+        },
+        {
+          "name": "SPANISH HOUND",
+          "fciNumber": 204
+        },
+        {
+          "name": "SWISS HOUND",
+          "fciNumber": 59
+        },
+        {
+          "name": "TYROLEAN HOUND",
+          "fciNumber": 68
+        },
+        {
+          "name": "WESTPHALIAN DACHSBRACKE",
+          "fciNumber": 100
+        },
+        {
+          "name": "NEDERLANDSE KOOIKERHONDJE",
+          "fciNumber": 314
+        },
+        {
+          "name": "WETTERHOUN",
+          "fciNumber": 221
+        }
+      ],
+      "breeds": [
+        "Airedale Terrier",
+        "Australian Terrier",
+        "Bedlington Terrier",
+        "Border Terrier",
+        "Bull Terrier",
+        "Bull Terrier Miniature",
+        "Cairn Terrier",
+        "Cesky Terrier",
+        "Dandie Dinmont Terrier",
+        "Fox Terrier (Smooth)",
+        "Fox Terrier (Wire)",
+        "Glen Of Imaal Terrier",
+        "Irish Glen Of Imaal Terrier",
+        "Irish Soft Coated Wheaten Terrier",
+        "Irish Terrier",
+        "Jack Russell Terrier",
+        "Kerry Blue Terrier",
+        "Lakeland Terrier",
+        "Manchester Terrier",
+        "Norfolk Terrier",
+        "Norwich Terrier",
+        "Parson Russell Terrier",
+        "Scottish Terrier",
+        "Sealyham Terrier",
+        "Skye Terrier",
+        "Welsh Terrier",
+        "West Highland White Terrier",
+        "Yorkshire Terrier",
+        "Akita",
+        "Alaskan Malamute",
+        "American Akita",
+        "Basenji",
+        "Canaan Dog",
+        "Chow Chow",
+        "Cirneco Dell'Etna",
+        "Eurasier",
+        "Finnish Lapphund",
+        "Finnish Spitz",
+        "German Spitz (Giant)",
+        "German Spitz (Medium)",
+        "German Spitz (Small)",
+        "German Spitz (Toy)",
+        "Greenland Dog",
+        "Hokkaido",
+        "Ibizan Hound",
+        "Icelandic Sheepdog",
+        "Italian Spitz",
+        "Japanese Spitz",
+        "Kai",
+        "Keeshond",
+        "Kishu",
+        "Korea Jindo Dog",
+        "Laika (East Siberian)",
+        "Laika (West Siberian)",
+        "Laika (Russian-European)",
+        "Norwegian Buhund",
+        "Norwegian Elkhound (Black)",
+        "Norwegian Elkhound (Grey)",
+        "Norwegian Lundehund",
+        "Peruvian Hairless Dog",
+        "Pharaoh Hound",
+        "Pomeranian",
+        "Samoyed",
+        "Shiba",
+        "Shikoku",
+        "Siberian Husky",
+        "Swedish Lapphund",
+        "Swedish Vallhund",
+        "Thai Ridgeback",
+        "Volpino Italiano",
+        "Xoloitzcuintle",
+        "Bichon Frisé",
+        "Bolognese",
+        "Boston Terrier",
+        "Brussels Griffon",
+        "Cavalier King Charles Spaniel",
+        "Chihuahua (Long Coat)",
+        "Chihuahua (Smooth Coat)",
+        "Chinese Crested Dog",
+        "Coton De Tuléar",
+        "Crested Dog",
+        "English Toy Terrier",
+        "French Bulldog",
+        "Griffon Belge",
+        "Griffon Bruxellois",
+        "Havanese",
+        "Japanese Chin",
+        "Japanese Spitz",
+        "King Charles Spaniel",
+        "Lhasa Apso",
+        "Löwchen",
+        "Maltese",
+        "Miniature Bull Terrier",
+        "Miniature Pinscher",
+        "Papillon",
+        "Pekinese",
+        "Petit Brabançon",
+        "Poodle",
+        "Poodle (Miniature)",
+        "Poodle (Standard)",
+        "Poodle (Toy)",
+        "Pug",
+        "Shih Tzu",
+        "Silky Terrier",
+        "Tibetan Spaniel",
+        "Tibetan Terrier",
+        "Toy Fox Terrier",
+        "Yorkshire Terrier",
+        "Bouvier Des Flandres",
+        "Collie Rough",
+        "Collie Smooth",
+        "Dutch Schapendoes",
+        "Dutch Shepherd Dog",
+        "Polish Lowland Sheepdog",
+        "Schipperke",
+        "Shetland Sheepdog",
+        "Welsh Corgi (cardigan)",
+        "Welsh Corgi (pembroke)",
+        "Affenpinscher",
+        "Austrian Pinscher",
+        "Bulldog",
+        "Danish-swedish Farmdog",
+        "Dogo Argentino",
+        "Dogue de Bordeaux",
+        "Dutch Smoushond",
+        "Fila Brasileiro",
+        "German Pinscher",
+        "Giant Schnauzer",
+        "Hovawart",
+        "Italian Cane Corso",
+        "Majorca Mastiff",
+        "Mastiff",
+        "Miniature Schnauzer",
+        "Russian Black Terrier",
+        "Schnauzer",
+        "Shar Pei",
+        "American Foxhound",
+        "Ariegeois",
+        "Artois Hound",
+        "Austrian Black And Tan Hound",
+        "Beagle",
+        "Beagle Harrier",
+        "Billy",
+        "Blue Gascony Griffon",
+        "Bosnian Broken-haired Hound - Called Barak",
+        "Briquet Griffon Vendeen",
+        "Coarse-haired Styrian Hound",
+        "Drever",
+        "English Foxhound",
+        "Estonian Hound",
+        "Fawn Brittany Griffon",
+        "Finnish Hound",
+        "French Tricolour Hound",
+        "French White & Black Hound",
+        "French White And Orange Hound",
+        "Gascon Saintongeois",
+        "German Hound",
+        "Grand Griffon Vendeen",
+        "Great Anglo-french Tricolour Hound",
+        "Great Anglo-french White & Orange Hound",
+        "Great Anglo-french White And Black Hound",
+        "Great Gascony Blue",
+        "Griffon Nivernais",
+        "Halden Hound",
+        "Hamiltonstövare",
+        "Harrier",
+        "Hellenic Hound",
+        "Hungarian Hound - Transylvanian Scent Hound",
+        "Hygen Hound",
+        "Istrian Short-haired Hound",
+        "Istrian Wire-haired Hound",
+        "Italian Rough-haired Segugio",
+        "Italian Short-haired Segugio",
+        "Medium-sized Anglo-french Hound",
+        "Montenegrin Mountain Hound",
+        "Norwegian Hound",
+        "Poitevin",
+        "Polish Hound",
+        "Porcelaine",
+        "Posavatz Hound",
+        "Schillerstövare",
+        "Segugio Maremmano",
+        "Serbian Hound",
+        "Serbian Tricolour Hound",
+        "Slovakian Hound",
+        "Smålandsstövare",
+        "Small Blue Gascony",
+        "Small Swiss Hound",
+        "Spanish Hound",
+        "Swiss Hound",
+        "Tyrolean Hound",
+        "Westphalian Dachsbracke",
+        "Nederlandse Kooikerhondje",
+        "Wetterhoun"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO59"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=23",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:25.803Z"
+    },
+    {
+      "id": "fci_24",
+      "fciUrlId": 24,
+      "fciLicenceId": "NO55",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 55,
+      "name": "Anne-marit Olsen",
+      "lastName": "Olsen",
+      "firstName": "Anne-marit",
+      "title": null,
+      "photo": "AO",
+      "birthYear": 1942,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        4,
+        7
+      ],
+      "groupNames": [
+        {
+          "group": 4,
+          "name": "Dachshunds"
+        },
+        {
+          "group": 7,
+          "name": "Pointing Dogs"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "EAST SIBERIAN LAIKA",
+          "fciNumber": 305
+        },
+        {
+          "name": "FINNISH SPITZ",
+          "fciNumber": 49
+        },
+        {
+          "name": "JÄMTHUND",
+          "fciNumber": 42
+        },
+        {
+          "name": "KARELIAN BEAR DOG",
+          "fciNumber": 48
+        },
+        {
+          "name": "NORRBOTTENSPITZ",
+          "fciNumber": 276
+        },
+        {
+          "name": "NORWEGIAN BUHUND",
+          "fciNumber": 237
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND BLACK",
+          "fciNumber": 268
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND GREY",
+          "fciNumber": 242
+        },
+        {
+          "name": "NORWEGIAN LUNDEHUND",
+          "fciNumber": 265
+        },
+        {
+          "name": "RUSSIAN-EUROPEAN LAIKA",
+          "fciNumber": 304
+        },
+        {
+          "name": "WEST SIBERIAN LAIKA",
+          "fciNumber": 306
+        },
+        {
+          "name": "ALPINE DACHSBRACKE",
+          "fciNumber": 254
+        },
+        {
+          "name": "AMERICAN FOXHOUND",
+          "fciNumber": 303
+        },
+        {
+          "name": "ARIEGEOIS",
+          "fciNumber": 20
+        },
+        {
+          "name": "ARTOIS HOUND",
+          "fciNumber": 28
+        },
+        {
+          "name": "AUSTRIAN BLACK AND TAN HOUND",
+          "fciNumber": 63
+        },
+        {
+          "name": "BASSET FAUVE DE BRETAGNE",
+          "fciNumber": 36
+        },
+        {
+          "name": "BASSET HOUND",
+          "fciNumber": 163
+        },
+        {
+          "name": "BAVARIAN MOUNTAIN SCENT HOUND",
+          "fciNumber": 217
+        },
+        {
+          "name": "BEAGLE",
+          "fciNumber": 161
+        },
+        {
+          "name": "BEAGLE HARRIER",
+          "fciNumber": 290
+        },
+        {
+          "name": "BILLY",
+          "fciNumber": 25
+        },
+        {
+          "name": "BLACK AND TAN COONHOUND",
+          "fciNumber": 300
+        },
+        {
+          "name": "BLOODHOUND",
+          "fciNumber": 84
+        },
+        {
+          "name": "BLUE GASCONY BASSET",
+          "fciNumber": 35
+        },
+        {
+          "name": "BLUE GASCONY GRIFFON",
+          "fciNumber": 32
+        },
+        {
+          "name": "BOSNIAN BROKEN-HAIRED HOUND - CALLED BARAK",
+          "fciNumber": 155
+        },
+        {
+          "name": "BRIQUET GRIFFON VENDEEN",
+          "fciNumber": 19
+        },
+        {
+          "name": "COARSE-HAIRED STYRIAN HOUND",
+          "fciNumber": 62
+        },
+        {
+          "name": "DALMATIAN",
+          "fciNumber": 153
+        },
+        {
+          "name": "DREVER",
+          "fciNumber": 130
+        },
+        {
+          "name": "ENGLISH FOXHOUND",
+          "fciNumber": 159
+        },
+        {
+          "name": "ESTONIAN HOUND",
+          "fciNumber": 366
+        },
+        {
+          "name": "FAWN BRITTANY GRIFFON",
+          "fciNumber": 66
+        },
+        {
+          "name": "FINNISH HOUND",
+          "fciNumber": 51
+        },
+        {
+          "name": "FRENCH TRICOLOUR HOUND",
+          "fciNumber": 219
+        },
+        {
+          "name": "FRENCH WHITE & BLACK HOUND",
+          "fciNumber": 220
+        },
+        {
+          "name": "FRENCH WHITE AND ORANGE HOUND",
+          "fciNumber": 316
+        },
+        {
+          "name": "GASCON SAINTONGEOIS",
+          "fciNumber": 21
+        },
+        {
+          "name": "GERMAN HOUND",
+          "fciNumber": 299
+        },
+        {
+          "name": "GRAND BASSET GRIFFON VENDEEN",
+          "fciNumber": 33
+        },
+        {
+          "name": "GRAND GRIFFON VENDEEN",
+          "fciNumber": 282
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH TRICOLOUR HOUND",
+          "fciNumber": 322
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH WHITE & ORANGE HOUND",
+          "fciNumber": 324
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH WHITE AND BLACK HOUND",
+          "fciNumber": 323
+        },
+        {
+          "name": "GREAT GASCONY BLUE",
+          "fciNumber": 22
+        },
+        {
+          "name": "GRIFFON NIVERNAIS",
+          "fciNumber": 17
+        },
+        {
+          "name": "HALDEN HOUND",
+          "fciNumber": 267
+        },
+        {
+          "name": "HAMILTONSTÖVARE",
+          "fciNumber": 132
+        },
+        {
+          "name": "HANOVERIAN SCENT HOUND",
+          "fciNumber": 213
+        },
+        {
+          "name": "HARRIER",
+          "fciNumber": 295
+        },
+        {
+          "name": "HELLENIC HOUND",
+          "fciNumber": 214
+        },
+        {
+          "name": "HUNGARIAN HOUND - TRANSYLVANIAN SCENT HOUND",
+          "fciNumber": 241
+        },
+        {
+          "name": "HYGEN HOUND",
+          "fciNumber": 266
+        },
+        {
+          "name": "ISTRIAN SHORT-HAIRED HOUND",
+          "fciNumber": 151
+        },
+        {
+          "name": "ISTRIAN WIRE-HAIRED HOUND",
+          "fciNumber": 152
+        },
+        {
+          "name": "ITALIAN ROUGH-HAIRED SEGUGIO",
+          "fciNumber": 198
+        },
+        {
+          "name": "ITALIAN SHORT-HAIRED SEGUGIO",
+          "fciNumber": 337
+        },
+        {
+          "name": "MEDIUM-SIZED ANGLO-FRENCH HOUND",
+          "fciNumber": 325
+        },
+        {
+          "name": "MONTENEGRIN MOUNTAIN HOUND",
+          "fciNumber": 279
+        },
+        {
+          "name": "NORMAN ARTESIEN BASSET",
+          "fciNumber": 34
+        },
+        {
+          "name": "NORWEGIAN HOUND",
+          "fciNumber": 203
+        },
+        {
+          "name": "OTTERHOUND",
+          "fciNumber": 294
+        },
+        {
+          "name": "PETIT BASSET GRIFFON VENDEEN",
+          "fciNumber": 67
+        },
+        {
+          "name": "POITEVIN",
+          "fciNumber": 24
+        },
+        {
+          "name": "POLISH HOUND",
+          "fciNumber": 52
+        },
+        {
+          "name": "PORCELAINE",
+          "fciNumber": 30
+        },
+        {
+          "name": "POSAVATZ HOUND",
+          "fciNumber": 154
+        },
+        {
+          "name": "SCHILLERSTÖVARE",
+          "fciNumber": 131
+        },
+        {
+          "name": "SEGUGIO MAREMMANO",
+          "fciNumber": 361
+        },
+        {
+          "name": "SERBIAN HOUND",
+          "fciNumber": 150
+        },
+        {
+          "name": "SERBIAN TRICOLOUR HOUND",
+          "fciNumber": 229
+        },
+        {
+          "name": "SLOVAKIAN HOUND",
+          "fciNumber": 244
+        },
+        {
+          "name": "SMÅLANDSSTÖVARE",
+          "fciNumber": 129
+        },
+        {
+          "name": "SMALL BLUE GASCONY",
+          "fciNumber": 31
+        },
+        {
+          "name": "SMALL SWISS HOUND",
+          "fciNumber": 60
+        },
+        {
+          "name": "SPANISH HOUND",
+          "fciNumber": 204
+        },
+        {
+          "name": "SWISS HOUND",
+          "fciNumber": 59
+        },
+        {
+          "name": "TYROLEAN HOUND",
+          "fciNumber": 68
+        },
+        {
+          "name": "WESTPHALIAN DACHSBRACKE",
+          "fciNumber": 100
+        }
+      ],
+      "breeds": [
+        "Dachshund",
+        "Dachshund (Miniature Long-haired)",
+        "Dachshund (Miniature Smooth-haired)",
+        "Dachshund (Miniature Wire-haired)",
+        "Dachshund (Rabbit Long-haired)",
+        "Dachshund (Rabbit Smooth-haired)",
+        "Dachshund (Rabbit Wire-haired)",
+        "Dachshund (Standard Long-haired)",
+        "Dachshund (Standard Smooth-haired)",
+        "Dachshund (Standard Wire-haired)",
+        "Bracco Italiano",
+        "Braque D'Auvergne",
+        "Braque Du Bourbonnais",
+        "Braque Francais (Gascogne)",
+        "Braque Francais (Pyrénées)",
+        "Braque Saint-Germain",
+        "Brittany",
+        "Burgos Pointer",
+        "Czech Fousek",
+        "Drentse Patrijshond",
+        "English Setter",
+        "French Spaniel",
+        "German Longhaired Pointer",
+        "German Shorthaired Pointer",
+        "German Wirehaired Pointer",
+        "Gordon Setter",
+        "Hungarian Wirehaired Vizsla",
+        "Irish Red and White Setter",
+        "Irish Setter",
+        "Istrian Coarse-Haired Hound",
+        "Italian Spinone",
+        "Korthals Griffon",
+        "Large Munsterlander",
+        "Old Danish Pointer",
+        "Perdigueiro Portugues",
+        "Perdiguero De Burgos",
+        "Picardy Spaniel",
+        "Pointer",
+        "Portuguese Pointer",
+        "Pudelpointer",
+        "Punta Griffon Korthals",
+        "Setter Gordon",
+        "Slovakian Wirehaired Pointer",
+        "Small Munsterlander",
+        "Spanish Pointer",
+        "Stabyhoun",
+        "Vizsla",
+        "Weimaraner",
+        "Wirehaired Pointing Griffon",
+        "East Siberian Laika",
+        "Finnish Spitz",
+        "Jämthund",
+        "Karelian Bear Dog",
+        "Norrbottenspitz",
+        "Norwegian Buhund",
+        "Norwegian Elkhound Black",
+        "Norwegian Elkhound Grey",
+        "Norwegian Lundehund",
+        "Russian-european Laika",
+        "West Siberian Laika",
+        "Alpine Dachsbracke",
+        "American Foxhound",
+        "Ariegeois",
+        "Artois Hound",
+        "Austrian Black And Tan Hound",
+        "Basset Fauve de Bretagne",
+        "Basset Hound",
+        "Bavarian Mountain Scent Hound",
+        "Beagle",
+        "Beagle Harrier",
+        "Billy",
+        "Black And Tan Coonhound",
+        "Bloodhound",
+        "Blue Gascony Basset",
+        "Blue Gascony Griffon",
+        "Bosnian Broken-haired Hound - Called Barak",
+        "Briquet Griffon Vendeen",
+        "Coarse-haired Styrian Hound",
+        "Dalmatian",
+        "Drever",
+        "English Foxhound",
+        "Estonian Hound",
+        "Fawn Brittany Griffon",
+        "Finnish Hound",
+        "French Tricolour Hound",
+        "French White & Black Hound",
+        "French White And Orange Hound",
+        "Gascon Saintongeois",
+        "German Hound",
+        "Grand Basset Griffon Vendeen",
+        "Grand Griffon Vendeen",
+        "Great Anglo-french Tricolour Hound",
+        "Great Anglo-french White & Orange Hound",
+        "Great Anglo-french White And Black Hound",
+        "Great Gascony Blue",
+        "Griffon Nivernais",
+        "Halden Hound",
+        "Hamiltonstövare",
+        "Hanoverian Scent Hound",
+        "Harrier",
+        "Hellenic Hound",
+        "Hungarian Hound - Transylvanian Scent Hound",
+        "Hygen Hound",
+        "Istrian Short-haired Hound",
+        "Istrian Wire-haired Hound",
+        "Italian Rough-haired Segugio",
+        "Italian Short-haired Segugio",
+        "Medium-sized Anglo-french Hound",
+        "Montenegrin Mountain Hound",
+        "Norman Artesien Basset",
+        "Norwegian Hound",
+        "Otterhound",
+        "Petit Basset Griffon Vendeen",
+        "Poitevin",
+        "Polish Hound",
+        "Porcelaine",
+        "Posavatz Hound",
+        "Schillerstövare",
+        "Segugio Maremmano",
+        "Serbian Hound",
+        "Serbian Tricolour Hound",
+        "Slovakian Hound",
+        "Smålandsstövare",
+        "Small Blue Gascony",
+        "Small Swiss Hound",
+        "Spanish Hound",
+        "Swiss Hound",
+        "Tyrolean Hound",
+        "Westphalian Dachsbracke"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO55"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=24",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:30.186Z"
+    },
+    {
+      "id": "fci_25",
+      "fciUrlId": 25,
+      "fciLicenceId": "NO207",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 207,
+      "name": "Knut Andersen",
+      "lastName": "Andersen",
+      "firstName": "Knut",
+      "title": null,
+      "photo": "KA",
+      "birthYear": 1938,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO207"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=25",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:34.583Z"
+    },
+    {
+      "id": "fci_26",
+      "fciUrlId": 26,
+      "fciLicenceId": "NO176",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 176,
+      "name": "Arne Andersen",
+      "lastName": "Andersen",
+      "firstName": "Arne",
+      "title": null,
+      "photo": "AA",
+      "birthYear": 1928,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO176"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=26",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:38.938Z"
+    },
+    {
+      "id": "fci_27",
+      "fciUrlId": 27,
+      "fciLicenceId": "NO146",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 146,
+      "name": "Wenja Rui",
+      "lastName": "Rui",
+      "firstName": "Wenja",
+      "title": null,
+      "photo": "WR",
+      "birthYear": 1945,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO146"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=27",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:46.205Z"
+    },
+    {
+      "id": "fci_28",
+      "fciUrlId": 28,
+      "fciLicenceId": "NO73",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 73,
+      "name": "Eva Mjelde",
+      "lastName": "Mjelde",
+      "firstName": "Eva",
+      "title": null,
+      "photo": "EM",
+      "birthYear": 1942,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO73"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=28",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:49.568Z"
+    },
+    {
+      "id": "fci_29",
+      "fciUrlId": 29,
+      "fciLicenceId": "NO182",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 182,
+      "name": "Hallvard Hegna",
+      "lastName": "Hegna",
+      "firstName": "Hallvard",
+      "title": null,
+      "photo": "HH",
+      "birthYear": 1928,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO182"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=29",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:28:56.847Z"
+    },
+    {
+      "id": "fci_30",
+      "fciUrlId": 30,
+      "fciLicenceId": "NO208",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 208,
+      "name": "Jan Hafskjold",
+      "lastName": "Hafskjold",
+      "firstName": "Jan",
+      "title": null,
+      "photo": "JH",
+      "birthYear": 1939,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO208"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=30",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:29:01.404Z"
+    },
+    {
+      "id": "fci_31",
+      "fciUrlId": 31,
+      "fciLicenceId": "NO135",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 135,
+      "name": "Johnny Johnsen",
+      "lastName": "Johnsen",
+      "firstName": "Johnny",
+      "title": null,
+      "photo": "JJ",
+      "birthYear": 1944,
+      "licensedDate": "1992-10-16",
+      "licensedYear": 1992,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "16-10-1992"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "GERMAN SHEPHERD DOG",
+          "fciNumber": 166
+        }
+      ],
+      "breeds": [
+        "German Shepherd Dog"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO135"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=31",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:29:07.885Z"
+    },
+    {
+      "id": "fci_32",
+      "fciUrlId": 32,
+      "fciLicenceId": "NO19",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 19,
+      "name": "Magne Bjørndal",
+      "lastName": "Bjørndal",
+      "firstName": "Magne",
+      "title": null,
+      "photo": "MB",
+      "birthYear": 1947,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "ENGLISH SETTER",
+          "fciNumber": 2
+        },
+        {
+          "name": "GORDON SETTER",
+          "fciNumber": 6
+        },
+        {
+          "name": "IRISH RED AND WHITE SETTER",
+          "fciNumber": 330
+        },
+        {
+          "name": "IRISH RED SETTER",
+          "fciNumber": 120
+        }
+      ],
+      "breeds": [
+        "English Setter",
+        "Gordon Setter",
+        "Irish Red And White Setter",
+        "Irish Red Setter"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO19"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=32",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:29:14.936Z"
+    },
+    {
+      "id": "fci_33",
+      "fciUrlId": 33,
+      "fciLicenceId": "NO129",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 129,
+      "name": "Anne Tove Strande",
+      "lastName": "Strande",
+      "firstName": "Anne Tove",
+      "title": null,
+      "photo": "AT",
+      "birthYear": 1953,
+      "licensedDate": "1984-11-13",
+      "licensedYear": 1984,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "13-11-1984"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        3,
+        8,
+        9
+      ],
+      "groupNames": [
+        {
+          "group": 3,
+          "name": "Terriers"
+        },
+        {
+          "group": 8,
+          "name": "Retrievers, Flushing Dogs and Water Dogs"
+        },
+        {
+          "group": 9,
+          "name": "Companion and Toy Dogs"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "BOUVIER DES FLANDRES",
+          "fciNumber": 191
+        },
+        {
+          "name": "DOBERMANN",
+          "fciNumber": 143
+        },
+        {
+          "name": "GIANT SCHNAUZER",
+          "fciNumber": 181
+        },
+        {
+          "name": "MINIATURE SCHNAUZER",
+          "fciNumber": 183
+        },
+        {
+          "name": "ROTTWEILER",
+          "fciNumber": 147
+        },
+        {
+          "name": "SCHNAUZER",
+          "fciNumber": 182
+        }
+      ],
+      "breeds": [
+        "Airedale Terrier",
+        "Australian Terrier",
+        "Bedlington Terrier",
+        "Border Terrier",
+        "Bull Terrier",
+        "Bull Terrier Miniature",
+        "Cairn Terrier",
+        "Cesky Terrier",
+        "Dandie Dinmont Terrier",
+        "Fox Terrier (Smooth)",
+        "Fox Terrier (Wire)",
+        "Glen Of Imaal Terrier",
+        "Irish Glen Of Imaal Terrier",
+        "Irish Soft Coated Wheaten Terrier",
+        "Irish Terrier",
+        "Jack Russell Terrier",
+        "Kerry Blue Terrier",
+        "Lakeland Terrier",
+        "Manchester Terrier",
+        "Norfolk Terrier",
+        "Norwich Terrier",
+        "Parson Russell Terrier",
+        "Scottish Terrier",
+        "Sealyham Terrier",
+        "Skye Terrier",
+        "Welsh Terrier",
+        "West Highland White Terrier",
+        "Yorkshire Terrier",
+        "American Cocker Spaniel",
+        "American Water Spaniel",
+        "Barbet",
+        "Boykin Spaniel",
+        "Chesapeake Bay Retriever",
+        "Clumber Spaniel",
+        "Curly Coated Retriever",
+        "English Cocker Spaniel",
+        "English Springer Spaniel",
+        "Field Spaniel",
+        "Flat Coated Retriever",
+        "French Water Dog",
+        "German Spaniel",
+        "Golden Retriever",
+        "Irish Water Spaniel",
+        "Labrador Retriever",
+        "Nederlandse Kooikerhondje",
+        "Nova Scotia Duck Tolling Retriever",
+        "Portuguese Water Dog",
+        "Romagna Water Dog",
+        "Spanish Water Dog",
+        "Sussex Spaniel",
+        "Welsh Springer Spaniel",
+        "Wetterhoun",
+        "Bichon Frisé",
+        "Bolognese",
+        "Boston Terrier",
+        "Brussels Griffon",
+        "Cavalier King Charles Spaniel",
+        "Chihuahua (Long Coat)",
+        "Chihuahua (Smooth Coat)",
+        "Chinese Crested Dog",
+        "Coton De Tuléar",
+        "Crested Dog",
+        "English Toy Terrier",
+        "French Bulldog",
+        "Griffon Belge",
+        "Griffon Bruxellois",
+        "Havanese",
+        "Japanese Chin",
+        "Japanese Spitz",
+        "King Charles Spaniel",
+        "Lhasa Apso",
+        "Löwchen",
+        "Maltese",
+        "Miniature Bull Terrier",
+        "Miniature Pinscher",
+        "Papillon",
+        "Pekinese",
+        "Petit Brabançon",
+        "Poodle",
+        "Poodle (Miniature)",
+        "Poodle (Standard)",
+        "Poodle (Toy)",
+        "Pug",
+        "Shih Tzu",
+        "Silky Terrier",
+        "Tibetan Spaniel",
+        "Tibetan Terrier",
+        "Toy Fox Terrier",
+        "Yorkshire Terrier",
+        "Bouvier Des Flandres",
+        "Dobermann",
+        "Giant Schnauzer",
+        "Miniature Schnauzer",
+        "Rottweiler",
+        "Schnauzer"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO129"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=33",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:29:19.548Z"
+    },
+    {
+      "id": "fci_34",
+      "fciUrlId": 34,
+      "fciLicenceId": "NO211",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 211,
+      "name": "Per Herset",
+      "lastName": "Herset",
+      "firstName": "Per",
+      "title": null,
+      "photo": "PH",
+      "birthYear": 1922,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO211"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=34",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:29:23.497Z"
+    },
+    {
+      "id": "fci_35",
+      "fciUrlId": 35,
+      "fciLicenceId": "NO64",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 64,
+      "name": "Christian Vole",
+      "lastName": "Vole",
+      "firstName": "Christian",
+      "title": null,
+      "photo": "CV",
+      "birthYear": 1942,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "EAST SIBERIAN LAIKA",
+          "fciNumber": 305
+        },
+        {
+          "name": "FINNISH LAPPONIAN DOG",
+          "fciNumber": 189
+        },
+        {
+          "name": "FINNISH SPITZ",
+          "fciNumber": 49
+        },
+        {
+          "name": "ICELANDIC SHEEPDOG",
+          "fciNumber": 289
+        },
+        {
+          "name": "JÄMTHUND",
+          "fciNumber": 42
+        },
+        {
+          "name": "KARELIAN BEAR DOG",
+          "fciNumber": 48
+        },
+        {
+          "name": "LAPPONIAN HERDER",
+          "fciNumber": 284
+        },
+        {
+          "name": "NORRBOTTENSPITZ",
+          "fciNumber": 276
+        },
+        {
+          "name": "NORWEGIAN BUHUND",
+          "fciNumber": 237
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND BLACK",
+          "fciNumber": 268
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND GREY",
+          "fciNumber": 242
+        },
+        {
+          "name": "NORWEGIAN LUNDEHUND",
+          "fciNumber": 265
+        },
+        {
+          "name": "RUSSIAN-EUROPEAN LAIKA",
+          "fciNumber": 304
+        },
+        {
+          "name": "SWEDISH LAPPHUND",
+          "fciNumber": 135
+        },
+        {
+          "name": "WEST SIBERIAN LAIKA",
+          "fciNumber": 306
+        },
+        {
+          "name": "HALDEN HOUND",
+          "fciNumber": 267
+        },
+        {
+          "name": "HYGEN HOUND",
+          "fciNumber": 266
+        },
+        {
+          "name": "NORWEGIAN HOUND",
+          "fciNumber": 203
+        }
+      ],
+      "breeds": [
+        "East Siberian Laika",
+        "Finnish Lapponian Dog",
+        "Finnish Spitz",
+        "Icelandic Sheepdog",
+        "Jämthund",
+        "Karelian Bear Dog",
+        "Lapponian Herder",
+        "Norrbottenspitz",
+        "Norwegian Buhund",
+        "Norwegian Elkhound Black",
+        "Norwegian Elkhound Grey",
+        "Norwegian Lundehund",
+        "Russian-european Laika",
+        "Swedish Lapphund",
+        "West Siberian Laika",
+        "Halden Hound",
+        "Hygen Hound",
+        "Norwegian Hound"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO64"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=35",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:29:34.030Z"
+    },
+    {
+      "id": "fci_36",
+      "fciUrlId": 36,
+      "fciLicenceId": "NO38",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 38,
+      "name": "Rolf Frostad",
+      "lastName": "Frostad",
+      "firstName": "Rolf",
+      "title": null,
+      "photo": "RF",
+      "birthYear": 1937,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO38"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=36",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:29:40.012Z"
+    },
+    {
+      "id": "fci_37",
+      "fciUrlId": 37,
+      "fciLicenceId": "NO45",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 45,
+      "name": "Ola A Holsing",
+      "lastName": "Holsing",
+      "firstName": "Ola A",
+      "title": null,
+      "photo": "OA",
+      "birthYear": 1942,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "EAST SIBERIAN LAIKA",
+          "fciNumber": 305
+        },
+        {
+          "name": "FINNISH SPITZ",
+          "fciNumber": 49
+        },
+        {
+          "name": "JÄMTHUND",
+          "fciNumber": 42
+        },
+        {
+          "name": "KARELIAN BEAR DOG",
+          "fciNumber": 48
+        },
+        {
+          "name": "NORRBOTTENSPITZ",
+          "fciNumber": 276
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND BLACK",
+          "fciNumber": 268
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND GREY",
+          "fciNumber": 242
+        },
+        {
+          "name": "RUSSIAN-EUROPEAN LAIKA",
+          "fciNumber": 304
+        },
+        {
+          "name": "WEST SIBERIAN LAIKA",
+          "fciNumber": 306
+        }
+      ],
+      "breeds": [
+        "East Siberian Laika",
+        "Finnish Spitz",
+        "Jämthund",
+        "Karelian Bear Dog",
+        "Norrbottenspitz",
+        "Norwegian Elkhound Black",
+        "Norwegian Elkhound Grey",
+        "Russian-european Laika",
+        "West Siberian Laika"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO45"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=37",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:29:45.128Z"
+    },
+    {
+      "id": "fci_38",
+      "fciUrlId": 38,
+      "fciLicenceId": "NO56",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 56,
+      "name": "Kjell Øybakken",
+      "lastName": "Øybakken",
+      "firstName": "Kjell",
+      "title": null,
+      "photo": "K",
+      "birthYear": 1942,
+      "licensedDate": "1969-01-01",
+      "licensedYear": 1969,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "01-01-1969"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "EAST SIBERIAN LAIKA",
+          "fciNumber": 305
+        },
+        {
+          "name": "FINNISH SPITZ",
+          "fciNumber": 49
+        },
+        {
+          "name": "JÄMTHUND",
+          "fciNumber": 42
+        },
+        {
+          "name": "KARELIAN BEAR DOG",
+          "fciNumber": 48
+        },
+        {
+          "name": "NORRBOTTENSPITZ",
+          "fciNumber": 276
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND BLACK",
+          "fciNumber": 268
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND GREY",
+          "fciNumber": 242
+        },
+        {
+          "name": "RUSSIAN-EUROPEAN LAIKA",
+          "fciNumber": 304
+        },
+        {
+          "name": "WEST SIBERIAN LAIKA",
+          "fciNumber": 306
+        }
+      ],
+      "breeds": [
+        "East Siberian Laika",
+        "Finnish Spitz",
+        "Jämthund",
+        "Karelian Bear Dog",
+        "Norrbottenspitz",
+        "Norwegian Elkhound Black",
+        "Norwegian Elkhound Grey",
+        "Russian-european Laika",
+        "West Siberian Laika"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO56"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=38",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:29:54.213Z"
+    },
+    {
+      "id": "fci_39",
+      "fciUrlId": 39,
+      "fciLicenceId": "NO36",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 36,
+      "name": "Rolf Evensen",
+      "lastName": "Evensen",
+      "firstName": "Rolf",
+      "title": null,
+      "photo": "RE",
+      "birthYear": 1954,
+      "licensedDate": "1997-09-02",
+      "licensedYear": 1997,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "02-09-1997"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "GERMAN SHEPHERD DOG",
+          "fciNumber": 166
+        }
+      ],
+      "breeds": [
+        "German Shepherd Dog"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO36"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=39",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:01.688Z"
+    },
+    {
+      "id": "fci_40",
+      "fciUrlId": 40,
+      "fciLicenceId": "DK100",
+      "fciLicenceCountry": "DK",
+      "fciLicenceNumber": 100,
+      "name": "Jørgen Hindse",
+      "lastName": "Hindse",
+      "firstName": "Jørgen",
+      "title": null,
+      "photo": "JH",
+      "birthYear": 1942,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Denmark",
+      "flag": "🇩🇰",
+      "kennelClub": "Dansk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        1,
+        2,
+        5
+      ],
+      "groupNames": [
+        {
+          "group": 1,
+          "name": "Sheepdogs and Cattle Dogs"
+        },
+        {
+          "group": 2,
+          "name": "Pinscher, Schnauzer, Molossoid and Swiss Mountain Dogs"
+        },
+        {
+          "group": 5,
+          "name": "Spitz and Primitive Types"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "FRENCH BULLDOG",
+          "fciNumber": 101
+        }
+      ],
+      "breeds": [
+        "Australian Cattle Dog",
+        "Australian Kelpie",
+        "Australian Shepherd",
+        "Barbado Da Terceira",
+        "Bearded Collie",
+        "Beauceron",
+        "Belgian Shepherd Dog",
+        "Bergamasco Sheepdog",
+        "Berger Picard",
+        "Border Collie",
+        "Bouvier Des Ardennes",
+        "Bouvier Des Flandres",
+        "Briard",
+        "Carpathian Shepherd Dog",
+        "Catalan Sheepdog",
+        "Croatian Sheepdog",
+        "Dutch Shepherd Dog",
+        "German Shepherd Dog",
+        "Hollandse Herder",
+        "Karst Shepherd Dog",
+        "Komondor",
+        "Kuvasz",
+        "Lancashire Heeler",
+        "Lupino Del Gigante",
+        "Maremma and Abruzzese Sheepdog",
+        "Mudi",
+        "Old English Sheepdog",
+        "Polish Lowland Sheepdog",
+        "Polish Tatra Sheepdog",
+        "Puli",
+        "Pumi",
+        "Pyrenean Sheepdog",
+        "Rough Collie",
+        "Saarloos Wolfdog",
+        "Sarplaninac",
+        "Schapendoes",
+        "Shetland Sheepdog",
+        "Smooth Collie",
+        "South Russian Ovtcharka",
+        "Tornjak",
+        "White Swiss Shepherd Dog",
+        "Affenpinscher",
+        "Appenzeller Sennenhund",
+        "Bernese Mountain Dog",
+        "Boxer",
+        "Broholmer",
+        "Bullmastiff",
+        "Ca De Bou",
+        "Cane Corso Italiano",
+        "Cao De Castro Laboreiro",
+        "Cimarrón Uruguayo",
+        "Dobermann",
+        "Dogue De Bordeaux",
+        "Entlebucher Mountain Dog",
+        "Estrela Mountain Dog",
+        "Fila Brasileiro",
+        "German Pinscher",
+        "Giant Schnauzer",
+        "Great Dane",
+        "Greater Swiss Mountain Dog",
+        "Hovawart",
+        "Landseer",
+        "Leonberger",
+        "Mastin Espanol",
+        "Mastin Del Pirineo",
+        "Mastiff",
+        "Miniature Pinscher",
+        "Miniature Schnauzer",
+        "Neapolitan Mastiff",
+        "Newfoundland",
+        "Rottweiler",
+        "Saint Bernard",
+        "Standard Schnauzer",
+        "Tibetan Mastiff",
+        "Tosa",
+        "Akita",
+        "Alaskan Malamute",
+        "American Akita",
+        "Basenji",
+        "Canaan Dog",
+        "Chow Chow",
+        "Cirneco Dell'Etna",
+        "Eurasier",
+        "Finnish Lapphund",
+        "Finnish Spitz",
+        "German Spitz (Giant)",
+        "German Spitz (Medium)",
+        "German Spitz (Small)",
+        "German Spitz (Toy)",
+        "Greenland Dog",
+        "Hokkaido",
+        "Ibizan Hound",
+        "Icelandic Sheepdog",
+        "Italian Spitz",
+        "Japanese Spitz",
+        "Kai",
+        "Keeshond",
+        "Kishu",
+        "Korea Jindo Dog",
+        "Laika (East Siberian)",
+        "Laika (West Siberian)",
+        "Laika (Russian-European)",
+        "Norwegian Buhund",
+        "Norwegian Elkhound (Black)",
+        "Norwegian Elkhound (Grey)",
+        "Norwegian Lundehund",
+        "Peruvian Hairless Dog",
+        "Pharaoh Hound",
+        "Pomeranian",
+        "Samoyed",
+        "Shiba",
+        "Shikoku",
+        "Siberian Husky",
+        "Swedish Lapphund",
+        "Swedish Vallhund",
+        "Thai Ridgeback",
+        "Volpino Italiano",
+        "Xoloitzcuintle",
+        "French Bulldog"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "DK100"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=40",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:07.248Z"
+    },
+    {
+      "id": "fci_41",
+      "fciUrlId": 41,
+      "fciLicenceId": "DK264",
+      "fciLicenceCountry": "DK",
+      "fciLicenceNumber": 264,
+      "name": "O. Staunskjær",
+      "lastName": "Staunskjær",
+      "firstName": "O.",
+      "title": null,
+      "photo": "OS",
+      "birthYear": null,
+      "licensedDate": "1956-01-01",
+      "licensedYear": 1956,
+      "country": "Denmark",
+      "flag": "🇩🇰",
+      "kennelClub": "Dansk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "01-01-1956"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "DK264"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=41",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:12.359Z"
+    },
+    {
+      "id": "fci_42",
+      "fciUrlId": 42,
+      "fciLicenceId": "DK49",
+      "fciLicenceCountry": "DK",
+      "fciLicenceNumber": 49,
+      "name": "T. Christensen",
+      "lastName": "Christensen",
+      "firstName": "T.",
+      "title": null,
+      "photo": "TC",
+      "birthYear": null,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Denmark",
+      "flag": "🇩🇰",
+      "kennelClub": "Dansk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        7
+      ],
+      "groupNames": [
+        {
+          "group": 7,
+          "name": "Pointing Dogs"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "BERNESE MOUNTAIN DOG",
+          "fciNumber": 45
+        },
+        {
+          "name": "DOBERMANN",
+          "fciNumber": 143
+        },
+        {
+          "name": "ROTTWEILER",
+          "fciNumber": 147
+        }
+      ],
+      "breeds": [
+        "Bracco Italiano",
+        "Braque D'Auvergne",
+        "Braque Du Bourbonnais",
+        "Braque Francais (Gascogne)",
+        "Braque Francais (Pyrénées)",
+        "Braque Saint-Germain",
+        "Brittany",
+        "Burgos Pointer",
+        "Czech Fousek",
+        "Drentse Patrijshond",
+        "English Setter",
+        "French Spaniel",
+        "German Longhaired Pointer",
+        "German Shorthaired Pointer",
+        "German Wirehaired Pointer",
+        "Gordon Setter",
+        "Hungarian Wirehaired Vizsla",
+        "Irish Red and White Setter",
+        "Irish Setter",
+        "Istrian Coarse-Haired Hound",
+        "Italian Spinone",
+        "Korthals Griffon",
+        "Large Munsterlander",
+        "Old Danish Pointer",
+        "Perdigueiro Portugues",
+        "Perdiguero De Burgos",
+        "Picardy Spaniel",
+        "Pointer",
+        "Portuguese Pointer",
+        "Pudelpointer",
+        "Punta Griffon Korthals",
+        "Setter Gordon",
+        "Slovakian Wirehaired Pointer",
+        "Small Munsterlander",
+        "Spanish Pointer",
+        "Stabyhoun",
+        "Vizsla",
+        "Weimaraner",
+        "Wirehaired Pointing Griffon",
+        "Bernese Mountain Dog",
+        "Dobermann",
+        "Rottweiler"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "DK49"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=42",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:17.862Z"
+    },
+    {
+      "id": "fci_43",
+      "fciUrlId": 43,
+      "fciLicenceId": "NO163",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 163,
+      "name": "Margareth Vear",
+      "lastName": "Vear",
+      "firstName": "Margareth",
+      "title": null,
+      "photo": "MV",
+      "birthYear": 1948,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [],
+      "breeds": [],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO163"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=43",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:21.471Z"
+    },
+    {
+      "id": "fci_44",
+      "fciUrlId": 44,
+      "fciLicenceId": "NO143",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 143,
+      "name": "Jan S Rennesund",
+      "lastName": "Rennesund",
+      "firstName": "Jan S",
+      "title": null,
+      "photo": "JS",
+      "birthYear": 1953,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "AMERICAN FOXHOUND",
+          "fciNumber": 303
+        },
+        {
+          "name": "ARIEGEOIS",
+          "fciNumber": 20
+        },
+        {
+          "name": "ARTOIS HOUND",
+          "fciNumber": 28
+        },
+        {
+          "name": "AUSTRIAN BLACK AND TAN HOUND",
+          "fciNumber": 63
+        },
+        {
+          "name": "BEAGLE",
+          "fciNumber": 161
+        },
+        {
+          "name": "BEAGLE HARRIER",
+          "fciNumber": 290
+        },
+        {
+          "name": "BILLY",
+          "fciNumber": 25
+        },
+        {
+          "name": "BLUE GASCONY GRIFFON",
+          "fciNumber": 32
+        },
+        {
+          "name": "BOSNIAN BROKEN-HAIRED HOUND - CALLED BARAK",
+          "fciNumber": 155
+        },
+        {
+          "name": "BRIQUET GRIFFON VENDEEN",
+          "fciNumber": 19
+        },
+        {
+          "name": "COARSE-HAIRED STYRIAN HOUND",
+          "fciNumber": 62
+        },
+        {
+          "name": "DREVER",
+          "fciNumber": 130
+        },
+        {
+          "name": "ENGLISH FOXHOUND",
+          "fciNumber": 159
+        },
+        {
+          "name": "ESTONIAN HOUND",
+          "fciNumber": 366
+        },
+        {
+          "name": "FAWN BRITTANY GRIFFON",
+          "fciNumber": 66
+        },
+        {
+          "name": "FINNISH HOUND",
+          "fciNumber": 51
+        },
+        {
+          "name": "FRENCH TRICOLOUR HOUND",
+          "fciNumber": 219
+        },
+        {
+          "name": "FRENCH WHITE & BLACK HOUND",
+          "fciNumber": 220
+        },
+        {
+          "name": "FRENCH WHITE AND ORANGE HOUND",
+          "fciNumber": 316
+        },
+        {
+          "name": "GASCON SAINTONGEOIS",
+          "fciNumber": 21
+        },
+        {
+          "name": "GERMAN HOUND",
+          "fciNumber": 299
+        },
+        {
+          "name": "GRAND GRIFFON VENDEEN",
+          "fciNumber": 282
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH TRICOLOUR HOUND",
+          "fciNumber": 322
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH WHITE & ORANGE HOUND",
+          "fciNumber": 324
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH WHITE AND BLACK HOUND",
+          "fciNumber": 323
+        },
+        {
+          "name": "GREAT GASCONY BLUE",
+          "fciNumber": 22
+        },
+        {
+          "name": "GRIFFON NIVERNAIS",
+          "fciNumber": 17
+        },
+        {
+          "name": "HALDEN HOUND",
+          "fciNumber": 267
+        },
+        {
+          "name": "HAMILTONSTÖVARE",
+          "fciNumber": 132
+        },
+        {
+          "name": "HARRIER",
+          "fciNumber": 295
+        },
+        {
+          "name": "HELLENIC HOUND",
+          "fciNumber": 214
+        },
+        {
+          "name": "HUNGARIAN HOUND - TRANSYLVANIAN SCENT HOUND",
+          "fciNumber": 241
+        },
+        {
+          "name": "HYGEN HOUND",
+          "fciNumber": 266
+        },
+        {
+          "name": "ISTRIAN SHORT-HAIRED HOUND",
+          "fciNumber": 151
+        },
+        {
+          "name": "ISTRIAN WIRE-HAIRED HOUND",
+          "fciNumber": 152
+        },
+        {
+          "name": "ITALIAN ROUGH-HAIRED SEGUGIO",
+          "fciNumber": 198
+        },
+        {
+          "name": "ITALIAN SHORT-HAIRED SEGUGIO",
+          "fciNumber": 337
+        },
+        {
+          "name": "MEDIUM-SIZED ANGLO-FRENCH HOUND",
+          "fciNumber": 325
+        },
+        {
+          "name": "MONTENEGRIN MOUNTAIN HOUND",
+          "fciNumber": 279
+        },
+        {
+          "name": "NORWEGIAN HOUND",
+          "fciNumber": 203
+        },
+        {
+          "name": "POITEVIN",
+          "fciNumber": 24
+        },
+        {
+          "name": "POLISH HOUND",
+          "fciNumber": 52
+        },
+        {
+          "name": "PORCELAINE",
+          "fciNumber": 30
+        },
+        {
+          "name": "POSAVATZ HOUND",
+          "fciNumber": 154
+        },
+        {
+          "name": "SCHILLERSTÖVARE",
+          "fciNumber": 131
+        },
+        {
+          "name": "SEGUGIO MAREMMANO",
+          "fciNumber": 361
+        },
+        {
+          "name": "SERBIAN HOUND",
+          "fciNumber": 150
+        },
+        {
+          "name": "SERBIAN TRICOLOUR HOUND",
+          "fciNumber": 229
+        },
+        {
+          "name": "SLOVAKIAN HOUND",
+          "fciNumber": 244
+        },
+        {
+          "name": "SMÅLANDSSTÖVARE",
+          "fciNumber": 129
+        },
+        {
+          "name": "SMALL BLUE GASCONY",
+          "fciNumber": 31
+        },
+        {
+          "name": "SMALL SWISS HOUND",
+          "fciNumber": 60
+        },
+        {
+          "name": "SPANISH HOUND",
+          "fciNumber": 204
+        },
+        {
+          "name": "SWISS HOUND",
+          "fciNumber": 59
+        },
+        {
+          "name": "TYROLEAN HOUND",
+          "fciNumber": 68
+        },
+        {
+          "name": "WESTPHALIAN DACHSBRACKE",
+          "fciNumber": 100
+        }
+      ],
+      "breeds": [
+        "American Foxhound",
+        "Ariegeois",
+        "Artois Hound",
+        "Austrian Black And Tan Hound",
+        "Beagle",
+        "Beagle Harrier",
+        "Billy",
+        "Blue Gascony Griffon",
+        "Bosnian Broken-haired Hound - Called Barak",
+        "Briquet Griffon Vendeen",
+        "Coarse-haired Styrian Hound",
+        "Drever",
+        "English Foxhound",
+        "Estonian Hound",
+        "Fawn Brittany Griffon",
+        "Finnish Hound",
+        "French Tricolour Hound",
+        "French White & Black Hound",
+        "French White And Orange Hound",
+        "Gascon Saintongeois",
+        "German Hound",
+        "Grand Griffon Vendeen",
+        "Great Anglo-french Tricolour Hound",
+        "Great Anglo-french White & Orange Hound",
+        "Great Anglo-french White And Black Hound",
+        "Great Gascony Blue",
+        "Griffon Nivernais",
+        "Halden Hound",
+        "Hamiltonstövare",
+        "Harrier",
+        "Hellenic Hound",
+        "Hungarian Hound - Transylvanian Scent Hound",
+        "Hygen Hound",
+        "Istrian Short-haired Hound",
+        "Istrian Wire-haired Hound",
+        "Italian Rough-haired Segugio",
+        "Italian Short-haired Segugio",
+        "Medium-sized Anglo-french Hound",
+        "Montenegrin Mountain Hound",
+        "Norwegian Hound",
+        "Poitevin",
+        "Polish Hound",
+        "Porcelaine",
+        "Posavatz Hound",
+        "Schillerstövare",
+        "Segugio Maremmano",
+        "Serbian Hound",
+        "Serbian Tricolour Hound",
+        "Slovakian Hound",
+        "Smålandsstövare",
+        "Small Blue Gascony",
+        "Small Swiss Hound",
+        "Spanish Hound",
+        "Swiss Hound",
+        "Tyrolean Hound",
+        "Westphalian Dachsbracke"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO143"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=44",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:26.224Z"
+    },
+    {
+      "id": "fci_45",
+      "fciUrlId": 45,
+      "fciLicenceId": "NO149",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 149,
+      "name": "Robert Valseth Sellevik",
+      "lastName": "Sellevik",
+      "firstName": "Robert Valseth",
+      "title": null,
+      "photo": "RV",
+      "birthYear": 1945,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "AKITA",
+          "fciNumber": 255
+        },
+        {
+          "name": "ALASKAN MALAMUTE",
+          "fciNumber": 243
+        },
+        {
+          "name": "AMERICAN AKITA",
+          "fciNumber": 344
+        },
+        {
+          "name": "BASENJI",
+          "fciNumber": 43
+        },
+        {
+          "name": "CHOW CHOW",
+          "fciNumber": 205
+        },
+        {
+          "name": "FINNISH LAPPONIAN DOG",
+          "fciNumber": 189
+        },
+        {
+          "name": "FINNISH SPITZ",
+          "fciNumber": 49
+        },
+        {
+          "name": "GERMAN SPITZ",
+          "fciNumber": 97
+        },
+        {
+          "name": "GREENLAND DOG",
+          "fciNumber": 274
+        },
+        {
+          "name": "HOKKAIDO",
+          "fciNumber": 261
+        },
+        {
+          "name": "ICELANDIC SHEEPDOG",
+          "fciNumber": 289
+        },
+        {
+          "name": "KAI",
+          "fciNumber": 317
+        },
+        {
+          "name": "KISHU",
+          "fciNumber": 318
+        },
+        {
+          "name": "KOREA JINDO DOG",
+          "fciNumber": 334
+        },
+        {
+          "name": "LAPPONIAN HERDER",
+          "fciNumber": 284
+        },
+        {
+          "name": "NORRBOTTENSPITZ",
+          "fciNumber": 276
+        },
+        {
+          "name": "SAMOYED",
+          "fciNumber": 212
+        },
+        {
+          "name": "SHIBA",
+          "fciNumber": 257
+        },
+        {
+          "name": "SHIKOKU",
+          "fciNumber": 319
+        },
+        {
+          "name": "SIBERIAN HUSKY",
+          "fciNumber": 270
+        },
+        {
+          "name": "SWEDISH LAPPHUND",
+          "fciNumber": 135
+        },
+        {
+          "name": "SWEDISH VALLHUND",
+          "fciNumber": 14
+        }
+      ],
+      "breeds": [
+        "Akita",
+        "Alaskan Malamute",
+        "American Akita",
+        "Basenji",
+        "Chow Chow",
+        "Finnish Lapponian Dog",
+        "Finnish Spitz",
+        "German Spitz",
+        "Greenland Dog",
+        "Hokkaido",
+        "Icelandic Sheepdog",
+        "Kai",
+        "Kishu",
+        "Korea Jindo Dog",
+        "Lapponian Herder",
+        "Norrbottenspitz",
+        "Samoyed",
+        "Shiba",
+        "Shikoku",
+        "Siberian Husky",
+        "Swedish Lapphund",
+        "Swedish Vallhund"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO149"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=45",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:30.483Z"
+    },
+    {
+      "id": "fci_46",
+      "fciUrlId": 46,
+      "fciLicenceId": "NO5",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 5,
+      "name": "Rolf Pedersen",
+      "lastName": "Pedersen",
+      "firstName": "Rolf",
+      "title": null,
+      "photo": "RP",
+      "birthYear": 1945,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "BOUVIER DES FLANDRES",
+          "fciNumber": 191
+        },
+        {
+          "name": "AFFENPINSCHER",
+          "fciNumber": 186
+        },
+        {
+          "name": "BOXER",
+          "fciNumber": 144
+        },
+        {
+          "name": "DOBERMANN",
+          "fciNumber": 143
+        },
+        {
+          "name": "GERMAN PINSCHER",
+          "fciNumber": 184
+        },
+        {
+          "name": "GIANT SCHNAUZER",
+          "fciNumber": 181
+        },
+        {
+          "name": "MINIATURE PINSCHER",
+          "fciNumber": 185
+        },
+        {
+          "name": "MINIATURE SCHNAUZER",
+          "fciNumber": 183
+        },
+        {
+          "name": "SCHNAUZER",
+          "fciNumber": 182
+        }
+      ],
+      "breeds": [
+        "Bouvier Des Flandres",
+        "Affenpinscher",
+        "Boxer",
+        "Dobermann",
+        "German Pinscher",
+        "Giant Schnauzer",
+        "Miniature Pinscher",
+        "Miniature Schnauzer",
+        "Schnauzer"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO5"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=46",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:35.366Z"
+    },
+    {
+      "id": "fci_47",
+      "fciUrlId": 47,
+      "fciLicenceId": "NO17",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 17,
+      "name": "Bjørn Bjerketvedt",
+      "lastName": "Bjerketvedt",
+      "firstName": "Bjørn",
+      "title": null,
+      "photo": "BB",
+      "birthYear": 1946,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "EAST SIBERIAN LAIKA",
+          "fciNumber": 305
+        },
+        {
+          "name": "JÄMTHUND",
+          "fciNumber": 42
+        },
+        {
+          "name": "KARELIAN BEAR DOG",
+          "fciNumber": 48
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND BLACK",
+          "fciNumber": 268
+        },
+        {
+          "name": "NORWEGIAN ELKHOUND GREY",
+          "fciNumber": 242
+        },
+        {
+          "name": "RUSSIAN-EUROPEAN LAIKA",
+          "fciNumber": 304
+        },
+        {
+          "name": "WEST SIBERIAN LAIKA",
+          "fciNumber": 306
+        }
+      ],
+      "breeds": [
+        "East Siberian Laika",
+        "Jämthund",
+        "Karelian Bear Dog",
+        "Norwegian Elkhound Black",
+        "Norwegian Elkhound Grey",
+        "Russian-european Laika",
+        "West Siberian Laika"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO17"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=47",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:41.709Z"
+    },
+    {
+      "id": "fci_48",
+      "fciUrlId": 48,
+      "fciLicenceId": "NO80",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 80,
+      "name": "Petter Fodstad",
+      "lastName": "Fodstad",
+      "firstName": "Petter",
+      "title": null,
+      "photo": "PF",
+      "birthYear": 1949,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        3,
+        10
+      ],
+      "groupNames": [
+        {
+          "group": 3,
+          "name": "Terriers"
+        },
+        {
+          "group": 10,
+          "name": "Sighthounds"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "COLLIE ROUGH",
+          "fciNumber": 156
+        },
+        {
+          "name": "COLLIE SMOOTH",
+          "fciNumber": 296
+        },
+        {
+          "name": "SHETLAND SHEEPDOG",
+          "fciNumber": 88
+        },
+        {
+          "name": "AFFENPINSCHER",
+          "fciNumber": 186
+        },
+        {
+          "name": "DOBERMANN",
+          "fciNumber": 143
+        },
+        {
+          "name": "GERMAN PINSCHER",
+          "fciNumber": 184
+        },
+        {
+          "name": "GIANT SCHNAUZER",
+          "fciNumber": 181
+        },
+        {
+          "name": "MINIATURE PINSCHER",
+          "fciNumber": 185
+        },
+        {
+          "name": "MINIATURE SCHNAUZER",
+          "fciNumber": 183
+        },
+        {
+          "name": "SCHNAUZER",
+          "fciNumber": 182
+        },
+        {
+          "name": "BOSTON TERRIER",
+          "fciNumber": 140
+        },
+        {
+          "name": "PUG",
+          "fciNumber": 253
+        },
+        {
+          "name": "RUSSIAN TOY",
+          "fciNumber": 352
+        }
+      ],
+      "breeds": [
+        "Airedale Terrier",
+        "Australian Terrier",
+        "Bedlington Terrier",
+        "Border Terrier",
+        "Bull Terrier",
+        "Bull Terrier Miniature",
+        "Cairn Terrier",
+        "Cesky Terrier",
+        "Dandie Dinmont Terrier",
+        "Fox Terrier (Smooth)",
+        "Fox Terrier (Wire)",
+        "Glen Of Imaal Terrier",
+        "Irish Glen Of Imaal Terrier",
+        "Irish Soft Coated Wheaten Terrier",
+        "Irish Terrier",
+        "Jack Russell Terrier",
+        "Kerry Blue Terrier",
+        "Lakeland Terrier",
+        "Manchester Terrier",
+        "Norfolk Terrier",
+        "Norwich Terrier",
+        "Parson Russell Terrier",
+        "Scottish Terrier",
+        "Sealyham Terrier",
+        "Skye Terrier",
+        "Welsh Terrier",
+        "West Highland White Terrier",
+        "Yorkshire Terrier",
+        "Afghan Hound",
+        "Azawakh",
+        "Borzoi",
+        "Deerhound",
+        "Greyhound",
+        "Hungarian Greyhound",
+        "Irish Wolfhound",
+        "Italian Greyhound",
+        "Magyar Agár",
+        "Polish Greyhound",
+        "Saluki",
+        "Scottish Deerhound",
+        "Sloughi",
+        "Spanish Greyhound",
+        "Whippet",
+        "Collie Rough",
+        "Collie Smooth",
+        "Shetland Sheepdog",
+        "Affenpinscher",
+        "Dobermann",
+        "German Pinscher",
+        "Giant Schnauzer",
+        "Miniature Pinscher",
+        "Miniature Schnauzer",
+        "Schnauzer",
+        "Boston Terrier",
+        "Pug",
+        "Russian Toy"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO80"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=48",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:48.492Z"
+    },
+    {
+      "id": "fci_49",
+      "fciUrlId": 49,
+      "fciLicenceId": "NO22",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 22,
+      "name": "Brit Schøne Brodwall",
+      "lastName": "Brodwall",
+      "firstName": "Brit Schøne",
+      "title": null,
+      "photo": "BS",
+      "birthYear": 1948,
+      "licensedDate": "1996-06-26",
+      "licensedYear": 1996,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [
+        "English",
+        "German"
+      ],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {
+        "Shows": "26-06-1996"
+      },
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [
+        10
+      ],
+      "groupNames": [
+        {
+          "group": 10,
+          "name": "Sighthounds"
+        }
+      ],
+      "authorizedBreeds": [
+        {
+          "name": "ABRUZZES AND MAREMMA SHEPHERD DOG",
+          "fciNumber": 201
+        },
+        {
+          "name": "BEARDED COLLIE",
+          "fciNumber": 271
+        },
+        {
+          "name": "BERGAMASCO SHEPHERD DOG",
+          "fciNumber": 194
+        },
+        {
+          "name": "BRIARD",
+          "fciNumber": 113
+        },
+        {
+          "name": "CATALAN SHEEPDOG",
+          "fciNumber": 87
+        },
+        {
+          "name": "DUTCH SCHAPENDOES",
+          "fciNumber": 313
+        },
+        {
+          "name": "KOMONDOR",
+          "fciNumber": 53
+        },
+        {
+          "name": "KUVASZ",
+          "fciNumber": 54
+        },
+        {
+          "name": "LONG-HAIRED PYRENEAN SHEEPDOG",
+          "fciNumber": 141
+        },
+        {
+          "name": "MUDI",
+          "fciNumber": 238
+        },
+        {
+          "name": "OLD ENGLISH SHEEPDOG",
+          "fciNumber": 16
+        },
+        {
+          "name": "POLISH LOWLAND SHEEPDOG",
+          "fciNumber": 251
+        },
+        {
+          "name": "POLISH TATRA SHEPHERD",
+          "fciNumber": 252
+        },
+        {
+          "name": "PORTUGUESE SHEEPDOG",
+          "fciNumber": 93
+        },
+        {
+          "name": "PULI",
+          "fciNumber": 55
+        },
+        {
+          "name": "PUMI",
+          "fciNumber": 56
+        },
+        {
+          "name": "PYRENEAN SHEEPDOG - SMOOTH FACED",
+          "fciNumber": 138
+        },
+        {
+          "name": "SLOVAKIAN CHUVACH",
+          "fciNumber": 142
+        },
+        {
+          "name": "SOUTH RUSSIAN SHEPHERD DOG",
+          "fciNumber": 326
+        },
+        {
+          "name": "CANARIAN WARREN HOUND",
+          "fciNumber": 329
+        },
+        {
+          "name": "CIRNECO DELL'ETNA",
+          "fciNumber": 199
+        },
+        {
+          "name": "IBIZAN PODENCO",
+          "fciNumber": 89
+        },
+        {
+          "name": "PHARAOH HOUND",
+          "fciNumber": 248
+        },
+        {
+          "name": "PORTUGUESE WARREN HOUND-PORTUGUESE PODENGO",
+          "fciNumber": 94
+        }
+      ],
+      "breeds": [
+        "Afghan Hound",
+        "Azawakh",
+        "Borzoi",
+        "Deerhound",
+        "Greyhound",
+        "Hungarian Greyhound",
+        "Irish Wolfhound",
+        "Italian Greyhound",
+        "Magyar Agár",
+        "Polish Greyhound",
+        "Saluki",
+        "Scottish Deerhound",
+        "Sloughi",
+        "Spanish Greyhound",
+        "Whippet",
+        "Abruzzes And Maremma Shepherd Dog",
+        "Bearded Collie",
+        "Bergamasco Shepherd Dog",
+        "Briard",
+        "Catalan Sheepdog",
+        "Dutch Schapendoes",
+        "Komondor",
+        "Kuvasz",
+        "Long-haired Pyrenean Sheepdog",
+        "Mudi",
+        "Old English Sheepdog",
+        "Polish Lowland Sheepdog",
+        "Polish Tatra Shepherd",
+        "Portuguese Sheepdog",
+        "Puli",
+        "Pumi",
+        "Pyrenean Sheepdog - Smooth Faced",
+        "Slovakian Chuvach",
+        "South Russian Shepherd Dog",
+        "Canarian Warren Hound",
+        "Cirneco Dell'etna",
+        "Ibizan Podenco",
+        "Pharaoh Hound",
+        "Portuguese Warren Hound-portuguese Podengo"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO22"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=49",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:53.779Z"
+    },
+    {
+      "id": "fci_50",
+      "fciUrlId": 50,
+      "fciLicenceId": "NO82",
+      "fciLicenceCountry": "NO",
+      "fciLicenceNumber": 82,
+      "name": "Roy Otto Fredriksen",
+      "lastName": "Fredriksen",
+      "firstName": "Roy Otto",
+      "title": null,
+      "photo": "RO",
+      "birthYear": 1955,
+      "licensedDate": null,
+      "licensedYear": null,
+      "country": "Norway",
+      "flag": "🇳🇴",
+      "kennelClub": "Norsk Kennel Klub",
+      "fciLanguages": [],
+      "disciplines": [
+        "Shows"
+      ],
+      "disciplineFirstAuth": {},
+      "disciplineGroups": [
+        "A"
+      ],
+      "allBreedJudge": false,
+      "bisJudge": false,
+      "groupJudge": [],
+      "groupNames": [],
+      "authorizedBreeds": [
+        {
+          "name": "ALPINE DACHSBRACKE",
+          "fciNumber": 254
+        },
+        {
+          "name": "AMERICAN FOXHOUND",
+          "fciNumber": 303
+        },
+        {
+          "name": "ARIEGEOIS",
+          "fciNumber": 20
+        },
+        {
+          "name": "ARTOIS HOUND",
+          "fciNumber": 28
+        },
+        {
+          "name": "AUSTRIAN BLACK AND TAN HOUND",
+          "fciNumber": 63
+        },
+        {
+          "name": "BAVARIAN MOUNTAIN SCENT HOUND",
+          "fciNumber": 217
+        },
+        {
+          "name": "BEAGLE",
+          "fciNumber": 161
+        },
+        {
+          "name": "BEAGLE HARRIER",
+          "fciNumber": 290
+        },
+        {
+          "name": "BILLY",
+          "fciNumber": 25
+        },
+        {
+          "name": "BLUE GASCONY GRIFFON",
+          "fciNumber": 32
+        },
+        {
+          "name": "BOSNIAN BROKEN-HAIRED HOUND - CALLED BARAK",
+          "fciNumber": 155
+        },
+        {
+          "name": "BRIQUET GRIFFON VENDEEN",
+          "fciNumber": 19
+        },
+        {
+          "name": "COARSE-HAIRED STYRIAN HOUND",
+          "fciNumber": 62
+        },
+        {
+          "name": "DREVER",
+          "fciNumber": 130
+        },
+        {
+          "name": "ENGLISH FOXHOUND",
+          "fciNumber": 159
+        },
+        {
+          "name": "ESTONIAN HOUND",
+          "fciNumber": 366
+        },
+        {
+          "name": "FAWN BRITTANY GRIFFON",
+          "fciNumber": 66
+        },
+        {
+          "name": "FINNISH HOUND",
+          "fciNumber": 51
+        },
+        {
+          "name": "FRENCH TRICOLOUR HOUND",
+          "fciNumber": 219
+        },
+        {
+          "name": "FRENCH WHITE & BLACK HOUND",
+          "fciNumber": 220
+        },
+        {
+          "name": "FRENCH WHITE AND ORANGE HOUND",
+          "fciNumber": 316
+        },
+        {
+          "name": "GASCON SAINTONGEOIS",
+          "fciNumber": 21
+        },
+        {
+          "name": "GERMAN HOUND",
+          "fciNumber": 299
+        },
+        {
+          "name": "GRAND GRIFFON VENDEEN",
+          "fciNumber": 282
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH TRICOLOUR HOUND",
+          "fciNumber": 322
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH WHITE & ORANGE HOUND",
+          "fciNumber": 324
+        },
+        {
+          "name": "GREAT ANGLO-FRENCH WHITE AND BLACK HOUND",
+          "fciNumber": 323
+        },
+        {
+          "name": "GREAT GASCONY BLUE",
+          "fciNumber": 22
+        },
+        {
+          "name": "GRIFFON NIVERNAIS",
+          "fciNumber": 17
+        },
+        {
+          "name": "HALDEN HOUND",
+          "fciNumber": 267
+        },
+        {
+          "name": "HAMILTONSTÖVARE",
+          "fciNumber": 132
+        },
+        {
+          "name": "HANOVERIAN SCENT HOUND",
+          "fciNumber": 213
+        },
+        {
+          "name": "HARRIER",
+          "fciNumber": 295
+        },
+        {
+          "name": "HELLENIC HOUND",
+          "fciNumber": 214
+        },
+        {
+          "name": "HUNGARIAN HOUND - TRANSYLVANIAN SCENT HOUND",
+          "fciNumber": 241
+        },
+        {
+          "name": "HYGEN HOUND",
+          "fciNumber": 266
+        },
+        {
+          "name": "ISTRIAN SHORT-HAIRED HOUND",
+          "fciNumber": 151
+        },
+        {
+          "name": "ISTRIAN WIRE-HAIRED HOUND",
+          "fciNumber": 152
+        },
+        {
+          "name": "ITALIAN ROUGH-HAIRED SEGUGIO",
+          "fciNumber": 198
+        },
+        {
+          "name": "ITALIAN SHORT-HAIRED SEGUGIO",
+          "fciNumber": 337
+        },
+        {
+          "name": "MEDIUM-SIZED ANGLO-FRENCH HOUND",
+          "fciNumber": 325
+        },
+        {
+          "name": "MONTENEGRIN MOUNTAIN HOUND",
+          "fciNumber": 279
+        },
+        {
+          "name": "NORWEGIAN HOUND",
+          "fciNumber": 203
+        },
+        {
+          "name": "POITEVIN",
+          "fciNumber": 24
+        },
+        {
+          "name": "POLISH HOUND",
+          "fciNumber": 52
+        },
+        {
+          "name": "PORCELAINE",
+          "fciNumber": 30
+        },
+        {
+          "name": "POSAVATZ HOUND",
+          "fciNumber": 154
+        },
+        {
+          "name": "SCHILLERSTÖVARE",
+          "fciNumber": 131
+        },
+        {
+          "name": "SEGUGIO MAREMMANO",
+          "fciNumber": 361
+        },
+        {
+          "name": "SERBIAN HOUND",
+          "fciNumber": 150
+        },
+        {
+          "name": "SERBIAN TRICOLOUR HOUND",
+          "fciNumber": 229
+        },
+        {
+          "name": "SLOVAKIAN HOUND",
+          "fciNumber": 244
+        },
+        {
+          "name": "SMÅLANDSSTÖVARE",
+          "fciNumber": 129
+        },
+        {
+          "name": "SMALL BLUE GASCONY",
+          "fciNumber": 31
+        },
+        {
+          "name": "SMALL SWISS HOUND",
+          "fciNumber": 60
+        },
+        {
+          "name": "SPANISH HOUND",
+          "fciNumber": 204
+        },
+        {
+          "name": "SWISS HOUND",
+          "fciNumber": 59
+        },
+        {
+          "name": "TYROLEAN HOUND",
+          "fciNumber": 68
+        },
+        {
+          "name": "WESTPHALIAN DACHSBRACKE",
+          "fciNumber": 100
+        }
+      ],
+      "breeds": [
+        "Alpine Dachsbracke",
+        "American Foxhound",
+        "Ariegeois",
+        "Artois Hound",
+        "Austrian Black And Tan Hound",
+        "Bavarian Mountain Scent Hound",
+        "Beagle",
+        "Beagle Harrier",
+        "Billy",
+        "Blue Gascony Griffon",
+        "Bosnian Broken-haired Hound - Called Barak",
+        "Briquet Griffon Vendeen",
+        "Coarse-haired Styrian Hound",
+        "Drever",
+        "English Foxhound",
+        "Estonian Hound",
+        "Fawn Brittany Griffon",
+        "Finnish Hound",
+        "French Tricolour Hound",
+        "French White & Black Hound",
+        "French White And Orange Hound",
+        "Gascon Saintongeois",
+        "German Hound",
+        "Grand Griffon Vendeen",
+        "Great Anglo-french Tricolour Hound",
+        "Great Anglo-french White & Orange Hound",
+        "Great Anglo-french White And Black Hound",
+        "Great Gascony Blue",
+        "Griffon Nivernais",
+        "Halden Hound",
+        "Hamiltonstövare",
+        "Hanoverian Scent Hound",
+        "Harrier",
+        "Hellenic Hound",
+        "Hungarian Hound - Transylvanian Scent Hound",
+        "Hygen Hound",
+        "Istrian Short-haired Hound",
+        "Istrian Wire-haired Hound",
+        "Italian Rough-haired Segugio",
+        "Italian Short-haired Segugio",
+        "Medium-sized Anglo-french Hound",
+        "Montenegrin Mountain Hound",
+        "Norwegian Hound",
+        "Poitevin",
+        "Polish Hound",
+        "Porcelaine",
+        "Posavatz Hound",
+        "Schillerstövare",
+        "Segugio Maremmano",
+        "Serbian Hound",
+        "Serbian Tricolour Hound",
+        "Slovakian Hound",
+        "Smålandsstövare",
+        "Small Blue Gascony",
+        "Small Swiss Hound",
+        "Spanish Hound",
+        "Swiss Hound",
+        "Tyrolean Hound",
+        "Westphalian Dachsbracke"
+      ],
+      "group": "A",
+      "orgs": [
+        {
+          "org": "FCI",
+          "id": "NO82"
+        }
+      ],
+      "suspensions": [],
+      "verified": false,
+      "claimedBy": null,
+      "bio": "",
+      "social": {},
+      "fciUrl": "https://www.fci.be/en/judges/Judge.aspx?id=50",
+      "source": "FCI",
+      "scrapedAt": "2026-05-25T07:30:58.285Z"
+    }
+  ]
+}

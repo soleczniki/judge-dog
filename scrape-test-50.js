@@ -116,6 +116,27 @@ async function scrapeJudge(page, id) {
         const inp = document.getElementById(`ContentPlaceHolder1_LanguesCheckBoxList_${idx}`);
         if (inp && inp.checked) fciLanguages.push(lang);
       }
+      // Other languages — in table inside right column of Languages section
+      const otherLanguages = [];
+      document.querySelectorAll(".col-md-6").forEach(col => {
+        const h = col.querySelector("h3, h4, strong, b");
+        if (!h || !h.innerText.toLowerCase().includes("other language")) return;
+        col.querySelectorAll("td").forEach(td => {
+          const t = td.innerText.trim();
+          if (t) otherLanguages.push(t);
+        });
+      });
+      // Kennel names — col-md-4 label / col-md-8 value row pattern
+      const kennelNames = [];
+      document.querySelectorAll(".row").forEach(row => {
+        const label = row.querySelector(".col-md-4");
+        const value = row.querySelector(".col-md-8");
+        if (!label || !value) return;
+        if (label.innerText.trim().toLowerCase() === "kennel name") {
+          const val = value.innerText.trim();
+          if (val) kennelNames.push(val);
+        }
+      });
 
       // Disciplines + first auth dates
       const disciplines = [];
@@ -182,7 +203,7 @@ async function scrapeJudge(page, id) {
 
       return {
         rawName, birthYear, kennelClub, kennelClubCountry, countryOfResidence,
-        fciLanguages, disciplines, disciplineFirstAuth,
+        fciLanguages, otherLanguages, kennelNames, disciplines, disciplineFirstAuth,
         allBreedJudge, bisJudge, groupJudge, authorizedBreeds, suspensions,
       };
     });
@@ -259,7 +280,10 @@ async function scrapeJudge(page, id) {
       country: toTitleCase(country),
       flag,
       kennelClub: data.kennelClub || null,
+      countryOfResidence: toTitleCase(data.countryOfResidence || country),
       fciLanguages: data.fciLanguages,
+      otherLanguages: data.otherLanguages,
+      kennelName: data.kennelNames?.[0] || null,
       disciplines: data.disciplines,
       disciplineFirstAuth: data.disciplineFirstAuth,
       disciplineGroups,

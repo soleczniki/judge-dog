@@ -983,7 +983,8 @@ function ReviewCard({review,isJudge,onReply}) {
 
 // ── Collapsible breed chip list ────────────────────────────────────────────────
 const BREEDS_PREVIEW = 10;
-function BreedList({breeds, label}) {
+// provisionalSet: optional Set of breed names that are provisional/permit only
+function BreedList({breeds, label, provisionalSet}) {
   const [expanded, setExpanded] = useState(false);
   if (!breeds?.length) return null;
   const shown = expanded ? breeds : breeds.slice(0, BREEDS_PREVIEW);
@@ -992,7 +993,15 @@ function BreedList({breeds, label}) {
     <>
       {label && <p style={{fontSize:12,fontWeight:500,color:T.textSub,margin:"14px 0 8px"}}>{label}</p>}
       <div style={{display:"flex",flexWrap:"wrap",gap:4,alignItems:"center"}}>
-        {shown.map(b=><Chip key={b} small>{b}</Chip>)}
+        {shown.map(b=>{
+          const isProv = provisionalSet?.has(b);
+          return (
+            <span key={b} style={{display:"inline-flex",alignItems:"center",gap:2}}>
+              <Chip small>{b}</Chip>
+              {isProv&&<span title="Provisional approval" style={{fontSize:9,fontWeight:700,color:"#b45309",background:"#fef3c7",border:"1px solid #fcd34d",borderRadius:4,padding:"0 3px",lineHeight:"14px",letterSpacing:.3}}>PROV</span>}
+            </span>
+          );
+        })}
         {!expanded && extra>0 && (
           <button onClick={()=>setExpanded(true)}
             style={{fontSize:12,color:T.accent,background:"none",border:`1px solid ${T.border}`,borderRadius:100,padding:"2px 10px",cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap"}}>
@@ -1303,14 +1312,18 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
               {judge.birthYear&&<span style={{fontSize:13,color:T.textSub}}>Born {judge.birthYear}</span>}
               {judge.licensedYear&&<span style={{fontSize:13,color:T.textSub}}>Lic. {judge.licensedYear}</span>}
             </div>
-            {/* FCI licence */}
+            {/* Org IDs — each org shows its own ID with appropriate label */}
             <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10}}>
-              {judge.orgs.map(o=>(
-                <div key={o.org} style={{display:"flex",alignItems:"center",gap:4}}>
-                  <OrgPill org={o.org}/>
-                  <code style={{fontSize:11,color:T.textHint,background:T.surface,padding:"1px 5px",borderRadius:4}}>{o.id}</code>
-                </div>
-              ))}
+              {judge.orgs.map(o=>{
+                // Format ID per org: numeric IDs get "#" prefix, alphanumeric stay as-is
+                const idLabel = o.id ? (/^\d+$/.test(o.id) ? `#${o.id}` : o.id) : null;
+                return (
+                  <div key={o.org} style={{display:"flex",alignItems:"center",gap:4}}>
+                    <OrgPill org={o.org}/>
+                    {idLabel&&<code style={{fontSize:11,color:T.textHint,background:T.surface,padding:"1px 5px",borderRadius:4}}>{idLabel}</code>}
+                  </div>
+                );
+              })}
             </div>
             {/* BIS */}
             {judge.bisJudge&&(
@@ -1365,7 +1378,7 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
         </div>
 
         {/* Official Details */}
-        {(judge.kennelClub||judge.fciLanguages?.length>0||judge.otherLanguages?.length>0||judge.kennelName)&&(
+        {(judge.kennelClub||judge.fciLanguages?.length>0||judge.otherLanguages?.length>0||judge.kennelName||judge.akcFeeInfo||judge.akcJudgeUrl)&&(
           <div style={{background:T.surface,borderRadius:T.r,padding:"18px 20px",marginBottom:18,border:`1px solid ${T.border}`}}>
             <SectionLabel>Official details</SectionLabel>
             <div style={{marginTop:-4}}>
@@ -1374,6 +1387,9 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
               <InfoRow label="FCI languages" value={judge.fciLanguages?.length>0?judge.fciLanguages.join(", "):null}/>
               <InfoRow label="Other languages" value={judge.otherLanguages?.length>0?judge.otherLanguages.join(", "):null}/>
               <InfoRow label="FCI kennel name" value={judge.kennelName}/>
+              <InfoRow label="Judge fee info" value={judge.akcFeeInfo}/>
+              {judge.akcJudgeUrl&&<InfoRow label="Judge website" value={<a href={judge.akcJudgeUrl} target="_blank" rel="noopener noreferrer" style={{color:T.accent}}>{judge.akcJudgeUrl}</a>}/>}
+              {judge.akcVisitingJudge&&<InfoRow label="Visiting judge" value="Available for international assignments"/>}
             </div>
           </div>
         )}
@@ -1459,20 +1475,23 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
 
         {/* Breed authorizations */}
         {(()=>{
+          const provSet = new Set(judge.akcProvisionalBreeds||[]);
           const groupCovered=new Set((judge.groupNames||[]).flatMap(g=>(FCI_GROUP_BREEDS[g.group]||[]).map(b=>b.toLowerCase())));
           const extra=(judge.breeds||[]).filter(b=>!groupCovered.has(b.toLowerCase()));
+          const hasProvBreeds = provSet.size > 0;
           return (
             <div style={{background:T.surface,borderRadius:T.r,padding:"18px 20px",marginBottom:18,border:`1px solid ${T.border}`}}>
               <SectionLabel>Breed authorizations</SectionLabel>
+              {hasProvBreeds&&<p style={{margin:"0 0 10px",fontSize:12,color:"#b45309"}}><span style={{background:"#fef3c7",border:"1px solid #fcd34d",borderRadius:4,padding:"1px 5px",fontWeight:700,fontSize:10,letterSpacing:.3}}>PROV</span> = Provisional approval</p>}
               {judge.allBreedJudge ? (
                 <Chip bg={T.greenLight} color={T.green}>All breeds</Chip>
               ) : judge.groupNames?.length>0 ? (
                 <>
                   {judge.groupNames.map(g=><GroupSection key={g.group} groupNum={g.group} groupName={g.name}/>)}
-                  {extra.length>0&&<BreedList breeds={extra} label="Additional individual breeds"/>}
+                  {extra.length>0&&<BreedList breeds={extra} label="Additional individual breeds" provisionalSet={provSet}/>}
                 </>
               ) : judge.breeds?.length>0 ? (
-                <BreedList breeds={judge.breeds}/>
+                <BreedList breeds={judge.breeds} provisionalSet={provSet}/>
               ) : (
                 <p style={{margin:0,fontSize:13,color:T.textHint,fontStyle:"italic"}}>No breed authorization data on file</p>
               )}
@@ -2536,8 +2555,8 @@ export default function App() {
           </div>
         )}
 
-        {/* Desktop: centered search */}
-        {!isMobile&&(
+        {/* Desktop: centered search — hidden on landing (hero has its own) */}
+        {!isMobile&&!(location.pathname==="/"&&!search.trim()&&!(user?.role==="judge"&&user?.judgeId))&&(
           <div style={{position:"absolute",left:0,right:0,display:"flex",justifyContent:"center",pointerEvents:"none"}}>
             <div style={{width:480,maxWidth:"calc(100vw - 340px)",position:"relative",pointerEvents:"all"}}>
               <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
@@ -2624,7 +2643,7 @@ export default function App() {
       )}
 
       <div style={{flex:1}}><Routes>
-        <Route path="/" element={user?.role==="judge" && !search.trim()
+        <Route path="/" element={user?.role==="judge" && user?.judgeId && !search.trim()
           ? <JudgeDashboard
               user={user}
               judge={judges.find(j=>j.id===user.judgeId)}
@@ -2632,16 +2651,75 @@ export default function App() {
               unreadMsgCount={unreadMsgCount}
               onEditProfile={()=>navigate(`/judge/${judges.find(j=>j.id===user.judgeId)?.slug||user.judgeId}`)}
             />
-          : (
-          <div style={{maxWidth:1040,margin:"0 auto",padding:"44px 20px"}}>
-            <div style={{textAlign:"center",marginBottom:44}}>
-              <h1 style={{fontSize:42,fontWeight:300,color:T.text,margin:"0 0 14px",letterSpacing:-1.2,lineHeight:1.15,fontFamily:"'Google Sans',sans-serif"}}>
-                Know your judge<br/><span style={{fontWeight:500}}>before you enter.</span>
-              </h1>
-              <p style={{color:T.textSub,fontSize:16,maxWidth:420,margin:"0 auto",lineHeight:1.6,fontWeight:300}}>
-                Real reviews from exhibitors worldwide. Verified judge profiles across FCI, AKC, KC and more.
-              </p>
+          : !search.trim()
+          ? /* ── Landing page ─────────────────────────────────────────── */
+          (<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:"calc(100vh - 64px)",padding:"0 20px 48px",textAlign:"center"}}>
+
+            {/* Logo + wordmark */}
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12,marginBottom:28}}>
+              <svg width="72" height="72" viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="0"     cy="-28"  r="10" fill="#1a73e8" opacity="0.25"/>
+                <circle cx="19.8"  cy="-19.8" r="10" fill="#1a73e8" opacity="0.25"/>
+                <circle cx="28"    cy="0"    r="10" fill="#1a73e8" opacity="0.25"/>
+                <circle cx="19.8"  cy="19.8" r="10" fill="#1a73e8" opacity="0.25"/>
+                <circle cx="0"     cy="28"   r="10" fill="#1a73e8" opacity="0.25"/>
+                <circle cx="-19.8" cy="19.8" r="10" fill="#1a73e8" opacity="0.25"/>
+                <circle cx="-28"   cy="0"    r="10" fill="#1a73e8" opacity="0.25"/>
+                <circle cx="-19.8" cy="-19.8" r="10" fill="#1a73e8" opacity="0.25"/>
+                <circle cx="0" cy="0" r="22" fill="#1a73e8"/>
+                <path d="M0,-12 L2.8,-4.2 L11,-3.5 L4.8,2.4 L6.8,11 L0,6.8 L-6.8,11 L-4.8,2.4 L-11,-3.5 L-2.8,-4.2 Z" fill="white"/>
+              </svg>
+              <span style={{fontSize:48,fontWeight:700,color:T.text,letterSpacing:-1.5,fontFamily:"'Google Sans',sans-serif",lineHeight:1}}>
+                judge<span style={{color:T.accent,fontWeight:400}}>.dog</span>
+              </span>
             </div>
+
+            {/* Slogan */}
+            <p style={{fontSize:isMobile?16:19,color:T.textSub,fontWeight:300,margin:"0 0 36px",letterSpacing:0.1}}>
+              The professional network for dog judges
+            </p>
+
+            {/* Hero search bar */}
+            <div style={{width:"100%",maxWidth:560,position:"relative",marginBottom:20}}>
+              <span style={{position:"absolute",left:18,top:"50%",transform:"translateY(-50%)",fontSize:18,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
+              <input
+                autoFocus
+                value={search}
+                onChange={e=>setSearch(e.target.value)}
+                placeholder="Search judges, breeds, countries…"
+                style={{width:"100%",padding:"14px 20px 14px 50px",border:`1.5px solid ${T.border}`,borderRadius:100,fontSize:16,background:T.surface,outline:"none",color:T.text,boxSizing:"border-box",boxShadow:T.shadowSm,transition:"border-color .15s,box-shadow .15s"}}
+                onFocus={e=>{e.target.style.borderColor=T.accent;e.target.style.boxShadow=`0 0 0 3px ${T.accentLight}`;}}
+                onBlur={e=>{e.target.style.borderColor=T.border;e.target.style.boxShadow=T.shadowSm;}}
+              />
+            </div>
+
+            {/* Three pillars */}
+            <div style={{display:"flex",gap:isMobile?10:16,flexWrap:"wrap",justifyContent:"center",maxWidth:680,margin:"16px 0 48px"}}>
+              {[
+                {icon:"🔍",title:"Find",desc:"Search by name, breed, country or discipline"},
+                {icon:"📖",title:"Read",desc:"Explore profiles, credentials and reviews"},
+                {icon:"📅",title:"Book",desc:"Send a booking inquiry directly to the judge"},
+              ].map(({icon,title,desc})=>(
+                <div key={title} style={{flex:"1 1 180px",maxWidth:200,padding:"18px 16px",background:T.surface,border:`1px solid ${T.border}`,borderRadius:T.r,textAlign:"center"}}>
+                  <div style={{fontSize:24,marginBottom:8}}>{icon}</div>
+                  <div style={{fontSize:14,fontWeight:600,color:T.text,marginBottom:4,fontFamily:"'Google Sans',sans-serif"}}>{title}</div>
+                  <div style={{fontSize:12,color:T.textHint,lineHeight:1.5}}>{desc}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Stats row */}
+            <div style={{display:"flex",gap:isMobile?16:32,flexWrap:"wrap",justifyContent:"center",fontSize:13,color:T.textHint}}>
+              <span><strong style={{color:T.textSub,fontWeight:500}}>{judges.filter(j=>!j.hidden).length.toLocaleString()}</strong> judges</span>
+              <span style={{color:T.border}}>·</span>
+              <span><strong style={{color:T.textSub,fontWeight:500}}>{[...new Set(judges.filter(j=>!j.hidden).map(j=>j.country))].length}</strong> countries</span>
+              <span style={{color:T.border}}>·</span>
+              <span>{Object.keys(ORGS).join(" · ")}</span>
+            </div>
+          </div>)
+
+          : /* ── Results ──────────────────────────────────────────────── */
+          (<div style={{maxWidth:1040,margin:"0 auto",padding:"28px 20px"}}>
 
             <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"flex-end",marginBottom:20}}>
               <select value={orgFilter} onChange={e=>setOrgFilter(e.target.value)}
@@ -2655,15 +2733,6 @@ export default function App() {
                 <option value="rating">Sort: Top rated</option>
                 <option value="reviews">Sort: Most reviewed</option>
               </select>
-            </div>
-
-            <div style={{display:"flex",marginBottom:28,background:T.surface,borderRadius:T.r,border:`1px solid ${T.border}`,overflow:"hidden"}}>
-              {[["Judges",judges.length],["Reviews",reviews.length],["Organisations",Object.keys(ORGS).length],["Countries",[...new Set(judges.map(j=>j.country))].length]].map(([l,v],i,arr)=>(
-                <div key={l} style={{flex:1,padding:"14px 20px",borderRight:i<arr.length-1?`1px solid ${T.border}`:"none",textAlign:"center"}}>
-                  <div style={{fontSize:22,fontWeight:500,color:T.text,marginBottom:2,fontFamily:"'Google Sans',sans-serif"}}>{v}</div>
-                  <div style={{fontSize:12,color:T.textHint}}>{l}</div>
-                </div>
-              ))}
             </div>
 
             {filtered.length===0?(
@@ -2688,8 +2757,8 @@ export default function App() {
                 )}
               </>
             )}
-          </div>
-          )}/>
+          </div>)
+          }/>
         <Route path="/judge/:slug" element={
           <JudgeRoute judges={judges} reviews={reviews} user={user}
             addReview={addReview} addBooking={addBooking}
