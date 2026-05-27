@@ -1,0 +1,121 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    function isAuth() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isAuth() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role','') == 'admin';
+    }
+    function callerJudgeId() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('judgeId', null);
+    }
+
+    // ── judges ────────────────────────────────────────────────────────────────
+    // Public read. Write: admin only OR the verified owner (matched by email).
+    match /judges/{judgeId} {
+      allow read: if true;
+      allow write: if isAdmin()
+        || (isAuth()
+            && resource != null
+            && resource.data.get('claimedBy', '') == request.auth.token.email);
+    }
+
+    // ── reviews ───────────────────────────────────────────────────────────────
+    // Public read.
+    // Create: authenticated; userId in the doc must equal the caller's UID.
+    // Update: admin | review owner | judge patching ONLY the reply field on their own profile.
+    // Delete: admin | review owner.
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isAuth()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasAll(['judgeId','userId','userName','date','overall','text']);
+      allow update: if isAdmin()
+        || (isAuth() && resource.data.userId == request.auth.uid)
+        || (isAuth()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reply'])
+            && callerJudgeId() == resource.data.judgeId);
+      allow delete: if isAdmin()
+        || (isAuth() && resource.data.userId == request.auth.uid);
+    }
+
+    // ── users ─────────────────────────────────────────────────────────────────
+    // Each user reads/writes their own doc. Admin reads all.
+    match /users/{userId} {
+      allow get:    if (isAuth() && request.auth.uid == userId) || isAdmin();
+      allow list:   if isAdmin();
+      allow create: if isAuth() && request.auth.uid == userId;
+      allow update: if (isAuth() && request.auth.uid == userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── claims ────────────────────────────────────────────────────────────────
+    // Authenticated users submit claims about themselves. Admin manages all.
+    match /claims/{claimId} {
+      allow read:   if isAdmin()
+        || (isAuth() && resource.data.userId == request.auth.uid);
+      allow create: if isAuth()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasAll(['judgeId','userId','userName','userEmail','status']);
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── contact ───────────────────────────────────────────────────────────────
+    // Anyone can submit (validated by reCAPTCHA in Cloud Function). Admin reads.
+    match /contact/{docId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ── messages (legacy direct-contact messages) ─────────────────────────────
+    match /messages/{msgId} {
+      allow create: if true;
+      allow read:   if isAdmin()
+        || (isAuth() && callerJudgeId() == resource.data.get('judgeId', null));
+      allow update, delete: if isAdmin();
+    }
+
+    // ── conversations + messages subcollection ────────────────────────────────
+    match /conversations/{convId} {
+      function isSender()     { return isAuth() && resource.data.senderUid == request.auth.uid; }
+      function isJudgeParty() { return isAuth() && callerJudgeId() == resource.data.get('judgeId', null); }
+
+      allow read, update: if isSender() || isJudgeParty() || isAdmin();
+      allow create:       if isAuth() && request.resource.data.senderUid == request.auth.uid;
+      allow delete:       if isAdmin();
+
+      match /messages/{msgId} {
+        function convData() {
+          return get(/databases/$(database)/documents/conversations/$(convId)).data;
+        }
+        function canAccessConv() {
+          return isAuth() && (
+            convData().senderUid == request.auth.uid
+            || callerJudgeId() == convData().get('judgeId', null)
+          );
+        }
+
+        allow read:          if canAccessConv() || isAdmin();
+        allow create:        if isAuth() && canAccessConv();
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // ── bookings ──────────────────────────────────────────────────────────────
+    match /bookings/{bookingId} {
+      allow create: if isAuth()
+        && request.resource.data.organizerId == request.auth.uid;
+      allow read:   if isAdmin()
+        || (isAuth() && resource.data.organizerId == request.auth.uid)
+        || (isAuth() && callerJudgeId() == resource.data.get('judgeId', null));
+      allow update: if isAdmin()
+        || (isAuth() && resource.data.organizerId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+  }
+}
