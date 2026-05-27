@@ -2351,6 +2351,15 @@ export default function App() {
   const [unreadMsgCount,setUnreadMsgCount]=useState(0);
   const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all");
   const [displayCount,setDisplayCount]=useState(48);
+  const navSearchRef=useRef(null);
+  // When the hero search bar triggers a transition to results, move focus to the nav search input
+  // so the user can keep typing without interruption.
+  const prevSearchEmpty=useRef(true);
+  useEffect(()=>{
+    const empty=!search.trim();
+    if(!empty && prevSearchEmpty.current) navSearchRef.current?.focus();
+    prevSearchEmpty.current=empty;
+  },[search]);
   const [isMobile,setIsMobile]=useState(window.innerWidth<640);
   const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
   const [cookieConsent,setCookieConsent]=useState(()=>localStorage.getItem("jyj_cookie_consent"));
@@ -2560,7 +2569,7 @@ export default function App() {
           <div style={{position:"absolute",left:0,right:0,display:"flex",justifyContent:"center",pointerEvents:"none"}}>
             <div style={{width:480,maxWidth:"calc(100vw - 340px)",position:"relative",pointerEvents:"all"}}>
               <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
-              <input value={search} onChange={e=>{setSearch(e.target.value);navigate("/");}}
+              <input ref={navSearchRef} value={search} onChange={e=>{setSearch(e.target.value);navigate("/");}}
                 placeholder="Search judges, breeds, countries…"
                 style={{width:"100%",padding:"8px 14px 8px 36px",border:`1.5px solid ${T.border}`,borderRadius:100,fontSize:13,background:T.surface,outline:"none",color:T.text,boxSizing:"border-box",transition:"border-color .15s,box-shadow .15s"}}
                 onFocus={e=>{e.target.style.borderColor=T.accent;e.target.style.boxShadow=`0 0 0 3px ${T.accentLight}`;}}
@@ -2683,7 +2692,6 @@ export default function App() {
             <div style={{width:"100%",maxWidth:560,position:"relative",marginBottom:20}}>
               <span style={{position:"absolute",left:18,top:"50%",transform:"translateY(-50%)",fontSize:18,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
               <input
-                autoFocus
                 value={search}
                 onChange={e=>setSearch(e.target.value)}
                 placeholder="Search judges, breeds, countries…"
