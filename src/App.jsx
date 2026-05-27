@@ -2352,12 +2352,20 @@ export default function App() {
   const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all");
   const [displayCount,setDisplayCount]=useState(48);
   const navSearchRef=useRef(null);
-  // When the hero search bar triggers a transition to results, move focus to the nav search input
-  // so the user can keep typing without interruption.
+  const heroSearchRef=useRef(null);
+  // Keep focus alive across the landing ↔ results transition.
+  // landing→results: focus nav input so typing continues uninterrupted.
+  // results→landing: focus hero input so the user doesn't have to click.
   const prevSearchEmpty=useRef(true);
   useEffect(()=>{
     const empty=!search.trim();
-    if(!empty && prevSearchEmpty.current) navSearchRef.current?.focus();
+    if(!empty && prevSearchEmpty.current){
+      // just left landing — focus nav bar
+      navSearchRef.current?.focus();
+    } else if(empty && !prevSearchEmpty.current){
+      // just returned to landing — hero mounts on next paint, wait one frame
+      requestAnimationFrame(()=>heroSearchRef.current?.focus());
+    }
     prevSearchEmpty.current=empty;
   },[search]);
   const [isMobile,setIsMobile]=useState(window.innerWidth<640);
@@ -2692,6 +2700,7 @@ export default function App() {
             <div style={{width:"100%",maxWidth:560,position:"relative",marginBottom:20}}>
               <span style={{position:"absolute",left:18,top:"50%",transform:"translateY(-50%)",fontSize:18,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
               <input
+                ref={heroSearchRef}
                 value={search}
                 onChange={e=>setSearch(e.target.value)}
                 placeholder="Search judges, breeds, countries…"
