@@ -220,7 +220,8 @@ export default function App() {
       {/* Nav */}
       <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:isMobile?"0 12px":"0 20px",display:"flex",alignItems:"center",gap:isMobile?8:0,justifyContent:"space-between",height:64,flexShrink:0,zIndex:200}}>
         {/* Brand */}
-        <div style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",flexShrink:0}} onClick={()=>navigate("/")}>
+        <div style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",flexShrink:0}} onClick={()=>{setSearch("");navigate("/")}}>
+
           <svg width="51" height="51" viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
             <circle cx="0"     cy="-28"  r="10" fill="#1a73e8" opacity="0.25"/>
             <circle cx="19.8"  cy="-19.8" r="10" fill="#1a73e8" opacity="0.25"/>
