@@ -215,10 +215,10 @@ export default function App() {
       `}</style>
 
       <ScrollToTop/>
-      <div style={{display:"flex",flexDirection:"column",minHeight:"100vh"}}>
+      <div style={{display:"flex",flexDirection:"column",height:"100vh",overflow:"hidden"}}>
 
       {/* Nav */}
-      <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:isMobile?"0 12px":"0 20px",display:"flex",alignItems:"center",gap:isMobile?8:0,justifyContent:"space-between",height:64,position:"sticky",top:0,zIndex:200}}>
+      <nav style={{background:T.bg,borderBottom:`1px solid ${T.border}`,padding:isMobile?"0 12px":"0 20px",display:"flex",alignItems:"center",gap:isMobile?8:0,justifyContent:"space-between",height:64,flexShrink:0,zIndex:200}}>
         {/* Brand */}
         <div style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",flexShrink:0}} onClick={()=>navigate("/")}>
           <svg width="51" height="51" viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
@@ -337,7 +337,7 @@ export default function App() {
         </>
       )}
 
-      <div style={{flex:1,height:0,minHeight:0}}><Routes>
+      <div style={{flex:1,overflowY:"auto",overflowX:"hidden"}}><Routes>
         <Route path="/" element={user?.role==="judge" && user?.judgeId && !search.trim()
           ? <JudgeDashboard
               user={user}

@@ -35,6 +35,11 @@
         if (e.touches.length > 1) e.preventDefault();
       }, { passive: false });
     </script>
+
+    <!-- Base font before React mounts (prevents Times New Roman on loading screen) -->
+    <style>
+      html, body { margin: 0; font-family: 'Segoe UI', system-ui, Arial, sans-serif; }
+    </style>
   </head>
   <body>
     <div id="root"></div>

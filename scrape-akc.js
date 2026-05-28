@@ -9,6 +9,7 @@
 
 import puppeteer from "puppeteer";
 import fs from "fs";
+import { akcTypesToGroups } from "./akc-disciplines.js";
 
 const args = process.argv.slice(2);
 const ALL_MODE   = args.includes("--all");
@@ -170,58 +171,77 @@ async function fetchJudgeDetail(page, judgeNumber) {
     await sleep(800);
 
     return page.evaluate(() => {
-      const KNOWN_TYPES = [
-        "Conformation","Hunting Test","Field Trial","Rally Obedience","Obedience",
-        "Agility","AKC Temperament Test","Tracking","Earthdog","Lure Coursing",
-        "Herding","Scent Work","Fast CAT","Barn Hunt",
-      ];
-
-      // ── Judge types — scan only <td> cells that exactly match a known type ──
-      // Do NOT scan document.body.textContent — the cfdump includes data from ALL
-      // judges in the state query, causing every judge to appear to have every type.
-      const judgeTypes = new Set();
-      const tdTexts = Array.from(document.querySelectorAll("td"))
-        .map(td => td.textContent.trim());
-      for (const t of KNOWN_TYPES) {
-        if (tdTexts.includes(t)) judgeTypes.add(t);
+      // ── Judge types ────────────────────────────────────────────────────────
+      // The detail page has a cell that contains "Judge Type: Herding Test, Herding Trial"
+      // It may be in the same cell as "Judge's Number: XXXXX" (combined label cell).
+      // Search for "Judge Type:" anywhere inside any cell's text.
+      const allCells = Array.from(document.querySelectorAll("td,th"))
+        .map(el => el.textContent);
+      const judgeTypes = [];
+      for (const cell of allCells) {
+        const m = cell.match(/judge type:\s*([^\n\r]+)/i);
+        if (m) {
+          m[1].trim().split(/[,;]/).map(s => s.trim()).filter(Boolean).forEach(t => {
+            if (!judgeTypes.includes(t)) judgeTypes.push(t);
+          });
+          break;
+        }
       }
 
       // ── Breed approvals table ──────────────────────────────────────────────
+      // The breed table has header "Breed/Group/Class | Status [| Date]"
+      // The first column may be empty (leading blank in cfdump layout) — detect
+      // column indices dynamically from the header row.
       const breedApprovals = [];
       const seenBreeds = new Set();
-      // ColdFusion cfdump keywords — never valid breed names
       const CF_JUNK = new Set(["RESULTSET","SQL","CACHENAME","DATASOURCE","DBTYPE",
                                "EXECUTIONTIME","CACHED","RECORDCOUNT","COLUMNLIST"]);
+
       document.querySelectorAll("table").forEach(table => {
+        if (!/breed|group|class/i.test(table.textContent)) return;
         const rows = Array.from(table.querySelectorAll("tr"));
         if (rows.length < 2) return;
-        // Need a status column (Approved / Prov)
-        const bodyText = table.textContent;
-        if (!/approv|prov|permit/i.test(bodyText)) return;
 
-        rows.slice(1).forEach(tr => {
-          const cells = Array.from(tr.querySelectorAll("td")).map(td=>td.textContent.trim());
-          if (cells.length < 2) return;
-          const breed = cells[0];
+        // Find header row and determine column offsets
+        let breedIdx = 0, statusIdx = 1, dateIdx = 2;
+        for (const row of rows) {
+          const cells = Array.from(row.querySelectorAll(":scope > td, :scope > th"))
+            .map(c => c.textContent.trim());
+          if (cells.some(c => /breed|group|class/i.test(c))) {
+            breedIdx  = cells.findIndex(c => /breed|group|class/i.test(c));
+            statusIdx = cells.findIndex(c => /status/i.test(c));
+            if (statusIdx === -1) statusIdx = breedIdx + 1;
+            dateIdx   = statusIdx + 1;
+            break;
+          }
+        }
+
+        rows.forEach(tr => {
+          const cells = Array.from(tr.querySelectorAll(":scope > td"))
+            .map(td => td.textContent.trim());
+          if (cells.length <= breedIdx) return;
+          const breed = cells[breedIdx];
           if (!breed || breed.length < 2 || seenBreeds.has(breed)) return;
-          // Skip cfdump meta-rows: all-caps strings and known ColdFusion keywords
           if (/^[A-Z_\s]+$/.test(breed) || CF_JUNK.has(breed)) return;
-          // Skip obvious non-breed content (column headers that slipped through)
           if (/^\[empty string\]$/i.test(breed)) return;
-          const statusRaw = cells[1] || "";
+          if (/breed|group|class|status/i.test(breed)) return; // header row
+          const statusRaw = cells[statusIdx] || "";
           const isProv = /prov|permit/i.test(statusRaw);
-          const isOk   = /approv/i.test(statusRaw) && !/^[A-Z_\s]+$/.test(statusRaw);
+          const isOk   = /approv/i.test(statusRaw);
           if (!isProv && !isOk) return;
           seenBreeds.add(breed);
+          // Extract date from status cell ("Approved - Jul, 02 2025" → "Jul 02 2025")
+          const dateMatch = statusRaw.match(/([A-Z][a-z]+,?\s+\d+,?\s+\d{4})/);
+          const dateStr = dateMatch ? dateMatch[1] : (cells[dateIdx] || null);
           breedApprovals.push({
             breed,
             status: isProv ? "Provisional" : "Approved",
-            date: cells[2] || null,
+            date: dateStr,
           });
         });
       });
 
-      return { judgeTypes: Array.from(judgeTypes), breedApprovals };
+      return { judgeTypes, breedApprovals };
     });
   } catch(e) {
     return { judgeTypes: [], breedApprovals: [], error: e.message };
@@ -245,6 +265,7 @@ function mapToJudge(basic, detail) {
   const provisionalBreeds = (detail.breedApprovals||[]).filter(b=>b.status==="Provisional").map(b=>b.breed);
   const allBreeds         = (detail.breedApprovals||[]).map(b=>b.breed);
   const disciplines       = detail.judgeTypes?.length ? detail.judgeTypes : ["Conformation"];
+  const disciplineGroups  = akcTypesToGroups(detail.judgeTypes || []);
   const initials = [toTitleCase(nameFirst)[0], toTitleCase(nameLast)[0]].filter(Boolean).join("").toUpperCase() || "??";
 
   return {
@@ -271,7 +292,7 @@ function mapToJudge(basic, detail) {
     akcProvisionalBreeds: provisionalBreeds,
 
     disciplines,
-    disciplineGroups: ["A"],
+    disciplineGroups,
     allBreedJudge: false,
     groupNames: [], groupJudge: [],
     authorizedBreeds: (detail.breedApprovals||[]).map(b=>({

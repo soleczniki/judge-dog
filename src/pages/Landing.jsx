@@ -2,17 +2,19 @@ import { T, ORGS } from "../theme.js";
 import { JudgeCard } from "../components/JudgeCard.jsx";
 import { Footer } from "../components/Footer.jsx";
 
-export function Landing({search, setSearch, judges, reviews, filtered, displayCount, setDisplayCount, orgFilter, setOrgFilter, sort, setSort, isMobile, heroSearchRef, onNavigate, onManageCookies}) {
+export function Landing({
+  search, setSearch, judges, reviews,
+  filtered, displayCount, setDisplayCount,
+  orgFilter, setOrgFilter,
+  sort, setSort,
+  isMobile, heroSearchRef, onNavigate, onManageCookies,
+}) {
   if (!search.trim()) {
     return (
-      // height:100% fills the flex:1 Routes wrapper (which has height:0;minHeight:0)
-      // so the full chain is: 100vh = nav(64px) + this div(100%) with no overflow
       <div style={{display:"flex",flexDirection:"column",height:"100%",overflow:"hidden"}}>
 
-        {/* Centered hero */}
         <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 20px",textAlign:"center"}}>
 
-          {/* Logo + wordmark */}
           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:8,marginBottom:isMobile?14:18}}>
             <svg width={isMobile?48:56} height={isMobile?48:56} viewBox="-55 -55 110 110" xmlns="http://www.w3.org/2000/svg">
               <circle cx="0"     cy="-28"  r="10" fill="#1a73e8" opacity="0.25"/>
@@ -31,12 +33,10 @@ export function Landing({search, setSearch, judges, reviews, filtered, displayCo
             </span>
           </div>
 
-          {/* Slogan */}
           <p style={{fontSize:isMobile?14:17,color:T.textSub,fontWeight:300,margin:`0 0 ${isMobile?16:22}px`,letterSpacing:0.1}}>
             The professional network for dog judges
           </p>
 
-          {/* Hero search bar */}
           <div style={{width:"100%",maxWidth:520,position:"relative",marginBottom:isMobile?14:18}}>
             <span style={{position:"absolute",left:16,top:"50%",transform:"translateY(-50%)",fontSize:16,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
             <input
@@ -50,7 +50,6 @@ export function Landing({search, setSearch, judges, reviews, filtered, displayCo
             />
           </div>
 
-          {/* Three pillars — cards on desktop, single text row on mobile */}
           {isMobile ? (
             <p style={{fontSize:13,color:T.textHint,margin:"0 0 14px",letterSpacing:0.5}}>
               Find &nbsp;·&nbsp; Read &nbsp;·&nbsp; Book
@@ -71,7 +70,6 @@ export function Landing({search, setSearch, judges, reviews, filtered, displayCo
             </div>
           )}
 
-          {/* Stats row */}
           <div style={{display:"flex",gap:isMobile?12:24,flexWrap:"wrap",justifyContent:"center",fontSize:12,color:T.textHint}}>
             <span><strong style={{color:T.textSub,fontWeight:500}}>{judges.filter(j=>!j.hidden).length.toLocaleString()}</strong> judges</span>
             <span style={{color:T.border}}>·</span>
@@ -80,16 +78,13 @@ export function Landing({search, setSearch, judges, reviews, filtered, displayCo
             <span>{Object.keys(ORGS).join(" · ")}</span>
           </div>
 
-        </div>{/* end centered hero */}
+        </div>
 
-        {/* Footer pinned at bottom — guarantees no page scroll on landing */}
         <Footer onManageCookies={onManageCookies}/>
-
       </div>
     );
   }
 
-  // ── Results view ────────────────────────────────────────────────────────────
   return (
     <div style={{maxWidth:1040,margin:"0 auto",padding:"28px 20px"}}>
       <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"flex-end",marginBottom:20}}>
@@ -114,7 +109,9 @@ export function Landing({search, setSearch, judges, reviews, filtered, displayCo
       ):(
         <>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:12}}>
-            {filtered.slice(0,displayCount).map(j=><JudgeCard key={j.id} judge={j} reviews={reviews} onClick={()=>onNavigate("/judge/"+(j.slug||j.id))}/>)}
+            {filtered.slice(0,displayCount).map(j=>(
+              <JudgeCard key={j.id} judge={j} reviews={reviews} onClick={()=>onNavigate("/judge/"+(j.slug||j.id))}/>
+            ))}
           </div>
           {filtered.length>displayCount&&(
             <div style={{textAlign:"center",marginTop:28}}>
