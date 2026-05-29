@@ -37,7 +37,7 @@ export function ClaimModal({judge,user,onClose}) {
 
   return (
     <Modal onClose={onClose} title="Claim this profile" subtitle={`Are you ${judge.name}?`}>
-      <p style={{fontSize:13,color:T.textSub,lineHeight:1.7,margin:"0 0 20px"}}>Once approved you'll be able to manage your profile, reply to reviews, and receive messages directly from exhibitors and show organisers.</p>
+      <p style={{fontSize:13,color:T.textSub,lineHeight:1.7,margin:"0 0 20px"}}>Once approved you'll be able to manage your profile, reply to reviews, and receive booking inquiries directly from verified show organisers.</p>
       {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
       <Btn fullWidth onClick={submit} disabled={sending}>{sending?"Submitting…":"Submit claim request"}</Btn>
     </Modal>

@@ -39,7 +39,7 @@ export function AuthModal({onClose,onAuth}) {
       </div>
       {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
       <p style={{margin:"16px 0 0",fontSize:12,color:T.textHint,textAlign:"center",lineHeight:1.6}}>
-        By signing in you agree to our terms. Your role defaults to <strong>Exhibitor</strong>.
+        By signing in you agree to our terms. Your role defaults to <strong>Handler</strong>.
       </p>
     </Modal>
   );

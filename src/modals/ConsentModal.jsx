@@ -28,7 +28,7 @@ export function ConsentModal({user, onClose, onComplete}) {
         <p style={{margin:"0 0 4px",fontSize:14,fontWeight:500,color:T.text}}>Welcome to judge.dog</p>
         <p style={{margin:0,fontSize:13,color:T.textSub,lineHeight:1.6}}>
           You're signing in as <strong>{user.email}</strong>. Your account will be created
-          with the Exhibitor role. You can submit reviews, message judges, and request bookings.
+          as a Handler. You can write reviews and research judges.
         </p>
       </div>
       <label style={{display:"flex",alignItems:"flex-start",gap:12,cursor:"pointer",marginBottom:20,userSelect:"none"}}>

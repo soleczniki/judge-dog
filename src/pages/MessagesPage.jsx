@@ -150,7 +150,7 @@ export function MessagesRoute({user}) {
                 <div style={{fontSize:36,marginBottom:12}}>✉</div>
                 <p style={{margin:"0 0 6px",fontSize:14,color:T.textSub,fontWeight:500}}>No conversations yet</p>
                 <p style={{margin:0,fontSize:13,color:T.textHint}}>
-                  {isJudge?"Exhibitors who contact you through your profile will appear here.":"Visit a judge's profile and click Contact to start a conversation."}
+                  {isJudge?"Booking inquiries from verified show organisers will appear here.":"Booking inquiries you send to judges will appear here."}
                 </p>
               </div>
             ):convs.map(c=>{

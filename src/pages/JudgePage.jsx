@@ -276,7 +276,6 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
           {!isOwner&&!claimStatus&&!hasReviewed&&<Btn onClick={onReview}>{user?"Write a review":"Sign in to review"}</Btn>}
           {!isOwner&&!claimStatus&&hasReviewed&&<Chip bg={T.greenLight} color={T.green}>✓ Reviewed</Chip>}
           {canBook&&<Btn onClick={onBook} color={T.green} icon="📅">Request booking</Btn>}
-          {!isOwner&&!claimStatus&&<Btn onClick={onContact} variant="outlined">Contact</Btn>}
           {isOwner&&<Btn onClick={onEditProfile} variant="outlined" icon="✏">Edit profile</Btn>}
         </div>
 

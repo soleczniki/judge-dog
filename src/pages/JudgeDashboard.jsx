@@ -92,7 +92,7 @@ export function JudgeDashboard({user, judge, reviews, unreadMsgCount, onEditProf
             </div>
           )}
           <div style={{fontSize:13,color:T.textSub,lineHeight:1.6}}>
-            Exhibitors and organizers can contact you through your profile page.
+            Verified show organisers can send you booking inquiries through your profile.
           </div>
         </Card>
       </div>
@@ -130,7 +130,7 @@ export function JudgeDashboard({user, judge, reviews, unreadMsgCount, onEditProf
         <Card style={{textAlign:"center",padding:"40px 22px"}}>
           <div style={{fontSize:36,marginBottom:12}}>★</div>
           <p style={{margin:"0 0 6px",fontSize:15,color:T.text,fontWeight:500}}>No reviews yet</p>
-          <p style={{margin:0,fontSize:13,color:T.textHint}}>Share your profile link so exhibitors can leave reviews after shows.</p>
+          <p style={{margin:0,fontSize:13,color:T.textHint}}>Share your profile link so handlers can leave reviews after shows.</p>
         </Card>
       )}
     </div>
