@@ -13,7 +13,7 @@ const ROLES = [
   {
     key: "organiser",
     label: "Event Organiser",
-    desc: "I organise shows, trials or events and need to find and book judges. Identity verification required.",
+    desc: "I organise shows, trials or events and need to find and book judges.",
   },
 ];
 
@@ -103,7 +103,6 @@ export function ConsentModal({user, onClose, onComplete}) {
 
       <p style={{margin:"14px 0 0",fontSize:12,color:T.textHint,textAlign:"center",lineHeight:1.6}}>
         By continuing you also consent to receiving transactional emails from judge.dog.
-        {selected.organiser && " You'll be prompted to verify your identity before sending booking inquiries."}
       </p>
     </Modal>
   );
