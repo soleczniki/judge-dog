@@ -363,7 +363,8 @@ export default function App() {
           <JudgeRoute judges={judges} reviews={reviews} user={user}
             addReview={addReview} addBooking={addBooking}
             claimJudge={claimJudge} editProfile={editProfile} saveReply={saveReply}
-            onRequestAuth={()=>setModal("auth")}/>
+            onRequestAuth={()=>setModal("auth")}
+            onUserUpdated={u=>setUser(prev=>({...prev,...u}))}/>
         }/>
         <Route path="/messages" element={<MessagesRoute user={user}/>}/>
         <Route path="/admin" element={

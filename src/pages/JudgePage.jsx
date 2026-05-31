@@ -16,6 +16,7 @@ import { ContactModal } from "../modals/ContactModal.jsx";
 import { EditProfileModal } from "../modals/EditProfileModal.jsx";
 import { ReplyModal } from "../modals/ReplyModal.jsx";
 import { StartConvModal } from "../modals/StartConvModal.jsx";
+import { AddOrganiserModal } from "../modals/AddOrganiserModal.jsx";
 
 // ── QR Section ────────────────────────────────────────────────────────────────
 function QRSection({judge}) {
@@ -129,7 +130,9 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
   const wr=rv.filter(r=>r.wouldReturn).length;
   const isOwner=user&&judge.claimedBy===user.email;
   const hasReviewed=user&&rv.some(r=>r.userId===user.id);
-  const canBook=user&&user.role==="organizer"&&judge.verified;
+  // Show booking button whenever judge can be notified (has email or is claimed)
+  const judgeContactable = judge.claimedBy || judge.contact?.email;
+  const canBook = !isOwner && judgeContactable;
 
   const [claimStatus,setClaimStatus]=useState(null);
   useEffect(()=>{
@@ -443,10 +446,14 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
 }
 
 // ── Judge Route ────────────────────────────────────────────────────────────────
-export function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editProfile,saveReply,onRequestAuth}) {
+export function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editProfile,saveReply,onRequestAuth,onUserUpdated}) {
   const {slug}=useParams();
   const navigate=useNavigate();
   const [modal,setModal]=useState(null);
+  // Track user locally so AddOrganiserModal update is immediate
+  const [localUser, setLocalUser]=useState(user);
+  // Keep in sync when parent user changes (login/logout)
+  if(user!==localUser&&JSON.stringify(user)!==JSON.stringify(localUser)) setLocalUser(user);
   // Check canonical slug, doc id, and any historical slug aliases
   const judge=judges.find(j=>j.slug===slug||j.id===slug||j.slugAliases?.includes(slug));
 
@@ -464,6 +471,13 @@ export function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,
     document.title=`${judge.name} — Dog Show Judge Reviews | judge.dog`;
     return()=>{ document.title="judge.dog — Know your judge before you enter"; };
   },[judge?.name]);
+
+  const handleBook=()=>{
+    if(!localUser){onRequestAuth();return;}
+    const hasOrganiserRole=localUser.organizerStatus||localUser.role==="judge";
+    if(hasOrganiserRole) setModal("booking");
+    else setModal("addOrganiser");
+  };
 
   const handleContact=()=>{
     if(judge.claimedBy){
@@ -483,20 +497,26 @@ export function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,
 
   return (
     <>
-      <JudgePage judge={judge} reviews={reviews} user={user}
+      <JudgePage judge={judge} reviews={reviews} user={localUser}
         onBack={()=>navigate(-1)}
-        onReview={()=>{if(!user){onRequestAuth();}else{setModal("review");}}}
-        onBook={()=>setModal("booking")}
+        onReview={()=>{if(!localUser){onRequestAuth();}else{setModal("review");}}}
+        onBook={handleBook}
         onClaim={()=>setModal("claim")}
         onContact={handleContact}
         onEditProfile={()=>setModal("editProfile")}
         onSaveReply={saveReply}
         onRequestAuth={onRequestAuth}/>
-      {modal==="review"&&user&&<ReviewModal judge={judge} user={user} onClose={()=>setModal(null)} onSubmit={addReview}/>}
-      {modal==="booking"&&user&&<BookingModal judge={judge} user={user} onClose={()=>setModal(null)} onSubmit={addBooking}/>}
-      {modal==="claim"&&user&&<ClaimModal judge={judge} user={user} onClose={()=>setModal(null)}/>}
-      {modal==="contact"&&<ContactModal judge={judge} user={user} onClose={()=>setModal(null)}/>}
-      {modal==="startConv"&&user&&<StartConvModal judge={judge} user={user} onClose={()=>setModal(null)} onCreated={()=>navigate("/messages")}/>}
+      {modal==="review"&&localUser&&<ReviewModal judge={judge} user={localUser} onClose={()=>setModal(null)} onSubmit={addReview}/>}
+      {modal==="booking"&&localUser&&<BookingModal judge={judge} user={localUser} onClose={()=>setModal(null)} onSubmit={addBooking}/>}
+      {modal==="addOrganiser"&&localUser&&<AddOrganiserModal user={localUser} onClose={()=>setModal(null)}
+        onComplete={updated=>{
+          setLocalUser(updated);
+          onUserUpdated?.(updated);
+          setModal("booking");
+        }}/>}
+      {modal==="claim"&&localUser&&<ClaimModal judge={judge} user={localUser} onClose={()=>setModal(null)}/>}
+      {modal==="contact"&&<ContactModal judge={judge} user={localUser} onClose={()=>setModal(null)}/>}
+      {modal==="startConv"&&localUser&&<StartConvModal judge={judge} user={localUser} onClose={()=>setModal(null)} onCreated={()=>navigate("/messages")}/>}
       {modal==="editProfile"&&<EditProfileModal judge={judge} onClose={()=>setModal(null)} onSave={editProfile}/>}
     </>
   );
