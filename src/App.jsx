@@ -20,6 +20,7 @@ import { AdminRoute } from "./pages/AdminPage.jsx";
 import { MessagesRoute } from "./pages/MessagesPage.jsx";
 import { JudgeDashboard } from "./pages/JudgeDashboard.jsx";
 import { ContactPage } from "./pages/ContactPage.jsx";
+import { SettingsPage } from "./pages/SettingsPage.jsx";
 import { Landing } from "./pages/Landing.jsx";
 
 export default function App() {
@@ -287,6 +288,7 @@ export default function App() {
                     :<Avatar label={initials(user.name)} size={26}/>}
                   <span style={{fontSize:13,color:T.textSub,fontWeight:500}}>{user.name.split(" ")[0]}</span>
                 </div>
+                <Btn onClick={()=>navigate("/settings")} variant="outlined" small>Settings</Btn>
                 <Btn onClick={logout} variant="outlined" small>Sign out</Btn>
                 {user.role==="admin"&&<Btn onClick={()=>navigate("/admin")} variant="tonal" small>⚙ Admin</Btn>}
               </>
@@ -323,6 +325,7 @@ export default function App() {
                   </div>
                 </div>
                 <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                  <Btn onClick={()=>{navigate("/settings");setMobileMenuOpen(false);}} variant="outlined" small>Settings</Btn>
                   <Btn onClick={()=>{logout();setMobileMenuOpen(false);}} variant="outlined" small>Sign out</Btn>
                   {user.role==="admin"&&<Btn onClick={()=>{navigate("/admin");setMobileMenuOpen(false);}} variant="tonal" small>⚙ Admin</Btn>}
                   <Btn onClick={()=>{navigate("/messages");setMobileMenuOpen(false);}} variant="outlined" small>✉ Messages{unreadMsgCount>0?` (${unreadMsgCount})`:""}</Btn>
@@ -373,6 +376,7 @@ export default function App() {
             saveJudges={saveJudges} saveReviews={saveReviews}/>
         }/>
         <Route path="/contact" element={<ContactPage user={user}/>}/>
+        <Route path="/settings" element={user ? <SettingsPage user={user} onUserUpdated={u=>setUser(prev=>({...prev,...u}))}/> : <Navigate to="/" replace/>}/>
         <Route path="/privacy" element={<PrivacyPolicy/>}/>
         <Route path="/terms" element={<TermsOfService/>}/>
         <Route path="/cookies" element={<CookiePolicy/>}/>

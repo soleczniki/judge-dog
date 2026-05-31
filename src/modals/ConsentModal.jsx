@@ -2,7 +2,7 @@ import { useState } from "react";
 import { T } from "../theme.js";
 import { completeRegistration } from "../firebase.js";
 import { Modal } from "../components/Modal.jsx";
-import { Btn } from "../components/atoms.jsx";
+import { Btn, Field } from "../components/atoms.jsx";
 
 const ROLES = [
   {
@@ -18,26 +18,40 @@ const ROLES = [
 ];
 
 export function ConsentModal({user, onClose, onComplete}) {
-  const [selected, setSelected] = useState({ owner: false, organiser: false });
-  const [agreed,   setAgreed]   = useState(false);
-  const [saving,   setSaving]   = useState(false);
-  const [err,      setErr]      = useState("");
+  const [selected,  setSelected]  = useState({ owner: false, organiser: false });
+  const [clubName,  setClubName]  = useState("");
+  const [country,   setCountry]   = useState("");
+  const [city,      setCity]      = useState("");
+  const [agreed,    setAgreed]    = useState(false);
+  const [saving,    setSaving]    = useState(false);
+  const [err,       setErr]       = useState("");
 
   const toggle = key => setSelected(s => ({ ...s, [key]: !s[key] }));
   const anySelected = selected.owner || selected.organiser;
 
   async function submit() {
     if (!anySelected) { setErr("Please select at least one option."); return; }
-    if (!agreed)      { setErr("You must agree to the terms to continue."); return; }
+    if (selected.organiser && !clubName.trim()) { setErr("Please enter your organisation or club name."); return; }
+    if (selected.organiser && !country.trim())  { setErr("Please enter your country."); return; }
+    if (selected.organiser && !city.trim())     { setErr("Please enter your city."); return; }
+    if (!agreed) { setErr("You must agree to the terms to continue."); return; }
     setSaving(true); setErr("");
     try {
       const isOwnerHandler  = selected.owner;
       const organizerStatus = selected.organiser ? "unverified" : null;
+      const organizerProfile = selected.organiser ? {
+        clubName: clubName.trim(),
+        country:  country.trim(),
+        city:     city.trim(),
+        updatedAt: new Date().toISOString(),
+      } : null;
+
       const full = await completeRegistration(user.uid, {
         name: user.name, email: user.email, photo: user.photo,
         role: "exhibitor",
         isOwnerHandler,
         organizerStatus,
+        ...(organizerProfile ? { organizerProfile } : {}),
       });
       onComplete(full);
     } catch(e) {
@@ -54,7 +68,7 @@ export function ConsentModal({user, onClose, onComplete}) {
       <p style={{margin:"0 0 6px",fontSize:13,fontWeight:500,color:T.textSub}}>
         I am joining as… <span style={{fontWeight:400,color:T.textHint}}>(select all that apply)</span>
       </p>
-      <div style={{display:"flex",gap:10,marginBottom:20}}>
+      <div style={{display:"flex",gap:10,marginBottom:selected.organiser ? 16 : 20}}>
         {ROLES.map(r => {
           const active = selected[r.key];
           return (
@@ -81,6 +95,27 @@ export function ConsentModal({user, onClose, onComplete}) {
           );
         })}
       </div>
+
+      {/* Organiser profile fields — shown immediately when organiser is selected */}
+      {selected.organiser && (
+        <div style={{padding:"16px",background:T.surface,borderRadius:T.rsm,border:`1px solid ${T.border}`,marginBottom:20}}>
+          <p style={{margin:"0 0 12px",fontSize:13,fontWeight:500,color:T.text}}>
+            Your organiser profile <span style={{color:T.textHint,fontWeight:400}}>— shown to judges on booking inquiries</span>
+          </p>
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            <Field
+              label="Organisation / Club name *"
+              value={clubName}
+              onChange={e=>setClubName(e.target.value)}
+              placeholder="e.g. Munich Dog Show Club"
+            />
+            <div style={{display:"flex",gap:10}}>
+              <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)} placeholder="e.g. Germany" style={{flex:1}}/>
+              <Field label="City *"    value={city}    onChange={e=>setCity(e.target.value)}    placeholder="e.g. Munich"  style={{flex:1}}/>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Terms */}
       <label style={{display:"flex",alignItems:"flex-start",gap:12,cursor:"pointer",marginBottom:20,userSelect:"none"}}>
