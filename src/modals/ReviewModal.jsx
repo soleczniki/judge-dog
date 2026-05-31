@@ -42,7 +42,7 @@ export function ReviewModal({judge,user,onClose,onSubmit}) {
   );
 
   return (
-    <Modal onClose={onClose} title={`Review ${judge.name}`} subtitle="Your experience helps fellow handlers" wide>
+    <Modal onClose={onClose} title={`Review ${judge.name}`} subtitle="Your experience helps fellow owners and handlers" wide>
       {/* Discipline group selector — only shown when judge has multiple groups */}
       {groups.length>1&&(
         <div style={{marginBottom:16}}>

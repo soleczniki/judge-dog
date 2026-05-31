@@ -240,7 +240,7 @@ export function TermsOfService() {
 
       <H2>2. The Platform</H2>
       <P>
-        judge.dog is a review and discovery platform for dog show judges. It allows handlers
+        judge.dog is a review and discovery platform for dog show judges. It allows owners, handlers
         and show participants to rate and review judges based on their first-hand experience,
         and allows judges to claim and manage their public profile. The Platform also facilitates
         direct messaging and booking enquiries between users and verified judges.
@@ -446,7 +446,7 @@ export function ReviewGuidelines() {
       <H2>2. Be specific and factual</H2>
       <P>
         Describe what you actually observed — how the ring was run, what the
-        judge prioritised, how they interacted with handlers and dogs. Vague
+        judge prioritised, how they interacted with owners, handlers and dogs. Vague
         praise or vague criticism is not helpful to anyone. Concrete detail is.
       </P>
 
@@ -461,7 +461,7 @@ export function ReviewGuidelines() {
       <H2>4. No harassment or bullying</H2>
       <P>
         Reviews that are abusive, threatening, or intended to harm a judge's
-        reputation rather than inform other handlers will be removed
+        reputation rather than inform other owners and handlers will be removed
         immediately. Repeated violations may result in account suspension.
       </P>
 

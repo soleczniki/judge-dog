@@ -51,11 +51,11 @@ export async function signInWithGoogle() {
 }
 
 // Called after the user accepts ToS + Privacy Policy
-export async function completeRegistration(uid, { name, email, photo }) {
+export async function completeRegistration(uid, { name, email, photo, role = "exhibitor" }) {
   const userRef = doc(db, "users", uid);
   await setDoc(userRef, {
     uid, name, email, photo,
-    role: "exhibitor",
+    role,
     consentedToS: true,
     consentedPrivacyPolicy: true,
     consentedAt: new Date().toISOString(),

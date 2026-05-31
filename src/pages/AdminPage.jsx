@@ -147,7 +147,7 @@ function AdminDashboard({judges,reviews,bookings,user,onBack,onUpdateUser,onRemo
                   </div>
                   <select value={u.role||"exhibitor"} onChange={e=>changeRole(u.id,e.target.value)}
                     style={{padding:"5px 10px",borderRadius:100,border:`1px solid ${T.border}`,background:T.surface,fontSize:12,color:T.text,cursor:"pointer",outline:"none"}}>
-                    {[["exhibitor","Handler"],["organizer","Organiser"],["judge","Judge"],["admin","Admin"]].map(([v,l])=><option key={v} value={v}>{l}</option>)}
+                    {[["exhibitor","Owner / Handler"],["organizer_unverified","Organiser (unverified)"],["organizer","Organiser"],["judge","Judge"],["admin","Admin"]].map(([v,l])=><option key={v} value={v}>{l}</option>)}
                   </select>
                   <button onClick={()=>suspendUser(u.id,!u.suspended)}
                     style={{padding:"5px 12px",borderRadius:100,border:`1px solid ${u.suspended?T.green:T.red}`,background:"none",color:u.suspended?T.green:T.red,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>
