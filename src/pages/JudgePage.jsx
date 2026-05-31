@@ -17,6 +17,7 @@ import { EditProfileModal } from "../modals/EditProfileModal.jsx";
 import { ReplyModal } from "../modals/ReplyModal.jsx";
 import { StartConvModal } from "../modals/StartConvModal.jsx";
 import { AddOrganiserModal } from "../modals/AddOrganiserModal.jsx";
+import { ReviewGateModal } from "../modals/ReviewGateModal.jsx";
 
 // ── QR Section ────────────────────────────────────────────────────────────────
 function QRSection({judge}) {
@@ -499,13 +500,33 @@ export function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,
     <>
       <JudgePage judge={judge} reviews={reviews} user={localUser}
         onBack={()=>navigate(-1)}
-        onReview={()=>{if(!localUser){onRequestAuth();}else{setModal("review");}}}
+        onReview={()=>{
+          if(!localUser){onRequestAuth();return;}
+          // Gate organisers before the review form
+          if(localUser.organizerStatus) setModal("reviewGate");
+          else setModal("review");
+        }}
         onBook={handleBook}
         onClaim={()=>setModal("claim")}
         onContact={handleContact}
         onEditProfile={()=>setModal("editProfile")}
         onSaveReply={saveReply}
         onRequestAuth={onRequestAuth}/>
+      {modal==="reviewGate"&&localUser&&<ReviewGateModal
+        judgeName={judge.name}
+        isOwnerHandler={localUser.isOwnerHandler !== false}
+        onClose={()=>setModal(null)}
+        onConfirm={()=>setModal("review")}
+        onAddOwnerHandler={async()=>{
+          try{
+            const {db}=await import("../firebase.js");
+            const {doc,updateDoc}=await import("firebase/firestore");
+            await updateDoc(doc(db,"users",localUser.uid),{isOwnerHandler:true});
+            const updated={...localUser,isOwnerHandler:true};
+            setLocalUser(updated); onUserUpdated?.(updated);
+            setModal("review");
+          }catch(e){console.error(e);}
+        }}/>}
       {modal==="review"&&localUser&&<ReviewModal judge={judge} user={localUser} onClose={()=>setModal(null)} onSubmit={addReview}/>}
       {modal==="booking"&&localUser&&<BookingModal judge={judge} user={localUser} onClose={()=>setModal(null)} onSubmit={addBooking}/>}
       {modal==="addOrganiser"&&localUser&&<AddOrganiserModal user={localUser} onClose={()=>setModal(null)}
