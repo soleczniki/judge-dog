@@ -37,6 +37,17 @@ export async function uploadPhoto(judgeId, file, slot) {
   return getDownloadURL(storageRef);
 }
 
+export async function uploadUserPhoto(uid, file) {
+  const ext = file.name.split(".").pop() || "jpg";
+  const storageRef = ref(storage, `users/${uid}/profile-${Date.now()}.${ext}`);
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+  // Persist to Firestore
+  const { doc, updateDoc } = await import("firebase/firestore");
+  await updateDoc(doc(db, "users", uid), { profilePhoto: url });
+  return url;
+}
+
 // Returns existing user data, or { needsConsent: true, ...googleData } for new users
 export async function signInWithGoogle() {
   const result = await signInWithPopup(auth, googleProvider);

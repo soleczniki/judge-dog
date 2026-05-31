@@ -286,8 +286,8 @@ export default function App() {
                   style={{display:"flex",alignItems:"center",gap:8,padding:"5px 12px 5px 6px",borderRadius:100,background:T.surface,border:`1px solid ${T.border}`,cursor:"pointer",transition:"background .15s"}}
                   onMouseEnter={e=>e.currentTarget.style.background=T.surfaceHover}
                   onMouseLeave={e=>e.currentTarget.style.background=T.surface}>
-                  {user.photo
-                    ?<img src={user.photo} style={{width:26,height:26,borderRadius:"50%",objectFit:"cover"}} alt=""/>
+                  {(user.profilePhoto||user.photo)
+                    ?<img src={user.profilePhoto||user.photo} style={{width:26,height:26,borderRadius:"50%",objectFit:"cover"}} alt=""/>
                     :<Avatar label={initials(user.name)} size={26}/>}
                   <span style={{fontSize:13,color:T.textSub,fontWeight:500}}>{user.name.split(" ")[0]}</span>
                 </div>
@@ -318,8 +318,8 @@ export default function App() {
             {user?(
               <>
                 <div onClick={()=>{navigate("/settings");setMobileMenuOpen(false);}} style={{display:"flex",alignItems:"center",gap:12,paddingBottom:12,borderBottom:`1px solid ${T.border}`,marginBottom:12,cursor:"pointer"}}>
-                  {user.photo
-                    ?<img src={user.photo} style={{width:38,height:38,borderRadius:"50%",objectFit:"cover",flexShrink:0}} alt=""/>
+                  {(user.profilePhoto||user.photo)
+                    ?<img src={user.profilePhoto||user.photo} style={{width:38,height:38,borderRadius:"50%",objectFit:"cover",flexShrink:0}} alt=""/>
                     :<Avatar label={initials(user.name)} size={38}/>}
                   <div style={{minWidth:0,flex:1}}>
                     <p style={{margin:0,fontSize:15,fontWeight:500,color:T.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{user.name}</p>

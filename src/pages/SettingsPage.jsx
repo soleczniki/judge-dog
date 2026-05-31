@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { T } from "../theme.js";
 import { Btn, Field } from "../components/atoms.jsx";
+import { uploadUserPhoto } from "../firebase.js";
 
 function Section({ title, children }) {
   return (
@@ -41,9 +42,13 @@ function RoleBadge({ label, active, colour="#1a73e8" }) {
 
 export function SettingsPage({ user, onUserUpdated }) {
   const navigate = useNavigate();
-  const [saving, setSaving] = useState(false);
-  const [saved,  setSaved]  = useState(false);
-  const [err,    setErr]    = useState("");
+  const [saving,         setSaving]         = useState(false);
+  const [saved,          setSaved]          = useState(false);
+  const [err,            setErr]            = useState("");
+  const [touched,        setTouched]        = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoPreview,   setPhotoPreview]   = useState(user.profilePhoto || user.photo || null);
+  const [photoErr,       setPhotoErr]       = useState("");
 
   // Organiser profile fields
   const org = user.organizerProfile || {};
@@ -58,6 +63,11 @@ export function SettingsPage({ user, onUserUpdated }) {
   const isJudge        = user.role === "judge";
 
   async function saveOrganiserProfile() {
+    setTouched(true);
+    if (!clubName.trim() || !country.trim() || !city.trim()) {
+      setErr("Please fill in all required fields (marked with *).");
+      return;
+    }
     setSaving(true); setErr(""); setSaved(false);
     try {
       const { db } = await import("../firebase.js");
@@ -82,6 +92,23 @@ export function SettingsPage({ user, onUserUpdated }) {
     setSaving(false);
   }
 
+  async function handlePhotoUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { setPhotoErr("Photo must be under 5 MB."); return; }
+    setPhotoUploading(true); setPhotoErr("");
+    try {
+      const preview = URL.createObjectURL(file);
+      setPhotoPreview(preview);
+      const url = await uploadUserPhoto(user.uid, file);
+      onUserUpdated?.({ ...user, profilePhoto: url });
+    } catch(e) {
+      setPhotoErr("Upload failed — please try again.");
+      setPhotoPreview(user.profilePhoto || user.photo || null);
+    }
+    setPhotoUploading(false);
+  }
+
   async function addOwnerHandler() {
     try {
       const { db } = await import("../firebase.js");
@@ -104,11 +131,22 @@ export function SettingsPage({ user, onUserUpdated }) {
       <Section title="Personal">
         <Row label="Name" value={user.name} hint="Set by your Google account"/>
         <Row label="Email" value={user.email} hint="Set by your Google account"/>
-        <div style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0"}}>
-          {user.photo&&<img src={user.photo} style={{width:48,height:48,borderRadius:"50%",objectFit:"cover",border:`1px solid ${T.border}`}} alt=""/>}
+        <div style={{display:"flex",alignItems:"center",gap:16,padding:"12px 0"}}>
+          <div style={{position:"relative",flexShrink:0}}>
+            {photoPreview
+              ? <img src={photoPreview} style={{width:60,height:60,borderRadius:"50%",objectFit:"cover",border:`1px solid ${T.border}`}} alt=""/>
+              : <div style={{width:60,height:60,borderRadius:"50%",background:T.surface,border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,color:T.textHint}}>?</div>
+            }
+            {photoUploading&&<div style={{position:"absolute",inset:0,borderRadius:"50%",background:"rgba(255,255,255,.7)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:T.textSub}}>…</div>}
+          </div>
           <div>
-            <div style={{fontSize:14,color:T.text,fontWeight:500}}>Profile photo</div>
-            <div style={{fontSize:12,color:T.textHint,marginTop:2}}>Set by your Google account</div>
+            <div style={{fontSize:14,color:T.text,fontWeight:500,marginBottom:6}}>Profile photo</div>
+            <label style={{cursor:"pointer",padding:"6px 14px",borderRadius:100,border:`1px solid ${T.border}`,background:T.surface,fontSize:13,fontWeight:500,color:T.text,fontFamily:"inherit",display:"inline-block"}}>
+              {photoUploading ? "Uploading…" : "Change photo"}
+              <input type="file" accept="image/*" style={{display:"none"}} disabled={photoUploading} onChange={handlePhotoUpload}/>
+            </label>
+            {photoErr&&<div style={{fontSize:12,color:T.red,marginTop:4}}>{photoErr}</div>}
+            <div style={{fontSize:12,color:T.textHint,marginTop:4}}>Max 5 MB · JPG or PNG</div>
           </div>
         </div>
       </Section>
@@ -157,10 +195,22 @@ export function SettingsPage({ user, onUserUpdated }) {
             This information is shown to judges when you send a booking inquiry.
           </p>
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
-            <Field label="Organisation / Club name *" value={clubName} onChange={e=>setClubName(e.target.value)} placeholder="e.g. Munich Dog Show Club"/>
+            <div>
+              <Field label="Organisation / Club name *" value={clubName} onChange={e=>{setClubName(e.target.value);}} placeholder="e.g. Munich Dog Show Club"
+                style={touched&&!clubName.trim()?{outline:`2px solid ${T.red}`,borderRadius:T.rsm}:{}}/>
+              {touched&&!clubName.trim()&&<p style={{margin:"4px 0 0",fontSize:12,color:T.red}}>Required</p>}
+            </div>
             <div style={{display:"flex",gap:10}}>
-              <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)} placeholder="e.g. Germany" style={{flex:1}}/>
-              <Field label="City *" value={city} onChange={e=>setCity(e.target.value)} placeholder="e.g. Munich" style={{flex:1}}/>
+              <div style={{flex:1}}>
+                <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)} placeholder="e.g. Germany"
+                  style={touched&&!country.trim()?{outline:`2px solid ${T.red}`,borderRadius:T.rsm}:{}}/>
+                {touched&&!country.trim()&&<p style={{margin:"4px 0 0",fontSize:12,color:T.red}}>Required</p>}
+              </div>
+              <div style={{flex:1}}>
+                <Field label="City *" value={city} onChange={e=>setCity(e.target.value)} placeholder="e.g. Munich"
+                  style={touched&&!city.trim()?{outline:`2px solid ${T.red}`,borderRadius:T.rsm}:{}}/>
+                {touched&&!city.trim()&&<p style={{margin:"4px 0 0",fontSize:12,color:T.red}}>Required</p>}
+              </div>
             </div>
             <div style={{display:"flex",gap:10}}>
               <Field label="Phone" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+49 89 123456" style={{flex:1}}/>
