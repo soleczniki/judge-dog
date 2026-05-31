@@ -90,7 +90,7 @@ const ContactBlock = () => (
 export function PrivacyPolicy() {
   return (
     <LegalLayout title="Privacy Policy">
-      <P><em>Effective date: 27 May 2026</em></P>
+      <P><em>Effective date: 1 June 2026</em></P>
 
       <H2>1. Who we are</H2>
       <P>
@@ -115,6 +115,14 @@ export function PrivacyPolicy() {
         <Li><strong>Booking requests:</strong> show details, dates, and messages submitted to judges.</Li>
         <Li><strong>Profile content (verified judges only):</strong> bio, headline, career highlights, gallery photos, and social media links you choose to add.</Li>
       </Ul>
+
+      <H3>Role and organiser profile data</H3>
+      <P>
+        When you create an account you select a role (Owner / Handler, Event Organiser, or both).
+        We store your selected role and, if you activate the Event Organiser role, your organisation
+        or club name, country, and city. This information is visible to judges when you send a
+        booking inquiry and may appear on your public organiser profile in future.
+      </P>
 
       <H3>Claim data</H3>
       <P>
@@ -153,6 +161,8 @@ export function PrivacyPolicy() {
           ["Firebase Cloud Functions", "Google LLC", "Server-side email delivery"],
           ["Google Analytics 4", "Google LLC", "Usage analytics (consent-based)"],
           ["Resend", "Resend Inc.", "Transactional email delivery"],
+          ["Sentry", "Functional Software, Inc.", "Error monitoring (anonymised crash reports)"],
+          ["Microsoft Clarity", "Microsoft Corporation", "Session analytics (anonymised heatmaps)"],
         ]}
       />
       <P>
@@ -224,7 +234,7 @@ export function PrivacyPolicy() {
 export function TermsOfService() {
   return (
     <LegalLayout title="Terms of Service">
-      <P><em>Effective date: 27 May 2026</em></P>
+      <P><em>Effective date: 1 June 2026</em></P>
       <P>
         These Terms of Service ("Terms") govern your use of judge.dog ("the Platform"),
         operated by <strong>Lenis res, MB</strong> (company code 302896460, VAT LT100007253217,
@@ -240,11 +250,14 @@ export function TermsOfService() {
 
       <H2>2. The Platform</H2>
       <P>
-        judge.dog is a review and discovery platform for dog show judges. It allows owners, handlers
-        and show participants to rate and review judges based on their first-hand experience,
-        and allows judges to claim and manage their public profile. The Platform also facilitates
-        direct messaging and booking enquiries between users and verified judges.
+        judge.dog is the professional network for dog judges. The Platform serves three types of users:
       </P>
+      <Ul>
+        <Li><strong>Owner / Handler:</strong> owners and handlers who enter dogs in shows, trials, or other competitive events. They may search judge profiles, read credentials, and submit reviews based on their first-hand experience competing under a judge.</Li>
+        <Li><strong>Event Organiser:</strong> individuals or organisations that organise dog shows, trials, or other canine events. They may search for judges and send booking inquiries. Organisers may be unverified (identity not confirmed) or verified (identity confirmed via a third-party service). Judges can see an organiser's verification status.</Li>
+        <Li><strong>Judge:</strong> licensed dog show or sport judges whose profiles are sourced from public FCI and national kennel club records. Judges may claim their profile, reply to reviews, and manage their public presence on the Platform.</Li>
+      </Ul>
+      <P>A single account may hold more than one of these roles simultaneously.</P>
 
       <H2>3. Eligibility</H2>
       <P>
@@ -255,7 +268,7 @@ export function TermsOfService() {
       <H2>4. Your account</H2>
       <Ul>
         <Li>You sign in via Google. You are responsible for the security of your Google account and for all activity that occurs under your account.</Li>
-        <Li>You must provide accurate and truthful information when using the Platform.</Li>
+        <Li>You must provide accurate and truthful information when using the Platform, including when selecting your role and providing organiser profile details.</Li>
         <Li>One account per person. Creating multiple accounts to circumvent moderation decisions is prohibited.</Li>
         <Li>You may not transfer your account to another person.</Li>
         <Li>We reserve the right to suspend or terminate accounts that violate these Terms.</Li>
@@ -263,14 +276,23 @@ export function TermsOfService() {
 
       <H2>5. Reviews and ratings</H2>
       <Ul>
-        <Li>Reviews must be based on your <strong>genuine, first-hand experience</strong> competing or showing under the judge in question.</Li>
+        <Li>Reviews must be based on your <strong>genuine, first-hand experience competing or showing under the judge</strong> in question — in your capacity as an owner or handler, not as a show organiser who hired the judge.</Li>
         <Li>You must not submit reviews on behalf of third parties, incentivise others to submit reviews, or coordinate campaigns to artificially inflate or suppress a judge's rating.</Li>
         <Li>Reviews must not contain defamatory statements, false factual claims, personal attacks unrelated to the judging experience, discriminatory language, or any content that violates applicable law.</Li>
         <Li>By submitting a review, you grant Lenis res, MB a perpetual, worldwide, royalty-free, irrevocable licence to display it on the Platform and in related communications.</Li>
         <Li>We reserve the right to remove any review that violates these Terms without prior notice. Decisions on review removal are at our sole discretion.</Li>
       </Ul>
 
-      <H2>6. Judge profiles</H2>
+      <H2>6. Booking inquiries</H2>
+      <Ul>
+        <Li>Booking inquiries may be sent by users with the Event Organiser role (verified or unverified).</Li>
+        <Li>You must only submit a booking inquiry if you are genuinely considering engaging the judge for a real event. Speculative, test, or harassing inquiries are prohibited.</Li>
+        <Li>Judges are under no obligation to respond to or accept any inquiry.</Li>
+        <Li>Unverified organisers are identified as such to judges. We recommend completing identity verification to improve response rates and build trust.</Li>
+        <Li>The Platform facilitates communication between organisers and judges but is not a party to any contract or agreement that may result from a booking inquiry. Any fees, terms, or arrangements agreed between a judge and an organiser are solely between those parties.</Li>
+      </Ul>
+
+      <H2>7. Judge profiles</H2>
       <Ul>
         <Li>Profile data is sourced from publicly available FCI and national kennel club records. We make no warranty as to its completeness or accuracy.</Li>
         <Li>Judges may claim their profile by submitting a request through the Platform. Claims are reviewed and approved by our administrators. We reserve the right to approve or reject any claim at our sole discretion.</Li>
@@ -278,20 +300,22 @@ export function TermsOfService() {
         <Li>We reserve the right to revoke verified status if a judge is found to have obtained it through misrepresentation or if they materially violate these Terms.</Li>
       </Ul>
 
-      <H2>7. Prohibited conduct</H2>
+      <H2>9. Prohibited conduct</H2>
       <P>You may not:</P>
       <Ul>
         <Li>Post false, misleading, or defamatory content about any judge or user.</Li>
+        <Li>Submit a review in your capacity as a show organiser rather than as an owner or handler who competed under the judge.</Li>
         <Li>Harass, threaten, intimidate, or abuse any other user.</Li>
         <Li>Impersonate any person, judge, organisation, or official body.</Li>
         <Li>Use the Platform to send commercial advertising, spam, or unsolicited messages.</Li>
+        <Li>Submit speculative, test, or bad-faith booking inquiries.</Li>
         <Li>Manipulate ratings through fake, coordinated, or incentivised reviews.</Li>
         <Li>Scrape, crawl, or systematically extract data from the Platform without our written permission.</Li>
         <Li>Attempt to access, reverse-engineer, or interfere with the technical operation of the Platform.</Li>
         <Li>Use the Platform in any way that violates applicable law, including EU consumer protection, data protection, or intellectual property law.</Li>
       </Ul>
 
-      <H2>8. Intellectual property</H2>
+      <H2>10. Intellectual property</H2>
       <P>
         The Platform, including its design, source code, and original content, is owned by
         Lenis res, MB and protected by applicable intellectual property law. You may not
@@ -300,16 +324,18 @@ export function TermsOfService() {
         grant us the licence described in section 5.
       </P>
 
-      <H2>9. Disclaimers</H2>
+      <H2>11. Disclaimers</H2>
       <P>
         The Platform is provided "as is" and "as available" without warranties of any kind,
         express or implied. We do not warrant that the Platform will be uninterrupted,
         error-free, or free of harmful components. Opinions expressed in reviews are those
         of individual users and do not represent the views of Lenis res, MB. Judge profile
         data sourced from third-party records is provided for informational purposes only.
+        The Platform does not guarantee that booking inquiries will be accepted or that any
+        engagement between organisers and judges will result in a contract.
       </P>
 
-      <H2>10. Limitation of liability</H2>
+      <H2>12. Limitation of liability</H2>
       <P>
         To the fullest extent permitted by applicable law, Lenis res, MB and its personnel
         shall not be liable for any indirect, incidental, special, consequential, or punitive
@@ -322,7 +348,7 @@ export function TermsOfService() {
         negligence, fraud, or any liability that cannot be excluded by law.
       </P>
 
-      <H2>11. Governing law and jurisdiction</H2>
+      <H2>13. Governing law and jurisdiction</H2>
       <P>
         These Terms are governed by the laws of the Republic of Lithuania and applicable
         European Union law. Any disputes shall be subject to the exclusive jurisdiction of
@@ -330,7 +356,7 @@ export function TermsOfService() {
         under mandatory EU consumer protection law.
       </P>
 
-      <H2>12. Changes to these Terms</H2>
+      <H2>14. Changes to these Terms</H2>
       <P>
         We may update these Terms at any time. We will notify registered users of material
         changes by email at least 14 days before they take effect. Continued use of the
@@ -346,7 +372,7 @@ export function TermsOfService() {
 export function CookiePolicy() {
   return (
     <LegalLayout title="Cookie Policy">
-      <P><em>Effective date: 27 May 2026</em></P>
+      <P><em>Effective date: 1 June 2026</em></P>
       <P>
         This Cookie Policy explains what cookies and similar local storage technologies
         judge.dog uses, why we use them, and how you can manage your preferences.
@@ -423,7 +449,7 @@ export function CookiePolicy() {
 export function ReviewGuidelines() {
   return (
     <LegalLayout title="Review Guidelines">
-      <P><em>Effective date: 27 May 2026</em></P>
+      <P><em>Effective date: 1 June 2026</em></P>
       <P>
         judge.dog is built on honest, first-hand reviews from people who have
         actually been judged. These guidelines exist to keep reviews useful,
@@ -435,12 +461,13 @@ export function ReviewGuidelines() {
         violates them.
       </P>
 
-      <H2>1. Write from your own experience</H2>
+      <H2>1. Write from your own experience as a competitor</H2>
       <P>
-        Only review a judge you have personally competed or shown under. Do not
-        relay stories you heard from others, repeat rumours, or review based on
-        a judge's general reputation. If you were not in the ring yourself,
-        don't submit a review.
+        Only review a judge you have personally competed or shown under — in your capacity
+        as an owner or handler with a dog in the ring. Do not submit a review based on your
+        experience as the show organiser who hired the judge. Do not relay stories you heard
+        from others, repeat rumours, or review based on a judge's general reputation. If you
+        were not in the ring yourself as a competitor, don't submit a review.
       </P>
 
       <H2>2. Be specific and factual</H2>
