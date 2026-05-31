@@ -31,7 +31,12 @@ async function syncAkc() {
   }
 
   const raw = JSON.parse(readFileSync("akc-full-raw.json", "utf8"));
-  const incoming = raw.judges.filter(j => j && j.id && j.name);
+  // Strip assignment arrays — they're large and not shown publicly yet.
+  // Will be synced to a subcollection when the calendar feature is built.
+  const incoming = raw.judges.filter(j => j && j.id && j.name).map(j => {
+    const { futureAssignments, pastAssignments, ...rest } = j;
+    return rest;
+  });
   console.log(`📊 ${incoming.length} judges in akc-full-raw.json`);
 
   console.log("📥 Fetching existing Firestore judges...");
@@ -84,16 +89,25 @@ async function syncAkc() {
     process.exit(0);
   }
 
-  const BATCH_SIZE = 400;
+  const BATCH_SIZE = 50;
   let written = 0;
   for (let i = 0; i < allChanges.length; i += BATCH_SIZE) {
     const batch = db.batch();
     allChanges.slice(i, i + BATCH_SIZE).forEach(j => {
       batch.set(db.collection("judges").doc(j.id), j, { merge: true });
     });
-    await batch.commit();
+    let retries = 0;
+    while (retries < 4) {
+      try { await batch.commit(); break; }
+      catch(e) {
+        if (retries === 3) throw e;
+        retries++;
+        await new Promise(r => setTimeout(r, 2000 * retries));
+      }
+    }
     written += Math.min(BATCH_SIZE, allChanges.length - i);
-    console.log(`   📤 ${written}/${allChanges.length} written...`);
+    if (written % 500 === 0 || written === allChanges.length)
+      console.log(`   📤 ${written}/${allChanges.length} written...`);
   }
 
   console.log(`\n🎉 Sync complete! ${toAdd.length} added, ${toUpdate.length} updated.`);

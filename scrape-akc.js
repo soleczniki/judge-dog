@@ -114,53 +114,38 @@ async function parseCfDump(page) {
   });
 }
 
-// ── Fetch all judge IDs for a state ──────────────────────────────────────────
-// Strategy: navigate to form, select state, then directly call form.submit() via
-// page.evaluate (bypasses onclick handler which silently fails in headless Puppeteer).
-// The form's real action URL is index.cfm?action=results — set it before submit().
-async function fetchStateIds(page, state) {
-  try {
-    await page.goto(`${BASE}/index.cfm`, { waitUntil: "domcontentloaded", timeout: 30000 });
-    await sleep(800);
+// ── Load complete conformation judge list + prime CF session ──────────────────
+// The page https://www.apps.akc.org/a/judges_directory/judge_search/ lists all
+// 3,100+ AKC conformation judges as links. Loading it also primes the CF session
+// so subsequent detail page requests work for any judge (no state search needed).
+const COMPLETE_LIST_URL = "https://www.apps.akc.org/a/judges_directory/judge_search/";
 
-    await page.select('select[name="states"]', state);
-    await sleep(300);
-
-    // Directly submit the form — bypasses onclick handler which fails silently in headless mode.
-    // IMPORTANT: form.submit() navigates the page, destroying the evaluate execution context.
-    // That throws into Promise.all and silently returns []. Fix: fire evaluate without awaiting,
-    // ignore the context-destroyed error, await only the navigation.
-    const navPromise = page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: 30000 });
-    page.evaluate(() => {
-      const form = document.querySelector("form");
-      form.action = "index.cfm?action=results";
-      form.submit();
-    }).catch(() => {}); // execution context destroyed on navigate — expected, ignore
-    await navPromise;
-    await sleep(1500);
-
-    const rows = await parseCfDump(page);
-    return rows.map(r => ({
-      judgeNumber:   cfClean(r.NUM_JUDGE),
-      nameFirst:     cfClean(r.TEXT_NAME_FIRST)   || cfClean(r.SEARCH_NAME_FIRST)  || "",
-      nameLast:      cfClean(r.TEXT_NAME_LAST_OR_OTHER) || cfClean(r.SEARCH_NAME_LAST) || "",
-      nameMiddle:    cfClean(r.TEXT_NAME_MIDDLE)  || "",
-      prefix:        cfClean(r.TEXT_PREFIX)       || "",
-      suffix:        cfClean(r.TEXT_SUFFIX)       || "",
-      city:          cfClean(r.TEXT_CITY)         || "",
-      stateCode:     cfClean(r.CDE_STATE_PROVINCE)|| state,
-      country:       cfClean(r.CDE_COUNTRY)       || "US",
-      email:         cfClean(r.TEXT_E_MAIL1)      || "",
-      feeInfo:       cfClean(r.TEXT_JUDGE_FEE_INFO) || "",
-      judgeUrl:      cfClean(r.TEXT_JUDGE_URL)    || "",
-      status:        cfClean(r.DESC_JUDGE_STATUS) || "Active",
-      visitingJudge: r.CDE_VISITING_JUDGE === "Y",
-      isDelegate:    r.IND_IS_DELEGATE   === "Y",
-    }));
-  } catch(e) {
-    console.warn(`⚠️  State ${state} failed: ${e.message}`);
-    return [];
-  }
+async function primeSessionAndGetIds(page) {
+  console.log("📋 Loading AKC complete conformation judge list...");
+  await page.goto(COMPLETE_LIST_URL, { waitUntil: "networkidle2", timeout: 30000 });
+  await sleep(2000);
+  const judges = await page.evaluate(() => {
+    return Array.from(document.querySelectorAll("a"))
+      .map(a => {
+        const m = a.href.match(/judge_id=([^&]+)/);
+        if (!m) return null;
+        const text = a.textContent.trim();
+        // Format: "Mr. Richard D Albee Alabama USA - 57263"
+        const dashIdx = text.lastIndexOf(" - ");
+        const namePart = dashIdx > -1 ? text.slice(0, dashIdx).trim() : text;
+        // Extract state and country from end of name part
+        // e.g. "Mr. Richard D Albee Alabama USA"
+        const words = namePart.split(" ");
+        const country = words[words.length - 1] || "USA";
+        const stateOrProvince = words[words.length - 2] || "";
+        // Name is everything before the state
+        const nameRaw = words.slice(0, words.length - 2).join(" ");
+        return { judgeNumber: m[1], nameRaw, stateOrProvince, country };
+      })
+      .filter(Boolean);
+  });
+  console.log(`✅ Found ${judges.length} conformation judges. Session primed.`);
+  return judges;
 }
 
 // ── Fetch full detail for one judge (breeds + types) ─────────────────────────
@@ -217,6 +202,8 @@ async function fetchJudgeDetail(page, judgeNumber) {
         }
 
         rows.forEach(tr => {
+          // Skip header rows (th elements)
+          if (tr.querySelectorAll(":scope > th").length > 0) return;
           const cells = Array.from(tr.querySelectorAll(":scope > td"))
             .map(td => td.textContent.trim());
           if (cells.length <= breedIdx) return;
@@ -224,18 +211,27 @@ async function fetchJudgeDetail(page, judgeNumber) {
           if (!breed || breed.length < 2 || seenBreeds.has(breed)) return;
           if (/^[A-Z_\s]+$/.test(breed) || CF_JUNK.has(breed)) return;
           if (/^\[empty string\]$/i.test(breed)) return;
-          if (/breed|group|class|status/i.test(breed)) return; // header row
+          // Only skip the exact header text, not "Hound Group", "Toy Group" etc.
+          if (/^breed\/group\/class$/i.test(breed.trim())) return;
+          // Filter SQL / cfdump query text leaking through
+          if (/SELECT\s|FROM\s|WHERE\s|pr_judge_search/i.test(breed)) return;
+          if (breed.includes('\n') || breed.length > 80) return;
           const statusRaw = cells[statusIdx] || "";
-          const isProv = /prov|permit/i.test(statusRaw);
-          const isOk   = /approv/i.test(statusRaw);
-          if (!isProv && !isOk) return;
+          // Status can be: "Approved", "Approved - Jul, 02 2025",
+          // "(Appr. Oct, 14 2008  Prov/Permit May, 01 2007)", "Prov/Permit Jan, 11 2018"
+          // A breed is Approved if it contains "Appr" (not part of "Prov").
+          // A breed is Provisional only if it has Prov/Permit with NO approval date.
+          const isApproved = /\bappr\b/i.test(statusRaw) || /^approved/i.test(statusRaw.trim());
+          const isProv     = !isApproved && /prov|permit/i.test(statusRaw);
+          if (!isApproved && !isProv) return;
           seenBreeds.add(breed);
-          // Extract date from status cell ("Approved - Jul, 02 2025" → "Jul 02 2025")
-          const dateMatch = statusRaw.match(/([A-Z][a-z]+,?\s+\d+,?\s+\d{4})/);
-          const dateStr = dateMatch ? dateMatch[1] : (cells[dateIdx] || null);
+          // Extract the approval date if present
+          const approvedMatch = statusRaw.match(/appr\.?\s+([A-Z][a-z]+,?\s+\d+,?\s+\d{4})/i);
+          const provMatch     = statusRaw.match(/prov[^,]*\s+([A-Z][a-z]+,?\s+\d+,?\s+\d{4})/i);
+          const dateStr = approvedMatch ? approvedMatch[1] : (provMatch ? provMatch[1] : null);
           breedApprovals.push({
             breed,
-            status: isProv ? "Provisional" : "Approved",
+            status: isApproved ? "Approved" : "Provisional",
             date: dateStr,
           });
         });

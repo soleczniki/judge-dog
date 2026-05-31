@@ -23,3 +23,21 @@ dist-ssr
 *.sln
 *.sw?
 serviceAccount.json
+.env.production
+
+# Large scraper data files — stored locally only
+akc-full-raw.json
+fci-full-raw.json
+fci-backfill-raw.json
+fci-full-progress.json
+akc-full-progress.json
+akc-progress.json
+fci-gap-ids.json
+fci-gaps-progress.json
+check-backfill.mjs
+scrape-status.mjs
+find-gaps.mjs
+merge-backfill.mjs
+probe-fci-beyond.js
+probe-fci-gaps.js
+debug-akc-*.js

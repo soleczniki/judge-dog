@@ -16,7 +16,7 @@ export function Footer({onManageCookies}) {
           style={{fontSize:12,color:T.textHint,background:"none",border:"none",cursor:"pointer",padding:0,fontFamily:"inherit",transition:"color .15s"}}
           onMouseEnter={e=>e.currentTarget.style.color=T.accent}
           onMouseLeave={e=>e.currentTarget.style.color=T.textHint}>
-          Manage cookies
+          Manage Cookies
         </button>
       </div>
     </div>
