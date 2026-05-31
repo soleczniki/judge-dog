@@ -58,7 +58,7 @@ export function ConsentModal({user, onClose, onComplete}) {
         {ROLES.map(r => {
           const active = selected[r.key];
           return (
-            <button key={r.key} onClick={()=>toggle(r.key)}
+            <button key={r.key} type="button" onClick={()=>toggle(r.key)}
               style={{
                 flex:1, padding:"14px 12px", borderRadius:T.r, cursor:"pointer",
                 fontFamily:"inherit", textAlign:"left", transition:"all .15s",
