@@ -62,7 +62,7 @@ export function Landing({
               style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:T.textHint,fontFamily:"inherit",padding:"4px 8px",borderRadius:T.rsm,transition:"color .15s"}}
               onMouseEnter={e=>e.currentTarget.style.color=T.accent}
               onMouseLeave={e=>e.currentTarget.style.color=T.textHint}>
-              {showAdvanced ? "▲ Less" : "▼ Advanced"}
+              {showAdvanced ? "▲ Less" : "▼ More"}
             </button>
 
             {showAdvanced && (
