@@ -9,8 +9,10 @@ export function ContactModal({judge,user,onClose}) {
   const [sending,setSending]=useState(false);
   const [sent,setSent]=useState(false);
   const [err,setErr]=useState("");
+  const [touched,setTouched]=useState(false);
 
   const send=async()=>{
+    setTouched(true);
     if(!name.trim()||!message.trim()){setErr("Please fill in all fields.");return;}
     setSending(true); setErr("");
     try {
@@ -45,9 +47,9 @@ export function ContactModal({judge,user,onClose}) {
   return (
     <Modal onClose={onClose} title={`Contact ${judge.name}`}
       subtitle={judge.claimedBy?"The judge will receive your message.":"This judge hasn't joined judge.dog yet — we'll forward your message to their registered email."}>
-      <Field label="Your name" value={name} onChange={e=>setName(e.target.value)} style={{marginBottom:10}}/>
+      <Field label="Your name" value={name} onChange={e=>setName(e.target.value)} style={{marginBottom:10}} error={touched&&!name.trim()}/>
       <Field label="Message" multiline rows={5} value={message} onChange={e=>setMessage(e.target.value)}
-        placeholder={`Write your message to ${judge.name}…`} style={{marginBottom:16}}/>
+        placeholder={`Write your message to ${judge.name}…`} style={{marginBottom:16}} error={touched&&!message.trim()}/>
       {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}
       <Btn fullWidth onClick={send} disabled={sending}>{sending?"Sending…":"Send message"}</Btn>
     </Modal>

@@ -10,6 +10,7 @@ export function ReviewModal({judge,user,onClose,onSubmit}) {
   const [selGroup,setSelGroup]=useState(groups[0]);
   const [f,setF]=useState({breed:"",show:"",wouldReturn:null,text:"",...EMPTY_RATINGS});
   const [err,setErr]=useState("");
+  const [touched,setTouched]=useState(false);
   const [agreedToGuidelines,setAgreedToGuidelines]=useState(false);
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
 
@@ -18,6 +19,7 @@ export function ReviewModal({judge,user,onClose,onSubmit}) {
   const labels = ENTRY_LABELS[selGroup]||ENTRY_LABELS.A;
 
   async function submit() {
+    setTouched(true);
     setErr("");
     if (!f.breed.trim()||!f.show.trim()) { setErr(`Please fill in ${labels.entry.toLowerCase()} and ${labels.event.toLowerCase()}.`); return; }
     const missing = allDims.filter(d=>!f[d.key]);
@@ -59,8 +61,8 @@ export function ReviewModal({judge,user,onClose,onSubmit}) {
       )}
 
       <div className="form-row" style={{marginBottom:16}}>
-        <Field label={labels.entry} value={f.breed} onChange={e=>set("breed",e.target.value)} placeholder={selGroup==="A"?"e.g. Golden Retriever":"e.g. Max / Open class"}/>
-        <Field label={labels.event} value={f.show} onChange={e=>set("show",e.target.value)} placeholder={selGroup==="A"?"e.g. Crufts 2024":"e.g. National Championship 2024"}/>
+        <Field label={labels.entry} value={f.breed} onChange={e=>set("breed",e.target.value)} placeholder={selGroup==="A"?"e.g. Golden Retriever":"e.g. Max / Open class"} error={touched&&!f.breed.trim()}/>
+        <Field label={labels.event} value={f.show}  onChange={e=>set("show",e.target.value)}  placeholder={selGroup==="A"?"e.g. Crufts 2024":"e.g. National Championship 2024"} error={touched&&!f.show.trim()}/>
       </div>
 
       <SectionLabel>Universal criteria</SectionLabel>

@@ -24,11 +24,13 @@ export function ContactPage({user}) {
   const [sending,setSending]=useState(false);
   const [done,setDone]=useState(false);
   const [err,setErr]=useState("");
+  const [touched,setTouched]=useState(false);
   const set=(k,v)=>setF(p=>({...p,[k]:v}));
   const getToken=useRecaptcha();
 
   async function submit(e) {
     e.preventDefault();
+    setTouched(true);
     if(!f.name.trim()||!f.email.trim()||!f.message.trim()){setErr("Please fill in all required fields.");return;}
     setSending(true);setErr("");
     try {
@@ -64,11 +66,11 @@ export function ContactPage({user}) {
       ):(
         <form onSubmit={submit} style={{display:"flex",flexDirection:"column",gap:14}}>
           <div className="form-row">
-            <Field label="Name *" value={f.name} onChange={e=>set("name",e.target.value)} placeholder="Your name"/>
-            <Field label="Email *" type="email" value={f.email} onChange={e=>set("email",e.target.value)} placeholder="you@example.com"/>
+            <Field label="Name *"  value={f.name}  onChange={e=>set("name",e.target.value)}  placeholder="Your name"        error={touched&&!f.name.trim()}/>
+            <Field label="Email *" type="email" value={f.email} onChange={e=>set("email",e.target.value)} placeholder="you@example.com" error={touched&&!f.email.trim()}/>
           </div>
           <Field label="Subject" value={f.subject} onChange={e=>set("subject",e.target.value)} placeholder="e.g. Question about a judge profile"/>
-          <Field label="Message *" multiline rows={6} value={f.message} onChange={e=>set("message",e.target.value)} placeholder="What's on your mind?"/>
+          <Field label="Message *" multiline rows={6} value={f.message} onChange={e=>set("message",e.target.value)} placeholder="What's on your mind?" error={touched&&!f.message.trim()}/>
           {err&&<div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red}}>{err}</div>}
           <Btn fullWidth onClick={submit} disabled={sending}>{sending?"Sending…":"Send message"}</Btn>
           <p style={{margin:0,fontSize:11,color:T.textHint,textAlign:"center",lineHeight:1.6}}>

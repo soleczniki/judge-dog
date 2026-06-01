@@ -3,6 +3,7 @@ import { T } from "../theme.js";
 import { completeRegistration } from "../firebase.js";
 import { Modal } from "../components/Modal.jsx";
 import { Btn, Field } from "../components/atoms.jsx";
+// error prop on Field highlights the input border only, not the label
 
 const ROLES = [
   {

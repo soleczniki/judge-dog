@@ -195,22 +195,13 @@ export function SettingsPage({ user, onUserUpdated }) {
             This information is shown to judges when you send a booking inquiry.
           </p>
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
-            <div>
-              <Field label="Organisation / Club name *" value={clubName} onChange={e=>{setClubName(e.target.value);}} placeholder="e.g. Munich Dog Show Club"
-                style={touched&&!clubName.trim()?{outline:`2px solid ${T.red}`,borderRadius:T.rsm}:{}}/>
-              {touched&&!clubName.trim()&&<p style={{margin:"4px 0 0",fontSize:12,color:T.red}}>Required</p>}
-            </div>
+            <Field label="Organisation / Club name *" value={clubName} onChange={e=>setClubName(e.target.value)}
+              placeholder="e.g. Munich Dog Show Club" error={touched&&!clubName.trim()}/>
             <div style={{display:"flex",gap:10}}>
-              <div style={{flex:1}}>
-                <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)} placeholder="e.g. Germany"
-                  style={touched&&!country.trim()?{outline:`2px solid ${T.red}`,borderRadius:T.rsm}:{}}/>
-                {touched&&!country.trim()&&<p style={{margin:"4px 0 0",fontSize:12,color:T.red}}>Required</p>}
-              </div>
-              <div style={{flex:1}}>
-                <Field label="City *" value={city} onChange={e=>setCity(e.target.value)} placeholder="e.g. Munich"
-                  style={touched&&!city.trim()?{outline:`2px solid ${T.red}`,borderRadius:T.rsm}:{}}/>
-                {touched&&!city.trim()&&<p style={{margin:"4px 0 0",fontSize:12,color:T.red}}>Required</p>}
-              </div>
+              <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)}
+                placeholder="e.g. Germany" style={{flex:1}} error={touched&&!country.trim()}/>
+              <Field label="City *" value={city} onChange={e=>setCity(e.target.value)}
+                placeholder="e.g. Munich" style={{flex:1}} error={touched&&!city.trim()}/>
             </div>
             <div style={{display:"flex",gap:10}}>
               <Field label="Phone" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+49 89 123456" style={{flex:1}}/>
