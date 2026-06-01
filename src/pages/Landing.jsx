@@ -83,32 +83,52 @@ export function Landing({
             )}
           </div>
 
+          {/* Three pillars */}
           {isMobile ? (
-            <p style={{fontSize:13,color:T.textHint,margin:"0 0 14px",letterSpacing:0.5}}>
-              Find &nbsp;·&nbsp; Read &nbsp;·&nbsp; Book
-            </p>
+            <div style={{display:"flex",gap:20,marginBottom:20,justifyContent:"center"}}>
+              {[{icon:"🔍",label:"Find"},{icon:"📖",label:"Read"},{icon:"📅",label:"Book"}].map(({icon,label})=>(
+                <div key={label} style={{textAlign:"center"}}>
+                  <div style={{fontSize:24,marginBottom:4}}>{icon}</div>
+                  <div style={{fontSize:13,fontWeight:600,color:T.textSub}}>{label}</div>
+                </div>
+              ))}
+            </div>
           ) : (
-            <div style={{display:"flex",gap:12,maxWidth:600,margin:"0 0 20px"}}>
+            <div style={{display:"flex",gap:16,maxWidth:640,width:"100%",margin:"0 0 24px"}}>
               {[
                 {icon:"🔍",title:"Find",desc:"Search by name, breed, country or discipline"},
                 {icon:"📖",title:"Read",desc:"Explore profiles, credentials and reviews"},
                 {icon:"📅",title:"Book",desc:"Send a booking inquiry directly to the judge"},
               ].map(({icon,title,desc})=>(
-                <div key={title} style={{flex:1,padding:"12px 14px",background:T.surface,border:`1px solid ${T.border}`,borderRadius:T.r,textAlign:"center"}}>
-                  <div style={{fontSize:20,marginBottom:5}}>{icon}</div>
-                  <div style={{fontSize:13,fontWeight:600,color:T.text,marginBottom:3,fontFamily:"'Google Sans',sans-serif"}}>{title}</div>
-                  <div style={{fontSize:11,color:T.textHint,lineHeight:1.45}}>{desc}</div>
+                <div key={title} style={{
+                  flex:1,padding:"20px 16px",
+                  background:T.surface,
+                  border:`1px solid ${T.border}`,
+                  borderRadius:T.r,
+                  textAlign:"center",
+                  boxShadow:T.shadow,
+                }}>
+                  <div style={{fontSize:28,marginBottom:10}}>{icon}</div>
+                  <div style={{fontSize:15,fontWeight:600,color:T.text,marginBottom:6,fontFamily:"'Google Sans',sans-serif"}}>{title}</div>
+                  <div style={{fontSize:13,color:T.textSub,lineHeight:1.55}}>{desc}</div>
                 </div>
               ))}
             </div>
           )}
 
-          <div style={{display:"flex",gap:isMobile?12:24,flexWrap:"wrap",justifyContent:"center",fontSize:12,color:T.textHint}}>
-            <span><strong style={{color:T.textSub,fontWeight:500}}>{judges.filter(j=>!j.hidden).length.toLocaleString()}</strong> judges</span>
-            <span style={{color:T.border}}>·</span>
-            <span><strong style={{color:T.textSub,fontWeight:500}}>{[...new Set(judges.filter(j=>!j.hidden).map(j=>j.country))].length}</strong> countries</span>
-            <span style={{color:T.border}}>·</span>
-            <span>{Object.keys(ORGS).join(" · ")}</span>
+          {/* Stats */}
+          <div style={{display:"flex",gap:isMobile?20:32,flexWrap:"wrap",justifyContent:"center",alignItems:"center"}}>
+            <div style={{textAlign:"center"}}>
+              <div style={{fontSize:isMobile?20:24,fontWeight:700,color:T.text,lineHeight:1}}>{judges.filter(j=>!j.hidden).length.toLocaleString()}</div>
+              <div style={{fontSize:12,color:T.textHint,marginTop:3}}>judges</div>
+            </div>
+            <div style={{width:1,height:32,background:T.border}}/>
+            <div style={{textAlign:"center"}}>
+              <div style={{fontSize:isMobile?20:24,fontWeight:700,color:T.text,lineHeight:1}}>{[...new Set(judges.filter(j=>!j.hidden).map(j=>j.country))].length}</div>
+              <div style={{fontSize:12,color:T.textHint,marginTop:3}}>countries</div>
+            </div>
+            <div style={{width:1,height:32,background:T.border}}/>
+            <div style={{fontSize:13,color:T.textHint,letterSpacing:0.3}}>{Object.keys(ORGS).join(" · ")}</div>
           </div>
 
         </div>
