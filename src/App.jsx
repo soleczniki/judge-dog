@@ -6,6 +6,7 @@ import { FCI_GROUP_BREEDS } from "../fci-groups.js";
 
 import { T } from "./theme.js";
 import { avg, toSlug, initials, sGet, sSet, K } from "./utils.js";
+import { matchesDiscipline } from "./disciplines.js";
 import { SEED_JUDGES } from "./seeds.js";
 
 import { Avatar, Btn, ScrollToTop } from "./components/atoms.jsx";
@@ -28,7 +29,7 @@ export default function App() {
   const [bookings,setBookings]=useState([]); const [user,setUser]=useState(null);
   const [loading,setLoading]=useState(true); const [modal,setModal]=useState(null);
   const [unreadMsgCount,setUnreadMsgCount]=useState(0);
-  const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all");
+  const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all"); const [disciplineFilter,setDisciplineFilter]=useState("all");
   const [displayCount,setDisplayCount]=useState(48);
   const navSearchRef=useRef(null);
   const heroSearchRef=useRef(null);
@@ -105,7 +106,8 @@ export default function App() {
   useEffect(()=>{ if(user?.needsConsent) setModal("consent"); },[user?.needsConsent]);
 
   useEffect(()=>{ setMobileMenuOpen(false); },[location.pathname]);
-  useEffect(()=>{ setDisplayCount(48); },[search,orgFilter,sort]);
+  useEffect(()=>{ setDisplayCount(48); setDisciplineFilter("all"); },[orgFilter]);
+  useEffect(()=>{ setDisplayCount(48); },[search,disciplineFilter,sort]);
 
   useEffect(()=>{
     if(!user){setUnreadMsgCount(0);return;}
@@ -192,7 +194,8 @@ export default function App() {
       );
       const mQ=nameMatch||countryMatch||breedMatch||(j.group||"").toLowerCase().includes(q);
       const mO=orgFilter==="all"||j.orgs.some(o=>o.org===orgFilter);
-      return mQ&&mO;
+      const mD=matchesDiscipline(j,disciplineFilter);
+      return mQ&&mO&&mD;
     }).sort((a,b)=>{
       if(sort==="name") return a.name.localeCompare(b.name);
       const ra=reviews.filter(r=>r.judgeId===a.id),rb=reviews.filter(r=>r.judgeId===b.id);
@@ -200,7 +203,7 @@ export default function App() {
       if(sort==="reviews") return rb.length-ra.length;
       return 0;
     });
-  },[judges,reviews,search,orgFilter,sort]);
+  },[judges,reviews,search,orgFilter,disciplineFilter,sort]);
 
   if(loading) return <div style={{minHeight:"100vh",background:T.bg,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:T.textHint,fontFamily:"'Google Sans Text','Segoe UI',system-ui,sans-serif"}}>Loading…</div>;
 
@@ -358,6 +361,7 @@ export default function App() {
               filtered={filtered}
               displayCount={displayCount} setDisplayCount={setDisplayCount}
               orgFilter={orgFilter} setOrgFilter={setOrgFilter}
+              disciplineFilter={disciplineFilter} setDisciplineFilter={setDisciplineFilter}
               sort={sort} setSort={setSort}
               isMobile={isMobile} heroSearchRef={heroSearchRef}
               onNavigate={navigate}

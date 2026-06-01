@@ -1,14 +1,17 @@
 import { T, ORGS } from "../theme.js";
 import { JudgeCard } from "../components/JudgeCard.jsx";
 import { Footer } from "../components/Footer.jsx";
+import { DISCIPLINE_OPTIONS } from "../disciplines.js";
 
 export function Landing({
   search, setSearch, judges, reviews,
   filtered, displayCount, setDisplayCount,
   orgFilter, setOrgFilter,
+  disciplineFilter, setDisciplineFilter,
   sort, setSort,
   isMobile, heroSearchRef, onNavigate, onManageCookies,
 }) {
+  const disciplineOptions = DISCIPLINE_OPTIONS[orgFilter] || null;
   if (!search.trim()) {
     return (
       <div style={{display:"flex",flexDirection:"column",height:"100%",overflow:"hidden"}}>
@@ -87,12 +90,23 @@ export function Landing({
 
   return (
     <div style={{maxWidth:1040,margin:"0 auto",padding:"28px 20px"}}>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"flex-end",marginBottom:20}}>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"flex-end",marginBottom:20,alignItems:"center"}}>
+        {/* Org selector */}
         <select value={orgFilter} onChange={e=>setOrgFilter(e.target.value)}
           style={{padding:"7px 14px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:13,color:T.textSub,cursor:"pointer",outline:"none"}}>
           <option value="all">All orgs</option>
           {Object.keys(ORGS).map(o=><option key={o} value={o}>{o}</option>)}
         </select>
+
+        {/* Discipline dropdown — only shown when org with discipline data is selected */}
+        {disciplineOptions && (
+          <select value={disciplineFilter} onChange={e=>setDisciplineFilter(e.target.value)}
+            style={{padding:"7px 14px",border:`1.5px solid ${disciplineFilter!=="all"?T.accent:T.border}`,borderRadius:100,background:disciplineFilter!=="all"?T.accentLight:T.bg,fontSize:13,color:disciplineFilter!=="all"?T.accent:T.textSub,cursor:"pointer",outline:"none",fontWeight:disciplineFilter!=="all"?600:400}}>
+            <option value="all">All disciplines</option>
+            {disciplineOptions.map(d=><option key={d.value} value={d.value}>{d.label}</option>)}
+          </select>
+        )}
+
         <select value={sort} onChange={e=>setSort(e.target.value)}
           style={{padding:"7px 14px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:13,color:T.textSub,cursor:"pointer",outline:"none"}}>
           <option value="name">Sort: Name</option>
