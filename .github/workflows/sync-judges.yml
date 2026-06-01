@@ -1,34 +1,30 @@
 name: Weekly Judge Sync
 
+# DISABLED: Data files (fci-full-raw.json, akc-full-raw.json) are too large
+# for git (~200MB) and are gitignored. Scraping and syncing happen locally.
+#
+# TODO: Replace with a Cloud Function or scheduled Cloud Run job that reads
+# directly from FCI/AKC and writes to Firestore — no local files needed.
+#
+# Manual workflow_dispatch kept for future use once data pipeline is redesigned.
+
 on:
-  schedule:
-    - cron: '0 3 * * 1'   # Every Monday at 03:00 UTC
-  workflow_dispatch:        # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:   # Manual trigger only — no automatic schedule
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 360    # 6 hours — enough for a full initial scrape
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
-
-      - name: Install system dependencies for Puppeteer
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y \
-            libnss3 libatk1.0-0 libatk-bridge2.0-0 \
-            libcups2 libdrm2 libxkbcommon0 libxcomposite1 \
-            libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64
 
       - name: Install npm dependencies
         run: npm install
@@ -38,21 +34,13 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: echo "$FIREBASE_SERVICE_ACCOUNT" > serviceAccount.json
 
-      - name: Run FCI scraper (auto-resumes from last checkpoint)
-        run: node scrape-fci-full.js
-        timeout-minutes: 300
-
-      - name: Sync new/changed judges to Firestore
-        run: node sync-judges.js
+      - name: Notice — data files required
+        run: |
+          echo "⚠️  sync-judges.js and sync-akc.js require fci-full-raw.json"
+          echo "   and akc-full-raw.json which are gitignored (too large for git)."
+          echo "   Upload them as artifacts or run sync locally."
+          echo "   This workflow is a placeholder until the data pipeline is redesigned."
 
       - name: Clean up credentials
         if: always()
         run: rm -f serviceAccount.json
-
-      - name: Commit updated data files
-        run: |
-          git config user.email "github-actions@github.com"
-          git config user.name "GitHub Actions"
-          git add fci-full-raw.json fci-full-progress.json public/sitemap.xml
-          git diff --staged --quiet || git commit -m "chore: weekly judge sync [skip ci]"
-          git push
