@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { T, ORGS } from "../theme.js";
 import { JudgeCard } from "../components/JudgeCard.jsx";
 import { Footer } from "../components/Footer.jsx";
@@ -12,7 +13,9 @@ export function Landing({
   isMobile, heroSearchRef, onNavigate, onManageCookies,
 }) {
   const disciplineOptions = DISCIPLINE_OPTIONS[orgFilter] || null;
-  if (!search.trim()) {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  if (!search.trim() && disciplineFilter === "all" && orgFilter === "all") {
     return (
       <div style={{display:"flex",flexDirection:"column",height:"100%",overflow:"hidden"}}>
 
@@ -51,6 +54,33 @@ export function Landing({
               onFocus={e=>{e.target.style.borderColor=T.accent;e.target.style.boxShadow=`0 0 0 3px ${T.accentLight}`;}}
               onBlur={e=>{e.target.style.borderColor=T.border;e.target.style.boxShadow=T.shadowSm;}}
             />
+          </div>
+
+          {/* Advanced filter toggle */}
+          <div style={{marginBottom:isMobile?12:16,textAlign:"center"}}>
+            <button type="button" onClick={()=>setShowAdvanced(v=>!v)}
+              style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:T.textHint,fontFamily:"inherit",padding:"4px 8px",borderRadius:T.rsm,transition:"color .15s"}}
+              onMouseEnter={e=>e.currentTarget.style.color=T.accent}
+              onMouseLeave={e=>e.currentTarget.style.color=T.textHint}>
+              {showAdvanced ? "▲ Less" : "▼ Advanced"}
+            </button>
+
+            {showAdvanced && (
+              <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap",marginTop:10}}>
+                <select value={orgFilter} onChange={e=>setOrgFilter(e.target.value)}
+                  style={{padding:"7px 16px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:13,color:T.textSub,cursor:"pointer",outline:"none"}}>
+                  <option value="all">All organisations</option>
+                  {Object.keys(ORGS).map(o=><option key={o} value={o}>{ORGS[o].name} ({o})</option>)}
+                </select>
+                {disciplineOptions && (
+                  <select value={disciplineFilter} onChange={e=>setDisciplineFilter(e.target.value)}
+                    style={{padding:"7px 16px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:13,color:T.textSub,cursor:"pointer",outline:"none"}}>
+                    <option value="all">All disciplines</option>
+                    {disciplineOptions.map(d=><option key={d.value} value={d.value}>{d.label}</option>)}
+                  </select>
+                )}
+              </div>
+            )}
           </div>
 
           {isMobile ? (
