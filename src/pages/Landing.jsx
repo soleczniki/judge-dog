@@ -70,7 +70,7 @@ export function Landing({
                 <select value={orgFilter} onChange={e=>setOrgFilter(e.target.value)}
                   style={{padding:"7px 16px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:13,color:T.textSub,cursor:"pointer",outline:"none"}}>
                   <option value="all">All organisations</option>
-                  {Object.keys(ORGS).map(o=><option key={o} value={o}>{ORGS[o].name} ({o})</option>)}
+                  {["FCI","AKC"].map(o=><option key={o} value={o}>{ORGS[o].name} ({o})</option>)}
                 </select>
                 {disciplineOptions && (
                   <select value={disciplineFilter} onChange={e=>setDisciplineFilter(e.target.value)}
@@ -128,7 +128,7 @@ export function Landing({
               <div style={{fontSize:12,color:T.textHint,marginTop:3}}>countries</div>
             </div>
             <div style={{width:1,height:32,background:T.border}}/>
-            <div style={{fontSize:13,color:T.textHint,letterSpacing:0.3}}>{Object.keys(ORGS).join(" · ")}</div>
+            <div style={{fontSize:13,color:T.textHint,letterSpacing:0.3}}>FCI · AKC</div>
           </div>
 
         </div>
@@ -145,7 +145,7 @@ export function Landing({
         <select value={orgFilter} onChange={e=>setOrgFilter(e.target.value)}
           style={{padding:"7px 14px",border:`1.5px solid ${T.border}`,borderRadius:100,background:T.bg,fontSize:13,color:T.textSub,cursor:"pointer",outline:"none"}}>
           <option value="all">All orgs</option>
-          {Object.keys(ORGS).map(o=><option key={o} value={o}>{o}</option>)}
+          {["FCI","AKC"].map(o=><option key={o} value={o}>{o}</option>)}
         </select>
 
         {/* Discipline dropdown — only shown when org with discipline data is selected */}

@@ -180,10 +180,28 @@ export default function App() {
 
   const logout=async()=>{await firebaseSignOut();setUser(null);};
 
+  // Filter out judges with clearly corrupted names (dots, dashes, digits, very short)
+  const hasValidName = j => {
+    const n = (j.name||"").trim();
+    if (n.length < 3) return false;
+    // Skip if name is only dots, dashes, digits, commas, spaces
+    if (/^[\s.,\-_0-9]+$/.test(n)) return false;
+    // Skip if meaningful letter count is less than 2
+    if ((n.match(/[a-zA-ZÀ-žА-я]/g)||[]).length < 2) return false;
+    return true;
+  };
+
   const filtered=useMemo(()=>{
     const q=search.toLowerCase().trim();
-    const visible=judges.filter(j=>!j.hidden);
-    if(!q) return visible;
+    const visible=judges.filter(j=>!j.hidden && hasValidName(j));
+    // When no text query but filters active, apply org/discipline filters only
+    if(!q){
+      return visible.filter(j=>{
+        const mO=orgFilter==="all"||j.orgs.some(o=>o.org===orgFilter);
+        const mD=matchesDiscipline(j,disciplineFilter);
+        return mO&&mD;
+      }).sort((a,b)=>a.name.localeCompare(b.name));
+    }
     // Check once if the query matches any known breed globally (for all-breed judges)
     const isKnownBreedQuery=Object.values(FCI_GROUP_BREEDS).some(arr=>arr.some(b=>b.toLowerCase().includes(q)));
     return visible.filter(j=>{
@@ -256,7 +274,7 @@ export default function App() {
         )}
 
         {/* Desktop: centered search — hidden on landing (hero has its own) */}
-        {!isMobile&&!(location.pathname==="/"&&!search.trim()&&!(user?.role==="judge"&&user?.judgeId))&&(
+        {!isMobile&&!(location.pathname==="/"&&!search.trim()&&orgFilter==="all"&&disciplineFilter==="all"&&!(user?.role==="judge"&&user?.judgeId))&&(
           <div style={{position:"absolute",left:0,right:0,display:"flex",justifyContent:"center",pointerEvents:"none"}}>
             <div style={{width:480,maxWidth:"calc(100vw - 340px)",position:"relative",pointerEvents:"all"}}>
               <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",fontSize:14,color:T.textHint,pointerEvents:"none",lineHeight:1}}>🔍</span>
@@ -392,7 +410,7 @@ export default function App() {
 
       {/* Footer — hidden on landing (it's embedded inside Landing) and on admin/messages */}
       {!["/admin","/messages"].some(p=>location.pathname.startsWith(p))
-        && !(location.pathname==="/" && !search.trim() && !(user?.role==="judge"&&user?.judgeId))
+        && !(location.pathname==="/" && !search.trim() && orgFilter==="all" && disciplineFilter==="all" && !(user?.role==="judge"&&user?.judgeId))
         && <Footer onManageCookies={manageCookies}/>}
       </div>
 
