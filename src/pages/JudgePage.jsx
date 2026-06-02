@@ -447,7 +447,7 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
 }
 
 // ── Judge Route ────────────────────────────────────────────────────────────────
-export function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,editProfile,saveReply,onRequestAuth,onUserUpdated}) {
+export function JudgeRoute({judges,reviews,user,addReview,claimJudge,editProfile,saveReply,onRequestAuth,onUserUpdated}) {
   const {slug}=useParams();
   const navigate=useNavigate();
   const [modal,setModal]=useState(null);
@@ -528,7 +528,7 @@ export function JudgeRoute({judges,reviews,user,addReview,addBooking,claimJudge,
           }catch(e){console.error(e);}
         }}/>}
       {modal==="review"&&localUser&&<ReviewModal judge={judge} user={localUser} onClose={()=>setModal(null)} onSubmit={addReview}/>}
-      {modal==="booking"&&localUser&&<BookingModal judge={judge} user={localUser} onClose={()=>setModal(null)} onSubmit={addBooking}/>}
+      {modal==="booking"&&localUser&&<BookingModal judge={judge} user={localUser} onClose={()=>setModal(null)}/>}
       {modal==="addOrganiser"&&localUser&&<AddOrganiserModal user={localUser} onClose={()=>setModal(null)}
         onComplete={updated=>{
           setLocalUser(updated);

@@ -11,6 +11,76 @@ const RECAPTCHA_SECRET = defineSecret("RECAPTCHA_SECRET_KEY");
 const FROM = "judge.dog <noreply@judge.dog>";
 const ADMIN_EMAIL = "hi@judge.dog";
 
+// ── Booking email templates ───────────────────────────────────────────────────
+
+function bookingToJudgeHtml({ judgeName, judgeSlug, organiserName, clubName, showName, date, location, country, breeds, entries, feeDiscussion, message, organiserId, claimed }) {
+  const profileUrl = `https://judge.dog/judge/${judgeSlug}`;
+  const safe = s => (s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+  const row = (label, value) => value ? `
+    <tr><td style="padding:7px 12px;color:#9aa0a6;font-size:13px;white-space:nowrap;vertical-align:top">${label}</td>
+    <td style="padding:7px 12px;color:#202124;font-size:13px;">${safe(value)}</td></tr>` : "";
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f8f9fa;font-family:'Segoe UI',system-ui,sans-serif;color:#202124;">
+  <div style="max-width:560px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(60,64,67,.15);">
+    <div style="background:#1a73e8;padding:28px 32px;">
+      <span style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.5px;">judge<span style="font-weight:400;">.dog</span></span>
+    </div>
+    <div style="padding:32px;">
+      <p style="margin:0 0 6px;font-size:22px;font-weight:400;color:#202124;">Booking inquiry received</p>
+      <p style="margin:0 0 20px;font-size:14px;color:#5f6368;line-height:1.6;">
+        Hi ${safe(judgeName)}, <strong>${safe(organiserName)}</strong>${clubName ? ` (${safe(clubName)})` : ""} has sent you a booking inquiry through judge.dog.
+      </p>
+      <table style="width:100%;border-collapse:collapse;background:#f8f9fa;border-radius:8px;margin-bottom:20px;">
+        ${row("Show / Event", showName)}
+        ${row("Date", date)}
+        ${row("Location", location + (country ? ", " + country : ""))}
+        ${row("Breeds / disciplines", breeds)}
+        ${row("Expected entries", entries)}
+        ${row("Fee & travel", feeDiscussion)}
+      </table>
+      ${message ? `<div style="background:#f0f4ff;border-left:3px solid #1a73e8;border-radius:4px;padding:14px 16px;margin-bottom:24px;font-size:14px;color:#202124;line-height:1.7;">${safe(message)}</div>` : ""}
+      <a href="${profileUrl}" style="display:inline-block;padding:12px 24px;background:#1a73e8;color:#fff;text-decoration:none;border-radius:100px;font-size:14px;font-weight:500;">${claimed ? "View and respond on judge.dog →" : "Claim your profile to respond →"}</a>
+    </div>
+    <div style="padding:16px 32px 24px;border-top:1px solid #e8eaed;">
+      <p style="margin:0;font-size:12px;color:#9aa0a6;line-height:1.6;">
+        You received this because your judge profile is listed on judge.dog.
+        To stop receiving these notifications, contact <a href="mailto:hi@judge.dog" style="color:#1a73e8;">hi@judge.dog</a>.
+      </p>
+    </div>
+  </div>
+</body></html>`;
+}
+
+function bookingConfirmationHtml({ organiserName, judgeName, judgeSlug, showName, date }) {
+  const profileUrl = `https://judge.dog/judge/${judgeSlug}`;
+  const safe = s => (s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f8f9fa;font-family:'Segoe UI',system-ui,sans-serif;color:#202124;">
+  <div style="max-width:520px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(60,64,67,.15);">
+    <div style="background:#1a73e8;padding:28px 32px;">
+      <span style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.5px;">judge<span style="font-weight:400;">.dog</span></span>
+    </div>
+    <div style="padding:32px;">
+      <p style="margin:0 0 6px;font-size:22px;font-weight:400;color:#202124;">Inquiry sent</p>
+      <p style="margin:0 0 20px;font-size:14px;color:#5f6368;line-height:1.6;">
+        Hi ${safe(organiserName)}, your booking inquiry for <strong>${safe(showName)}</strong> on ${safe(date)} has been sent to <strong>${safe(judgeName)}</strong>.
+      </p>
+      <p style="margin:0 0 20px;font-size:13px;color:#5f6368;line-height:1.6;">
+        The judge has been notified and can respond through their judge.dog profile. You'll hear back directly by email.
+      </p>
+      <a href="${profileUrl}" style="display:inline-block;padding:12px 24px;background:#f8f9fa;color:#202124;text-decoration:none;border-radius:100px;font-size:14px;font-weight:500;border:1px solid #e8eaed;">View judge profile</a>
+    </div>
+    <div style="padding:16px 32px 24px;border-top:1px solid #e8eaed;">
+      <p style="margin:0;font-size:12px;color:#9aa0a6;">
+        You're receiving this because you sent a booking inquiry on <a href="https://judge.dog" style="color:#1a73e8;">judge.dog</a>.
+      </p>
+    </div>
+  </div>
+</body></html>`;
+}
+
 // ── Email templates ────────────────────────────────────────────────────────────
 
 function adminNewClaimHtml({ userName, userEmail, judgeName, judgeSlug }) {
@@ -258,6 +328,75 @@ exports.onMessageCreated = onDocumentCreated(
         messageText: msg.message,
       }),
     });
+  }
+);
+
+// ── Notify judge + confirm to organiser on new booking inquiry ────────────────
+exports.onBookingInquiryCreated = onDocumentCreated(
+  { document: "bookingInquiries/{inquiryId}", secrets: [RESEND_KEY] },
+  async (event) => {
+    const inq = event.data.data();
+    if (!inq) return;
+
+    const db = getFirestore();
+    const resend = new Resend(RESEND_KEY.value());
+
+    // ── Email to judge ──────────────────────────────────────────────────────
+    // Claimed judge → email to their Google account email
+    // Unclaimed judge → email to scraped contact email
+    let judgeEmail = null;
+    if (inq.judgeClaimed) {
+      // Get judge's user account email
+      const judgeDoc = await db.collection("judges").doc(inq.judgeId).get();
+      if (judgeDoc.exists) {
+        const j = judgeDoc.data();
+        if (j.claimedBy) {
+          // Find user by email (claimedBy is the email)
+          judgeEmail = j.claimedBy;
+        }
+      }
+    } else {
+      judgeEmail = inq.judgeEmail;
+    }
+
+    if (judgeEmail) {
+      await resend.emails.send({
+        from: FROM,
+        to: judgeEmail,
+        subject: `Booking inquiry: ${inq.showName} — ${inq.organiserName}`,
+        html: bookingToJudgeHtml({
+          judgeName:    inq.judgeName,
+          judgeSlug:    inq.judgeSlug,
+          organiserName: inq.organiserName,
+          clubName:     inq.organiserProfile?.clubName,
+          showName:     inq.showName,
+          date:         inq.date,
+          location:     inq.location,
+          country:      inq.country,
+          breeds:       inq.breeds,
+          entries:      inq.entries,
+          feeDiscussion: inq.feeDiscussion,
+          message:      inq.message,
+          claimed:      inq.judgeClaimed,
+        }),
+      });
+    }
+
+    // ── Confirmation to organiser ───────────────────────────────────────────
+    if (inq.organiserEmail) {
+      await resend.emails.send({
+        from: FROM,
+        to: inq.organiserEmail,
+        subject: `Booking inquiry sent to ${inq.judgeName}`,
+        html: bookingConfirmationHtml({
+          organiserName: inq.organiserName,
+          judgeName:     inq.judgeName,
+          judgeSlug:     inq.judgeSlug,
+          showName:      inq.showName,
+          date:          inq.date,
+        }),
+      });
+    }
   }
 );
 

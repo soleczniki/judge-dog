@@ -26,7 +26,7 @@ import { Landing } from "./pages/Landing.jsx";
 
 export default function App() {
   const [judges,setJudges]=useState([]); const [reviews,setReviews]=useState([]);
-  const [bookings,setBookings]=useState([]); const [user,setUser]=useState(null);
+  const [user,setUser]=useState(null);
   const [loading,setLoading]=useState(true); const [modal,setModal]=useState(null);
   const [unreadMsgCount,setUnreadMsgCount]=useState(0);
   const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all"); const [disciplineFilter,setDisciplineFilter]=useState("all");
@@ -57,11 +57,8 @@ export default function App() {
   useEffect(()=>{
     const BATCH=200;
     (async()=>{
-      // Load reviews + bookings (small, local)
       const sr=await sGet(K.reviews,null);
-      const sb=await sGet(K.bookings,null);
       if(!sr){await sSet(K.reviews,[]);setReviews([]);}else setReviews(sr);
-      if(!sb){await sSet(K.bookings,[]);setBookings([]);}else setBookings(sb);
 
       try {
         const {db}=await import("./firebase");
@@ -144,9 +141,7 @@ export default function App() {
   const acceptCookies=()=>{ localStorage.setItem("jyj_cookie_consent","accepted"); setCookieConsent("accepted"); initAnalytics(); };
   const declineCookies=()=>{ localStorage.setItem("jyj_cookie_consent","declined"); setCookieConsent("declined"); };
   const manageCookies=()=>{ localStorage.removeItem("jyj_cookie_consent"); setCookieConsent(null); };
-  const saveBookings=async bb=>{setBookings(bb);await sSet(K.bookings,bb);};
   const addReview=useCallback(async r=>{const u=[...reviews,r];await saveReviews(u);},[reviews]);
-  const addBooking=useCallback(async b=>{const u=[...bookings,b];await saveBookings(u);},[bookings]);
 
   const claimJudge=useCallback(async(judgeId)=>{
     if(!judgeId||!user) return;
@@ -388,14 +383,14 @@ export default function App() {
           }/>
         <Route path="/judge/:slug" element={
           <JudgeRoute judges={judges} reviews={reviews} user={user}
-            addReview={addReview} addBooking={addBooking}
+            addReview={addReview}
             claimJudge={claimJudge} editProfile={editProfile} saveReply={saveReply}
             onRequestAuth={()=>setModal("auth")}
             onUserUpdated={u=>setUser(prev=>({...prev,...u}))}/>
         }/>
         <Route path="/messages" element={<MessagesRoute user={user}/>}/>
         <Route path="/admin" element={
-          <AdminRoute judges={judges} reviews={reviews} bookings={bookings} user={user}
+          <AdminRoute judges={judges} reviews={reviews} user={user}
             patchJudge={(id,updates)=>setJudges(jj=>jj.map(j=>j.id===id?{...j,...updates}:j))}
             saveJudges={saveJudges} saveReviews={saveReviews}/>
         }/>
