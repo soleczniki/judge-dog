@@ -400,6 +400,55 @@ exports.onBookingInquiryCreated = onDocumentCreated(
   }
 );
 
+// ── Email organiser when judge accepts or declines their booking inquiry ────────
+exports.onBookingStatusChange = onDocumentUpdated(
+  { document: "bookingInquiries/{inquiryId}", secrets: [RESEND_KEY] },
+  async (event) => {
+    const before = event.data.before.data();
+    const after  = event.data.after.data();
+    if (before.status === after.status) return;
+    if (after.status !== "accepted" && after.status !== "declined") return;
+    if (!after.organiserEmail) return;
+
+    const resend = new Resend(RESEND_KEY.value());
+    const isAccepted = after.status === "accepted";
+    const safe = s => (s||"").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+    const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f8f9fa;font-family:'Segoe UI',system-ui,sans-serif;color:#202124;">
+  <div style="max-width:520px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(60,64,67,.15);">
+    <div style="background:${isAccepted?"#1e8e3e":"#d93025"};padding:28px 32px;">
+      <span style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.5px;">judge<span style="font-weight:400;">.dog</span></span>
+    </div>
+    <div style="padding:32px;">
+      <p style="margin:0 0 8px;font-size:22px;font-weight:400;color:#202124;">
+        ${isAccepted?"Booking inquiry accepted ✓":"Booking inquiry declined"}
+      </p>
+      <p style="margin:0 0 16px;font-size:14px;color:#5f6368;line-height:1.6;">
+        <strong>${safe(after.judgeName)}</strong> has ${isAccepted?"accepted":"declined"} your booking inquiry for
+        <strong>${safe(after.showName)}</strong> (${safe(after.dateFrom)}${after.dateTo!==after.dateFrom?" – "+safe(after.dateTo):""}).
+      </p>
+      ${after.judgeResponse?`<div style="background:#f8f9fa;border-left:3px solid ${isAccepted?"#1e8e3e":"#d93025"};border-radius:4px;padding:14px 16px;margin-bottom:20px;font-size:14px;color:#202124;line-height:1.7;">${safe(after.judgeResponse)}</div>`:""}
+      <a href="https://judge.dog/my-bookings" style="display:inline-block;padding:12px 24px;background:${isAccepted?"#1e8e3e":"#1a73e8"};color:#fff;text-decoration:none;border-radius:100px;font-size:14px;font-weight:500;">
+        View in My Bookings →
+      </a>
+    </div>
+    <div style="padding:16px 32px 24px;border-top:1px solid #e8eaed;">
+      <p style="margin:0;font-size:12px;color:#9aa0a6;">You're receiving this because you sent a booking inquiry on <a href="https://judge.dog" style="color:#1a73e8;">judge.dog</a>.</p>
+    </div>
+  </div>
+</body></html>`;
+
+    await resend.emails.send({
+      from: FROM,
+      to: after.organiserEmail,
+      subject: `${after.judgeName} ${isAccepted?"accepted":"declined"} your booking inquiry — ${after.showName}`,
+      html,
+    });
+  }
+);
+
 // ── Email claimant when status changes to approved or rejected ─────────────────
 exports.onClaimStatusChange = onDocumentUpdated(
   { document: "claims/{claimId}", secrets: [RESEND_KEY] },

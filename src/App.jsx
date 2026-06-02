@@ -22,6 +22,7 @@ import { MessagesRoute } from "./pages/MessagesPage.jsx";
 import { JudgeDashboard } from "./pages/JudgeDashboard.jsx";
 import { ContactPage } from "./pages/ContactPage.jsx";
 import { SettingsPage } from "./pages/SettingsPage.jsx";
+import { BookingsPage } from "./pages/BookingsPage.jsx";
 import { Landing } from "./pages/Landing.jsx";
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
   const [user,setUser]=useState(null);
   const [loading,setLoading]=useState(true); const [modal,setModal]=useState(null);
   const [unreadMsgCount,setUnreadMsgCount]=useState(0);
+  const [unreadBookingCount,setUnreadBookingCount]=useState(0);
   const [search,setSearch]=useState(""); const [sort,setSort]=useState("name"); const [orgFilter,setOrgFilter]=useState("all"); const [disciplineFilter,setDisciplineFilter]=useState("all");
   const [displayCount,setDisplayCount]=useState(48);
   const navSearchRef=useRef(null);
@@ -125,6 +127,27 @@ export default function App() {
           setUnreadMsgCount(total);
         },()=>{});
       } catch(e){}
+    })();
+    return()=>{if(unsub)unsub();};
+  },[user]);
+
+  // Booking badge listener
+  useEffect(()=>{
+    if(!user){setUnreadBookingCount(0);return;}
+    const isJudge=user.role==="judge"&&user.judgeId;
+    const isOrg=!!user.organizerStatus;
+    if(!isJudge&&!isOrg){setUnreadBookingCount(0);return;}
+    let unsub;
+    (async()=>{
+      try{
+        const {db}=await import("./firebase");
+        const {collection,query,where,onSnapshot}=await import("firebase/firestore");
+        // Judge: count pending inquiries; Organiser: count unread status changes
+        const q=isJudge
+          ? query(collection(db,"bookingInquiries"),where("judgeId","==",user.judgeId),where("status","==","pending"))
+          : query(collection(db,"bookingInquiries"),where("organiserId","==",user.uid),where("organiserRead","==",false));
+        unsub=onSnapshot(q,snap=>setUnreadBookingCount(snap.size),()=>{});
+      }catch(e){}
     })();
     return()=>{if(unsub)unsub();};
   },[user]);
@@ -298,6 +321,13 @@ export default function App() {
                   ✉
                   {unreadMsgCount>0&&<span style={{position:"absolute",top:2,right:4,width:16,height:16,background:T.red,borderRadius:"50%",fontSize:10,fontWeight:700,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{unreadMsgCount}</span>}
                 </button>
+                {(user.role==="judge"||user.organizerStatus)&&(
+                  <button onClick={()=>navigate("/my-bookings")} title="Bookings"
+                    style={{position:"relative",background:"none",border:"none",cursor:"pointer",padding:"6px 10px",borderRadius:100,color:T.textSub,fontSize:20,display:"flex",alignItems:"center",lineHeight:1}}>
+                    📋
+                    {unreadBookingCount>0&&<span style={{position:"absolute",top:2,right:4,width:16,height:16,background:T.red,borderRadius:"50%",fontSize:10,fontWeight:700,color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>{unreadBookingCount}</span>}
+                  </button>
+                )}
                 <div onClick={()=>navigate("/settings")}
                   style={{display:"flex",alignItems:"center",gap:8,padding:"5px 12px 5px 6px",borderRadius:100,background:T.surface,border:`1px solid ${T.border}`,cursor:"pointer",transition:"background .15s"}}
                   onMouseEnter={e=>e.currentTarget.style.background=T.surfaceHover}
@@ -396,6 +426,7 @@ export default function App() {
         }/>
         <Route path="/contact" element={<ContactPage user={user}/>}/>
         <Route path="/settings" element={user ? <SettingsPage user={user} onUserUpdated={u=>setUser(prev=>({...prev,...u}))}/> : <Navigate to="/" replace/>}/>
+        <Route path="/my-bookings" element={user ? <BookingsPage user={user}/> : <Navigate to="/" replace/>}/>
         <Route path="/privacy" element={<PrivacyPolicy/>}/>
         <Route path="/terms" element={<TermsOfService/>}/>
         <Route path="/cookies" element={<CookiePolicy/>}/>

@@ -117,8 +117,23 @@ export function BookingModal({ judge, user, onClose }) {
     setSending(true); setErr("");
     try {
       const { db } = await import("../firebase.js");
-      const { collection, addDoc } = await import("firebase/firestore");
+      const { collection, addDoc, query, where, getDocs } = await import("firebase/firestore");
       const orgProfile = user.organizerProfile || {};
+
+      // Check for date conflicts with existing accepted bookings
+      let hasConflict = false;
+      try {
+        const conflicts = await getDocs(query(
+          collection(db,"bookingInquiries"),
+          where("judgeId","==",judge.id),
+          where("status","==","accepted")
+        ));
+        hasConflict = conflicts.docs.some(d => {
+          const b = d.data();
+          return b.dateFrom <= dateTo && b.dateTo >= dateFrom;
+        });
+      } catch(e) {}
+
       await addDoc(collection(db, "bookingInquiries"), {
         judgeId: judge.id, judgeName: judge.name, judgeSlug: judge.slug||judge.id,
         judgeClaimed: !!judge.claimedBy, judgeEmail: judge.contact?.email||null,
@@ -137,6 +152,8 @@ export function BookingModal({ judge, user, onClose }) {
         specialRequirements: requirements.trim(),
         message: message.trim(),
         status: "pending",
+        hasConflict,
+        organiserRead: false,
         submittedAt: new Date().toISOString(),
       });
       setDone(true);
