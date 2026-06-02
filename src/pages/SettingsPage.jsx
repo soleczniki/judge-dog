@@ -214,11 +214,41 @@ export function SettingsPage({ user, onUserUpdated }) {
         </Section>
       )}
 
-      {/* Judge profile link */}
+      {/* Judge profile + calendar confirmation */}
       {isJudge&&(
         <Section title="Judge profile">
           <p style={{margin:"0 0 12px",fontSize:13,color:T.textSub}}>You have a claimed judge profile. Edit your bio, headline, and photos there.</p>
           <Btn onClick={()=>navigate(`/judge/${user.judgeId}`)} variant="outlined">View my judge profile →</Btn>
+
+          <div style={{marginTop:20,paddingTop:16,borderTop:`1px solid ${T.border}`}}>
+            <div style={{fontSize:13,fontWeight:500,color:T.text,marginBottom:6}}>Calendar management</div>
+            <label style={{display:"flex",alignItems:"flex-start",gap:12,cursor:"pointer",userSelect:"none",padding:"12px 14px",background:user.calendarConfirmed?T.greenLight:T.surface,border:`1px solid ${user.calendarConfirmed?"#a8d5b5":T.border}`,borderRadius:T.rsm,transition:"all .15s"}}>
+              <input type="checkbox" checked={!!user.calendarConfirmed}
+                onChange={async e=>{
+                  try{
+                    const {db}=await import("../firebase.js");
+                    const {doc,updateDoc}=await import("firebase/firestore");
+                    // Also update the judge profile doc
+                    const {collection,query,where,getDocs,setDoc}=await import("firebase/firestore");
+                    const confirmed=e.target.checked;
+                    await updateDoc(doc(db,"users",user.uid),{calendarConfirmed:confirmed});
+                    // Propagate to judge doc
+                    const judgeSnap=await getDocs(query(collection(db,"judges"),where("id","==",user.judgeId)));
+                    if(!judgeSnap.empty) await updateDoc(judgeSnap.docs[0].ref,{calendarConfirmed:confirmed});
+                    onUserUpdated?.({...user,calendarConfirmed:confirmed});
+                  }catch(e2){console.error(e2);}
+                }}
+                style={{marginTop:2,width:16,height:16,accentColor:T.green,flexShrink:0,cursor:"pointer"}}/>
+              <div>
+                <div style={{fontSize:13,fontWeight:500,color:user.calendarConfirmed?T.green:T.text,marginBottom:3}}>
+                  {user.calendarConfirmed?"✓ I am actively managing my calendar":"I confirm I am actively managing my calendar on judge.dog"}
+                </div>
+                <div style={{fontSize:12,color:T.textSub,lineHeight:1.55}}>
+                  When enabled, your profile shows a "Calendar managed by judge" badge and removes the data accuracy disclaimer. You can untick this at any time.
+                </div>
+              </div>
+            </label>
+          </div>
         </Section>
       )}
     </div>

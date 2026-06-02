@@ -19,6 +19,76 @@ import { StartConvModal } from "../modals/StartConvModal.jsx";
 import { AddOrganiserModal } from "../modals/AddOrganiserModal.jsx";
 import { ReviewGateModal } from "../modals/ReviewGateModal.jsx";
 
+// ── Availability Section ────────────────────────────────────────────────────────
+function AvailabilitySection({ judge }) {
+  const [bookings, setBookings] = useState([]);
+  const isAKC = judge.orgs?.some(o=>o.org==="AKC");
+  const isClaimed = !!judge.claimedBy;
+  const calendarConfirmed = !!judge.calendarConfirmed;
+  const today = new Date().toISOString().slice(0,10);
+
+  useEffect(()=>{
+    (async()=>{
+      try{
+        const {db}=await import("../firebase.js");
+        const {collection,query,where,getDocs}=await import("firebase/firestore");
+        const snap=await getDocs(query(
+          collection(db,"bookingInquiries"),
+          where("judgeId","==",judge.id),
+          where("status","==","accepted")
+        ));
+        const upcoming=snap.docs
+          .map(d=>({id:d.id,...d.data()}))
+          .filter(b=>b.dateTo>=today)
+          .sort((a,b)=>a.dateFrom.localeCompare(b.dateFrom));
+        setBookings(upcoming);
+      }catch(e){}
+    })();
+  },[judge.id]);
+
+  // Disclaimer text
+  const disclaimer = calendarConfirmed
+    ? { color:T.green, bg:T.greenLight, border:"#a8d5b5", text:"This judge actively manages their calendar on judge.dog. Dates shown are up to date." }
+    : isClaimed
+    ? { color:"#f57f17", bg:"#fff8e1", border:"#fcd34d", text:"This judge has claimed their profile but has not yet confirmed they are actively managing their calendar. Dates may be incomplete." }
+    : isAKC
+    ? { color:T.textHint, bg:T.surface, border:T.border, text:"Availability data is sourced from public AKC records. Accuracy is not guaranteed." }
+    : { color:T.textHint, bg:T.surface, border:T.border, text:"No availability data available for this judge." };
+
+  const fmtD = d => d ? new Date(d).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) : "";
+
+  return (
+    <div style={{marginBottom:24}}>
+      <h2 style={{margin:"0 0 10px",fontSize:17,fontWeight:400,color:T.text}}>Availability</h2>
+
+      {/* Disclaimer */}
+      <div style={{padding:"9px 14px",background:disclaimer.bg,border:`1px solid ${disclaimer.border}`,borderRadius:T.rsm,fontSize:12,color:disclaimer.color,lineHeight:1.6,marginBottom:bookings.length>0?12:0}}>
+        {calendarConfirmed && "✓ "}{disclaimer.text}
+      </div>
+
+      {/* Upcoming bookings */}
+      {bookings.length > 0 && (
+        <div style={{display:"flex",flexDirection:"column",gap:6}}>
+          {bookings.map(b=>(
+            <div key={b.id} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:T.surface,border:`1px solid ${T.border}`,borderRadius:T.rsm,fontSize:13}}>
+              <span style={{fontSize:18,flexShrink:0}}>📅</span>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontWeight:500,color:T.text}}>
+                  {fmtD(b.dateFrom)}{b.dateTo!==b.dateFrom?` – ${fmtD(b.dateTo)}`:""}
+                </div>
+                <div style={{color:T.textHint,marginTop:1}}>
+                  {b.location}{b.country?`, ${b.country}`:""}
+                </div>
+              </div>
+              <span style={{padding:"2px 8px",borderRadius:100,background:"#fce8e6",color:T.red,fontSize:11,fontWeight:600,flexShrink:0}}>Unavailable</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── QR Section ────────────────────────────────────────────────────────────────
 function QRSection({judge}) {
   const thumbRef  = useRef(null);
@@ -426,6 +496,9 @@ function JudgePage({judge,reviews,user,onBack,onReview,onBook,onClaim,onEditProf
             </div>
           </div>
         )}
+
+        {/* Availability */}
+        <AvailabilitySection judge={judge}/>
 
         {/* Reviews */}
         <h2 style={{margin:"0 0 4px",fontSize:17,fontWeight:400,color:T.text}}>

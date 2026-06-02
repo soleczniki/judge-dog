@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { T } from "../theme.js";
 import { Modal } from "../components/Modal.jsx";
 import { Btn, Field } from "../components/atoms.jsx";
@@ -92,6 +92,31 @@ export function BookingModal({ judge, user, onClose }) {
   const [breeds,       setBreeds]   = useState([]);
   const [dateFrom,     setDateFrom] = useState("");
   const [dateTo,       setDateTo]   = useState("");
+  const [dateConflict, setDateConflict] = useState(false);
+
+  // Real-time conflict check when dates change
+  useEffect(()=>{
+    if(!dateFrom||!dateTo) { setDateConflict(false); return; }
+    let cancelled=false;
+    (async()=>{
+      try{
+        const {db}=await import("../firebase.js");
+        const {collection,query,where,getDocs}=await import("firebase/firestore");
+        const snap=await getDocs(query(
+          collection(db,"bookingInquiries"),
+          where("judgeId","==",judge.id),
+          where("status","==","accepted")
+        ));
+        if(cancelled) return;
+        const conflict=snap.docs.some(d=>{
+          const b=d.data();
+          return b.dateFrom<=dateTo && b.dateTo>=dateFrom;
+        });
+        setDateConflict(conflict);
+      }catch(e){ setDateConflict(false); }
+    })();
+    return()=>{ cancelled=true; };
+  },[dateFrom,dateTo,judge.id]);
   const [location,     setLocation] = useState("");
   const [country,      setCountry]  = useState(user.organizerProfile?.country||"");
   const [fee,          setFee]      = useState("");
@@ -238,6 +263,11 @@ export function BookingModal({ judge, user, onClose }) {
           <Field label="Date from *" type="date" value={dateFrom} onChange={e=>setDateFrom(e.target.value)} error={touched&&!dateFrom} style={{flex:"1 1 140px"}}/>
           <Field label="Date to *"   type="date" value={dateTo}   onChange={e=>setDateTo(e.target.value)}   error={touched&&!dateTo}   style={{flex:"1 1 140px"}}/>
         </div>
+        {dateConflict && (
+          <div style={{padding:"9px 13px",background:"#fff8e1",border:"1px solid #fcd34d",borderRadius:T.rsm,fontSize:13,color:"#92400e",lineHeight:1.6}}>
+            ⚠️ The judge is already shown as busy on these dates. You can still send the inquiry — the judge will decide whether to accept.
+          </div>
+        )}
 
         {/* Location */}
         <Field label="City / Venue *" value={location} onChange={e=>setLocation(e.target.value)} error={touched&&!location.trim()} placeholder="e.g. Munich Fairgrounds"/>
