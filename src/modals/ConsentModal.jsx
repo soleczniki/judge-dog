@@ -3,7 +3,7 @@ import { T } from "../theme.js";
 import { completeRegistration } from "../firebase.js";
 import { Modal } from "../components/Modal.jsx";
 import { Btn, Field } from "../components/atoms.jsx";
-// error prop on Field highlights the input border only, not the label
+import { COUNTRIES } from "../countries.js";
 
 const ROLES = [
   {
@@ -110,10 +110,11 @@ export function ConsentModal({user, onClose, onComplete}) {
               onChange={e=>setClubName(e.target.value)}
               placeholder="e.g. Munich Dog Show Club"
             />
-            <div style={{display:"flex",gap:10}}>
-              <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)} placeholder="e.g. Germany" style={{flex:1}}/>
-              <Field label="City *"    value={city}    onChange={e=>setCity(e.target.value)}    placeholder="e.g. Munich"  style={{flex:1}}/>
-            </div>
+            <datalist id="country-list-consent">
+              {COUNTRIES.map(c=><option key={c} value={c}/>)}
+            </datalist>
+            <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)} placeholder="Start typing…" list="country-list-consent"/>
+            <Field label="City *"    value={city}    onChange={e=>setCity(e.target.value)}    placeholder="e.g. Munich"/>
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { T } from "../theme.js";
+import { COUNTRIES } from "../countries.js";
 import { Modal } from "../components/Modal.jsx";
 import { Btn, Field } from "../components/atoms.jsx";
 
@@ -40,6 +41,11 @@ export function AddOrganiserModal({ user, onClose, onComplete }) {
     <Modal onClose={onClose} title="Add Event Organiser access"
       subtitle="Send booking inquiries to judges for your shows and events">
 
+      {/* datalist for country autocomplete */}
+      <datalist id="country-list">
+        {COUNTRIES.map(c=><option key={c} value={c}/>)}
+      </datalist>
+
       <div style={{padding:"12px 14px",background:T.accentLight,borderRadius:T.rsm,border:`1px solid #c5d9f7`,marginBottom:20,fontSize:13,color:T.accent,lineHeight:1.6}}>
         Once activated you can send booking inquiries immediately. A <strong>Verified Organiser</strong> badge ($2 identity check) will be available to build additional trust with judges.
       </div>
@@ -49,24 +55,21 @@ export function AddOrganiserModal({ user, onClose, onComplete }) {
           label="Organisation / Club name *"
           value={clubName}
           onChange={e=>setClubName(e.target.value)}
-          placeholder="e.g. Munich Dog Show Club, Midwest Agility Association"
+          placeholder="e.g. Munich Dog Show Club"
         />
-        <div style={{display:"flex",gap:10}}>
-          <Field
-            label="Country *"
-            value={country}
-            onChange={e=>setCountry(e.target.value)}
-            placeholder="e.g. Germany"
-            style={{flex:1}}
-          />
-          <Field
-            label="City *"
-            value={city}
-            onChange={e=>setCity(e.target.value)}
-            placeholder="e.g. Munich"
-            style={{flex:1}}
-          />
-        </div>
+        <Field
+          label="Country *"
+          value={country}
+          onChange={e=>setCountry(e.target.value)}
+          placeholder="Start typing…"
+          list="country-list"
+        />
+        <Field
+          label="City *"
+          value={city}
+          onChange={e=>setCity(e.target.value)}
+          placeholder="e.g. Munich"
+        />
       </div>
 
       {err && <div style={{padding:"10px 14px",background:T.redLight,borderRadius:T.rsm,fontSize:13,color:T.red,marginBottom:14}}>{err}</div>}

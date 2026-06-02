@@ -102,7 +102,7 @@ export const Btn = ({children,onClick,variant="filled",color,small,fullWidth,ico
   );
 };
 
-export const Field = ({label,value,onChange,type="text",multiline,rows=4,placeholder,style:s,error}) => (
+export const Field = ({label,value,onChange,type="text",multiline,rows=4,placeholder,style:s,error,list}) => (
   <div style={{display:"flex",flexDirection:"column",gap:4,...s}}>
     {label&&<label style={{fontSize:12,fontWeight:500,color:T.textSub,letterSpacing:0.2}}>{label}</label>}
     {multiline
@@ -110,7 +110,7 @@ export const Field = ({label,value,onChange,type="text",multiline,rows=4,placeho
           style={{padding:"10px 14px",border:`1.5px solid ${error?T.red:T.border}`,borderRadius:T.rsm,fontSize:14,fontFamily:"inherit",background:T.bg,resize:"vertical",outline:"none",color:T.text,lineHeight:1.6}}
           onFocus={e=>e.target.style.borderColor=T.accent}
           onBlur={e=>e.target.style.borderColor=error?T.red:T.border}/>
-      : <input type={type} value={value} onChange={onChange} placeholder={placeholder}
+      : <input type={type} value={value} onChange={onChange} placeholder={placeholder} list={list}
           style={{padding:"10px 14px",border:`1.5px solid ${error?T.red:T.border}`,borderRadius:T.rsm,fontSize:14,fontFamily:"inherit",background:T.bg,outline:"none",color:T.text}}
           onFocus={e=>e.target.style.borderColor=T.accent}
           onBlur={e=>e.target.style.borderColor=error?T.red:T.border}/>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { T } from "../theme.js";
 import { Btn, Field } from "../components/atoms.jsx";
+import { COUNTRIES } from "../countries.js";
 import { uploadUserPhoto } from "../firebase.js";
 
 function Section({ title, children }) {
@@ -197,12 +198,13 @@ export function SettingsPage({ user, onUserUpdated }) {
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
             <Field label="Organisation / Club name *" value={clubName} onChange={e=>setClubName(e.target.value)}
               placeholder="e.g. Munich Dog Show Club" error={touched&&!clubName.trim()}/>
-            <div style={{display:"flex",gap:10}}>
-              <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)}
-                placeholder="e.g. Germany" style={{flex:1}} error={touched&&!country.trim()}/>
-              <Field label="City *" value={city} onChange={e=>setCity(e.target.value)}
-                placeholder="e.g. Munich" style={{flex:1}} error={touched&&!city.trim()}/>
-            </div>
+            <datalist id="country-list-settings">
+              {COUNTRIES.map(c=><option key={c} value={c}/>)}
+            </datalist>
+            <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)}
+              placeholder="Start typing…" list="country-list-settings" error={touched&&!country.trim()}/>
+            <Field label="City *" value={city} onChange={e=>setCity(e.target.value)}
+              placeholder="e.g. Munich" error={touched&&!city.trim()}/>
             <div style={{display:"flex",gap:10}}>
               <Field label="Phone" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="+49 89 123456" style={{flex:1}}/>
               <Field label="Website" value={website} onChange={e=>setWebsite(e.target.value)} placeholder="https://yourclub.com" style={{flex:1}}/>
