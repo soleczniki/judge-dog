@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { T } from "../theme.js";
 import { Btn, Field } from "../components/atoms.jsx";
-import { COUNTRIES } from "../countries.js";
+import { CountrySelect } from "../components/CountrySelect.jsx";
 import { uploadUserPhoto } from "../firebase.js";
 
 function Section({ title, children }) {
@@ -198,11 +198,7 @@ export function SettingsPage({ user, onUserUpdated }) {
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
             <Field label="Organisation / Club name *" value={clubName} onChange={e=>setClubName(e.target.value)}
               placeholder="e.g. Munich Dog Show Club" error={touched&&!clubName.trim()}/>
-            <datalist id="country-list-settings">
-              {COUNTRIES.map(c=><option key={c} value={c}/>)}
-            </datalist>
-            <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)}
-              placeholder="Start typing…" list="country-list-settings" error={touched&&!country.trim()}/>
+            <CountrySelect label="Country *" value={country} onChange={setCountry} error={touched&&!country.trim()}/>
             <Field label="City *" value={city} onChange={e=>setCity(e.target.value)}
               placeholder="e.g. Munich" error={touched&&!city.trim()}/>
             <div style={{display:"flex",gap:10}}>

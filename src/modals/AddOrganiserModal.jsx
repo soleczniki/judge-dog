@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { T } from "../theme.js";
-import { COUNTRIES } from "../countries.js";
 import { Modal } from "../components/Modal.jsx";
 import { Btn, Field } from "../components/atoms.jsx";
+import { CountrySelect } from "../components/CountrySelect.jsx";
 
 export function AddOrganiserModal({ user, onClose, onComplete }) {
   const [clubName, setClubName] = useState("");
@@ -13,7 +13,7 @@ export function AddOrganiserModal({ user, onClose, onComplete }) {
 
   async function submit() {
     if (!clubName.trim()) { setErr("Please enter your organisation or club name."); return; }
-    if (!country.trim())  { setErr("Please enter your country."); return; }
+    if (!country.trim())  { setErr("Please select your country."); return; }
     if (!city.trim())     { setErr("Please enter your city."); return; }
     setSaving(true); setErr("");
     try {
@@ -41,11 +41,6 @@ export function AddOrganiserModal({ user, onClose, onComplete }) {
     <Modal onClose={onClose} title="Add Event Organiser access"
       subtitle="Send booking inquiries to judges for your shows and events">
 
-      {/* datalist for country autocomplete */}
-      <datalist id="country-list">
-        {COUNTRIES.map(c=><option key={c} value={c}/>)}
-      </datalist>
-
       <div style={{padding:"12px 14px",background:T.accentLight,borderRadius:T.rsm,border:`1px solid #c5d9f7`,marginBottom:20,fontSize:13,color:T.accent,lineHeight:1.6}}>
         Once activated you can send booking inquiries immediately. A <strong>Verified Organiser</strong> badge ($2 identity check) will be available to build additional trust with judges.
       </div>
@@ -57,12 +52,11 @@ export function AddOrganiserModal({ user, onClose, onComplete }) {
           onChange={e=>setClubName(e.target.value)}
           placeholder="e.g. Munich Dog Show Club"
         />
-        <Field
+        <CountrySelect
           label="Country *"
           value={country}
-          onChange={e=>setCountry(e.target.value)}
-          placeholder="Start typing…"
-          list="country-list"
+          onChange={setCountry}
+          error={!country.trim() && !!err}
         />
         <Field
           label="City *"

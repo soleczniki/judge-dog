@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { T } from "../theme.js";
-import { COUNTRIES } from "../countries.js";
+import { CountrySelect } from "../components/CountrySelect.jsx";
 import { Modal } from "../components/Modal.jsx";
 import { Btn, Field } from "../components/atoms.jsx";
 
@@ -97,10 +97,6 @@ export function BookingModal({judge, user, onClose}) {
         </div>
       )}
 
-      <datalist id="country-list-booking">
-        {COUNTRIES.map(c=><option key={c} value={c}/>)}
-      </datalist>
-
       <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:12}}>
         <Field label="Show / Event name *"   value={f.showName}  onChange={e=>set("showName",e.target.value)}  error={touched&&!f.showName.trim()}/>
         <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
@@ -108,7 +104,7 @@ export function BookingModal({judge, user, onClose}) {
           <Field label="Expected entries" value={f.entries} onChange={e=>set("entries",e.target.value)} placeholder="Approx. number" style={{flex:"1 1 140px"}}/>
         </div>
         <Field label="City / Venue *"        value={f.location}  onChange={e=>set("location",e.target.value)}  error={touched&&!f.location.trim()}/>
-        <Field label="Country *"             value={f.country}   onChange={e=>set("country",e.target.value)}   error={touched&&!f.country.trim()} placeholder="Start typing…" list="country-list-booking"/>
+        <CountrySelect label="Country *"     value={f.country}   onChange={v=>set("country",v)}                error={touched&&!f.country.trim()}/>
         <Field label="Breeds / disciplines *" value={f.breeds}   onChange={e=>set("breeds",e.target.value)}   error={touched&&!f.breeds.trim()} placeholder="e.g. Hound Group, German Shepherd"/>
       </div>
       <Field label="Fee & travel" value={f.feeDiscussion} onChange={e=>set("feeDiscussion",e.target.value)}

@@ -3,7 +3,7 @@ import { T } from "../theme.js";
 import { completeRegistration } from "../firebase.js";
 import { Modal } from "../components/Modal.jsx";
 import { Btn, Field } from "../components/atoms.jsx";
-import { COUNTRIES } from "../countries.js";
+import { CountrySelect } from "../components/CountrySelect.jsx";
 
 const ROLES = [
   {
@@ -110,11 +110,8 @@ export function ConsentModal({user, onClose, onComplete}) {
               onChange={e=>setClubName(e.target.value)}
               placeholder="e.g. Munich Dog Show Club"
             />
-            <datalist id="country-list-consent">
-              {COUNTRIES.map(c=><option key={c} value={c}/>)}
-            </datalist>
-            <Field label="Country *" value={country} onChange={e=>setCountry(e.target.value)} placeholder="Start typing…" list="country-list-consent"/>
-            <Field label="City *"    value={city}    onChange={e=>setCity(e.target.value)}    placeholder="e.g. Munich"/>
+            <CountrySelect label="Country *" value={country} onChange={setCountry}/>
+            <Field label="City *" value={city} onChange={e=>setCity(e.target.value)} placeholder="e.g. Munich"/>
           </div>
         </div>
       )}
