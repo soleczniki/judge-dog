@@ -397,6 +397,7 @@ export default function App() {
               reviews={reviews}
               unreadMsgCount={unreadMsgCount}
               onEditProfile={()=>navigate(`/judge/${judges.find(j=>j.id===user.judgeId)?.slug||user.judgeId}`)}
+              onUserUpdated={u=>setUser(prev=>({...prev,...u}))}
             />
           : <Landing
               search={search} setSearch={setSearch}

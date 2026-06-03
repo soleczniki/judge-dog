@@ -1,10 +1,24 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { T } from "../theme.js";
 import { fmtDate } from "../utils.js";
 import { Avatar, Stars, Btn } from "../components/atoms.jsx";
 
-export function JudgeDashboard({user, judge, reviews, unreadMsgCount, onEditProfile, onNavigate}) {
+async function setCalendarConfirmed(uid, value, onUserUpdated) {
+  try {
+    const { db } = await import("../firebase.js");
+    const { doc, updateDoc, collection, query, where, getDocs } = await import("firebase/firestore");
+    await updateDoc(doc(db, "users", uid), { calendarConfirmed: value });
+    // Also update judge doc if found
+    const snap = await getDocs(query(collection(db,"judges"), where("id","==", uid)));
+    if (!snap.empty) await updateDoc(snap.docs[0].ref, { calendarConfirmed: value });
+    onUserUpdated?.({ calendarConfirmed: value });
+  } catch(e) { console.error(e); }
+}
+
+export function JudgeDashboard({user, judge, reviews, unreadMsgCount, onEditProfile, onNavigate, onUserUpdated}) {
   const navigate = useNavigate();
+  const [calPromptDone, setCalPromptDone] = useState(false);
   const myReviews = reviews.filter(r=>r.judgeId===judge?.id)
     .sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3);
   const overallAvg = judge && myReviews.length
@@ -26,6 +40,38 @@ export function JudgeDashboard({user, judge, reviews, unreadMsgCount, onEditProf
 
   return (
     <div style={{maxWidth:900,margin:"0 auto",padding:"36px 20px"}}>
+      {/* Calendar confirmation prompt — shown once, only when never answered */}
+      {!calPromptDone && user.calendarConfirmed === undefined && (
+        <div style={{marginBottom:24,padding:"18px 20px",background:"linear-gradient(135deg,#e8f0fe,#f0f4ff)",border:`1px solid #c5d9f7`,borderRadius:T.r,boxShadow:T.shadow}}>
+          <div style={{display:"flex",gap:14,alignItems:"flex-start"}}>
+            <span style={{fontSize:28,flexShrink:0}}>📅</span>
+            <div style={{flex:1}}>
+              <p style={{margin:"0 0 4px",fontSize:15,fontWeight:500,color:T.text}}>
+                Do you want to manage your calendar on judge.dog?
+              </p>
+              <p style={{margin:"0 0 14px",fontSize:13,color:T.textSub,lineHeight:1.6}}>
+                When enabled, show organisers can see your booked dates and you'll display a <strong>"Calendar managed by judge"</strong> badge on your profile — replacing the data accuracy disclaimer with a trust signal.
+                You can change this at any time in Settings.
+              </p>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                <Btn small color={T.accent} onClick={async()=>{
+                  await setCalendarConfirmed(user.uid, true, onUserUpdated);
+                  setCalPromptDone(true);
+                }}>
+                  Yes, I'll keep it updated
+                </Btn>
+                <Btn small variant="outlined" onClick={async()=>{
+                  await setCalendarConfirmed(user.uid, false, onUserUpdated);
+                  setCalPromptDone(true);
+                }}>
+                  Not now
+                </Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Welcome */}
       <div style={{marginBottom:28}}>
         <h1 style={{margin:"0 0 4px",fontSize:28,fontWeight:400,color:T.text,letterSpacing:-0.5}}>
