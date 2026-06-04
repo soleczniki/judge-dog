@@ -215,10 +215,21 @@ async function scrapeJudge(id, attempt=1) {
         }
       }
 
+      // Email — from mailto links (most reliable, avoids false "(private)" exclusion)
+      let email = null;
+      const mailtoLinks = Array.from(document.querySelectorAll('a[href^="mailto:"]'));
+      if(mailtoLinks.length>0){
+        email = mailtoLinks[0].href.replace('mailto:','').trim().split('?')[0];
+      } else {
+        const bodyText = document.body.innerText;
+        const emailMatch = bodyText.match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/i);
+        if(emailMatch) email = emailMatch[0];
+      }
+
       return {
         rawName,badName,birthYear,kennelClub,kennelClubCountry,countryOfResidence,
         fciLicenceId,fciLicenceCountry,fciLicenceNumber,fciLicenceDate,
-        flag,country,
+        flag,country,email,
         disciplines,disciplineGroups:[...disciplineGroups],
         allBreedJudge,authorizedBreeds,groupNames,fciLanguages,
       };
@@ -245,7 +256,7 @@ async function scrapeJudge(id, attempt=1) {
       groupNames:data.groupNames.map(g=>({group:g,name:FCI_GROUP_NAMES[g]||g})),
       authorizedBreeds:data.authorizedBreeds,breeds:data.authorizedBreeds,
       fciLanguages:data.fciLanguages,otherLanguages:[],
-      suspensions:[],contact:{email:null,phone:null,address:null},
+      suspensions:[],contact:{email:data.email||null,phone:null,address:null},
       kennelName:null,bisJudge:false,
       verified:false,claimedBy:null,bio:"",social:{},highlights:[],headline:"",
       source:"FCI",status:"active",

@@ -294,10 +294,19 @@ async function scrapeJudge(id) {
       });
 
       // ── Contact ──────────────────────────────────────────────────────────
+      // Extract email from mailto links — most reliable source on FCI pages.
+      // Previous approach checked bodyText.includes("(private)") which incorrectly
+      // blocked emails when the phone number was marked private.
       let email = null;
-      const bodyText = document.body.innerText;
-      const emailMatch = bodyText.match(/[\w.+-]+@[\w-]+\.[a-z]{2,}/i);
-      if (emailMatch && !bodyText.includes("(private)")) email = emailMatch[0];
+      const mailtoLinks = Array.from(document.querySelectorAll('a[href^="mailto:"]'));
+      if (mailtoLinks.length > 0) {
+        email = mailtoLinks[0].href.replace('mailto:', '').trim().split('?')[0];
+      } else {
+        // Fallback: regex on body text
+        const bodyText = document.body.innerText;
+        const emailMatch = bodyText.match(/[\w.+-]+@[\w.-]+\.[a-z]{2,}/i);
+        if (emailMatch) email = emailMatch[0];
+      }
 
       return {
         rawName, badName, birthYear, kennelClub, kennelClubCountry, countryOfResidence,
