@@ -524,12 +524,46 @@ export function JudgeRoute({judges,reviews,user,addReview,claimJudge,editProfile
   const {slug}=useParams();
   const navigate=useNavigate();
   const [modal,setModal]=useState(null);
+  const [fetchedJudge,setFetchedJudge]=useState(null);
+  const [fetching,setFetching]=useState(false);
   // Track user locally so AddOrganiserModal update is immediate
   const [localUser, setLocalUser]=useState(user);
   // Keep in sync when parent user changes (login/logout)
   if(user!==localUser&&JSON.stringify(user)!==JSON.stringify(localUser)) setLocalUser(user);
   // Check canonical slug, doc id, and any historical slug aliases
-  const judge=judges.find(j=>j.slug===slug||j.id===slug||j.slugAliases?.includes(slug));
+  const judgeFromList=judges.find(j=>j.slug===slug||j.id===slug||j.slugAliases?.includes(slug));
+  const judge=judgeFromList||fetchedJudge;
+
+  // If not in local list yet (still loading batches), fetch directly from Firestore
+  useEffect(()=>{
+    if(judgeFromList||fetching) return;
+    setFetching(true);
+    (async()=>{
+      try{
+        const {db}=await import("../firebase.js");
+        const {collection,query,where,getDocs}=await import("firebase/firestore");
+        // Try slug, then slugAliases
+        for(const field of ["slug","slugAliases"]){
+          const q=query(collection(db,"judges"),where(field,field==="slugAliases"?"array-contains":"==",slug));
+          const snap=await getDocs(q);
+          if(!snap.empty){
+            setFetchedJudge({...snap.docs[0].data(),id:snap.docs[0].id});
+            break;
+          }
+        }
+        // Also try by id directly
+        if(!fetchedJudge){
+          const {doc,getDoc}=await import("firebase/firestore");
+          const possibleId=slug.startsWith("fci_")||slug.startsWith("akc_")?slug:null;
+          if(possibleId){
+            const snap=await getDoc(doc(db,"judges",possibleId));
+            if(snap.exists()) setFetchedJudge({...snap.data(),id:snap.id});
+          }
+        }
+      }catch(e){}
+      setFetching(false);
+    })();
+  },[slug,judgeFromList]);
 
   // Redirect alias URLs to the canonical slug (preserves QR codes / old links)
   useEffect(()=>{
@@ -564,8 +598,8 @@ export function JudgeRoute({judges,reviews,user,addReview,claimJudge,editProfile
 
   if(!judge) return (
     <div style={{minHeight:"60vh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:12,color:T.textHint}}>
-      <div style={{fontSize:36}}>🔍</div>
-      <p style={{fontSize:15,color:T.textSub,margin:0}}>Judge not found.</p>
+      <div style={{fontSize:36}}>{fetching?"⏳":"🔍"}</div>
+      <p style={{fontSize:15,color:T.textSub,margin:0}}>{fetching?"Loading…":"Judge not found."}</p>
     </div>
   );
 

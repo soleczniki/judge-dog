@@ -57,7 +57,7 @@ export default function App() {
   const location=useLocation();
 
   useEffect(()=>{
-    const BATCH=200;
+    const BATCH=500;
     (async()=>{
       const sr=await sGet(K.reviews,null);
       if(!sr){await sSet(K.reviews,[]);setReviews([]);}else setReviews(sr);
