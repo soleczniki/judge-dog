@@ -121,7 +121,10 @@ export const Field = ({label,value,onChange,type="text",multiline,rows=4,placeho
 export function ScrollToTop() {
   const {pathname}=useLocation();
   useEffect(()=>{
-    window.scrollTo(0,0);
+    // Scroll the routes wrapper div (which has overflowY:auto), not window
+    const el = document.getElementById("routes-wrapper");
+    if(el) el.scrollTop = 0;
+    else window.scrollTo(0,0);
     trackPageView(pathname);
   },[pathname]);
   return null;

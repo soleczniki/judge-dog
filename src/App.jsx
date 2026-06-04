@@ -392,7 +392,7 @@ export default function App() {
         </>
       )}
 
-      <div style={{flex:1,overflowY:"auto",overflowX:"hidden"}}><Routes>
+      <div id="routes-wrapper" style={{flex:1,overflowY:"auto",overflowX:"hidden"}}><Routes>
         <Route path="/" element={user?.role==="judge" && user?.judgeId && !search.trim()
           ? <JudgeDashboard
               user={user}
