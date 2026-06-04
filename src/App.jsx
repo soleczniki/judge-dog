@@ -198,14 +198,17 @@ export default function App() {
 
   const logout=async()=>{await firebaseSignOut();setUser(null);};
 
-  // Filter out judges with clearly corrupted names (dots, dashes, digits, very short)
+  // Filter out judges with clearly corrupted names
   const hasValidName = j => {
     const n = (j.name||"").trim();
     if (n.length < 3) return false;
-    // Skip if name is only dots, dashes, digits, commas, spaces
-    if (/^[\s.,\-_0-9]+$/.test(n)) return false;
-    // Skip if meaningful letter count is less than 2
-    if ((n.match(/[a-zA-ZÀ-žА-я]/g)||[]).length < 2) return false;
+    // Strip parenthesized content — FCI licence IDs like (by43), (jp166) pollute the name
+    const nameOnly = n.replace(/\([^)]*\)/g, "").trim();
+    if (!nameOnly) return false;
+    // Must have at least 3 real letters outside parentheses
+    if ((nameOnly.match(/[a-zA-ZÀ-žА-яёЁ]/g)||[]).length < 3) return false;
+    // Must contain at least one word with 2+ consecutive letters (filters "A A.", ". ..")
+    if (!/[a-zA-ZÀ-žА-яёЁ]{2,}/.test(nameOnly)) return false;
     return true;
   };
 

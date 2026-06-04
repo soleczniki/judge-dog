@@ -19,7 +19,7 @@ const backfillArg = args.find(a=>a.startsWith("--backfill="))?.split("=")[1];
 const BACKFILL_MODE = !!backfillArg;
 const [bfStart, bfEnd] = backfillArg ? backfillArg.split("-").map(Number) : [null, null];
 // Restart browser every N IDs to prevent session expiry / popup re-appearance
-const RESTART_EVERY = parseInt(args.find(a=>a.startsWith("--restart-every="))?.split("=")[1] || "400");
+const RESTART_EVERY = parseInt(args.find(a=>a.startsWith("--restart-every="))?.split("=")[1] || "50");
 const SAVE_EVERY = 50;
 const OUTPUT    = BACKFILL_MODE ? "fci-backfill-raw.json" : "fci-full-raw.json";
 const PROGRESS  = "fci-full-progress.json";
@@ -83,12 +83,9 @@ function toTitleCase(str) {
   }).join(" ");
 }
 
-// How often to run a session health-check when hitting consecutive empty pages.
-// After HEALTH_CHECK_EVERY empty pages in a row, navigate to a known-good judge
-// ID to verify the session is still alive. If dead → restart + rewind those IDs.
-const HEALTH_CHECK_EVERY = parseInt(
-  args.find(a=>a.startsWith("--health-check="))?.split("=")[1] || "30"
-);
+// Restart browser every N IDs to keep the CF session fresh.
+// Set low (50) so sessions can never expire between restarts.
+// This replaces the unreliable health check approach.
 
 // ── Browser management ────────────────────────────────────────────────────────
 let browser = null;
@@ -134,10 +131,17 @@ async function initBrowser(label = "") {
 }
 
 // ── Session health check ──────────────────────────────────────────────────────
-// Navigate to a previously-confirmed judge page and verify h3.pink is present.
-// Used after N consecutive empty pages to distinguish real gaps from expiry.
+// Re-prime the session by visiting the listing page first, then verify a
+// recently-scraped judge ID is reachable. This prevents false "alive" signals
+// where ID=1 responds but higher IDs silently return empty due to stale session.
 async function isSessionAlive(knownGoodId) {
   try {
+    // Always re-prime first — this is what makes the gap scraper reliable
+    await page.goto("https://www.fci.be/en/judges", { waitUntil: "networkidle2", timeout: 20000 });
+    await sleep(800);
+    await dismissPopup();
+
+    // Now check a real recently-scraped judge (not always ID=1)
     const resp = await page.goto(
       `https://www.fci.be/en/judges/Judge.aspx?id=${knownGoodId}`,
       { waitUntil: "networkidle2", timeout: 20000 }
@@ -167,7 +171,9 @@ async function scrapeJudge(id) {
       const h3pink = document.querySelector("h3.pink");
       if (!h3pink) return null;
       const rawName = h3pink.innerText.trim();
-      if (!rawName || rawName.length < 3) return null;
+      if (!rawName) return null;
+      // Mark as bad name but still return — store as hidden so we keep the ID
+      const badName = rawName.length < 3 || /^[\s.,\-_0-9]+$/.test(rawName) || (rawName.match(/[a-zA-ZÀ-žА-я]/g)||[]).length < 2;
 
       // ── Birth year ───────────────────────────────────────────────────────
       let birthYear = null;
@@ -294,7 +300,7 @@ async function scrapeJudge(id) {
       if (emailMatch && !bodyText.includes("(private)")) email = emailMatch[0];
 
       return {
-        rawName, birthYear, kennelClub, kennelClubCountry, countryOfResidence,
+        rawName, badName, birthYear, kennelClub, kennelClubCountry, countryOfResidence,
         fciLanguages, otherLanguages, kennelNames, disciplines, disciplineFirstAuth,
         allBreedJudge, bisJudge, groupJudge, authorizedBreeds, suspensions,
         contact: { email, phone: null, address: null }
@@ -411,6 +417,7 @@ async function scrapeJudge(id) {
       fciUrl: `https://www.fci.be/en/judges/Judge.aspx?id=${id}`,
       source: "FCI",
       status: "active",
+      hidden: data.badName ? true : false,
       scrapedAt: new Date().toISOString(),
       lastUpdated: new Date().toISOString(),
     };
@@ -444,8 +451,7 @@ async function main() {
   let i = resumeFrom;
   let idsSinceRestart = 0;
   // ID of first successfully scraped judge — used for health checks.
-  // Seed from loaded judges if resuming, otherwise set on first find.
-  let healthCheckId = judges.length > 0 ? judges[0].fciUrlId : null;
+
 
   const loopMax = BACKFILL_MODE ? bfEnd : maxId;
   while (i <= loopMax) {
@@ -458,11 +464,8 @@ async function main() {
     }
 
     const judge = await scrapeJudge(i);
-    let rewound = false;
 
     if (judge) {
-      // Record first good ID for health checks
-      if (!healthCheckId) healthCheckId = i;
       judges.push(judge);
       consecutive = 0;
       const total = judges.length;
@@ -472,34 +475,12 @@ async function main() {
     } else {
       consecutive++;
 
-      // ── Session health check ───────────────────────────────────────────────
-      // Every HEALTH_CHECK_EVERY consecutive empties, verify the session is live.
-      // If dead (session expired), restart browser and rewind to the first empty
-      // ID in this streak — those IDs may actually have judges we missed.
-      if (healthCheckId && consecutive % HEALTH_CHECK_EVERY === 0) {
-        console.log(`🔍 Health check after ${consecutive} empties (id=${i}, checking id=${healthCheckId})...`);
-        const alive = await isSessionAlive(healthCheckId);
-        if (!alive) {
-          const rewindTo = i - consecutive + 1;
-          console.log(`⚠️  Session expired! Restarting + rewinding ${consecutive} IDs → resuming from id=${rewindTo}`);
-          await initBrowser(`expired-restart at id=${i}`);
-          i = rewindTo;
-          consecutive = 0;
-          idsSinceRestart = 0;
-          rewound = true;
-        } else {
-          console.log(`✅ Session alive — ids ${i - consecutive + 1}..${i} are genuinely empty`);
-        }
+      if (consecutive % 100 === 0) {
+        console.log(`⬜ ${consecutive} empty in a row (id=${i}) | judges found: ${judges.length}`);
       }
-
-      if (!rewound) {
-        if (consecutive % 100 === 0) {
-          console.log(`⬜ ${consecutive} empty in a row (id=${i}) | judges found: ${judges.length}`);
-        }
-        if (consecutive >= MAX_EMPTY) {
-          console.log(`\n🏁 Stopping — ${MAX_EMPTY} consecutive empty pages. Last id: ${i}`);
-          break;
-        }
+      if (consecutive >= MAX_EMPTY) {
+        console.log(`\n🏁 Stopping — ${MAX_EMPTY} consecutive empty pages. Last id: ${i}`);
+        break;
       }
     }
 
@@ -511,10 +492,8 @@ async function main() {
     }
 
     await sleep(DELAY_MS);
-    if (!rewound) {
-      i++;
-      idsSinceRestart++;
-    }
+    i++;
+    idsSinceRestart++;
   }
 
   // Final save

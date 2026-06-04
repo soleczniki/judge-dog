@@ -119,7 +119,8 @@ async function scrapeJudge(id, attempt=1) {
       const h3pink = document.querySelector("h3.pink");
       if (!h3pink) return null;
       const rawName = h3pink.innerText.trim();
-      if (!rawName || rawName.length < 3) return null;
+      if (!rawName) return null;
+      const badName = rawName.length < 3 || /^[\s.,\-_0-9]+$/.test(rawName) || (rawName.match(/[a-zA-ZÀ-žА-я]/g)||[]).length < 2;
 
       let birthYear=null;
       for (const col of document.querySelectorAll(".col-md-11.vcenter")) {
@@ -215,7 +216,7 @@ async function scrapeJudge(id, attempt=1) {
       }
 
       return {
-        rawName,birthYear,kennelClub,kennelClubCountry,countryOfResidence,
+        rawName,badName,birthYear,kennelClub,kennelClubCountry,countryOfResidence,
         fciLicenceId,fciLicenceCountry,fciLicenceNumber,fciLicenceDate,
         flag,country,
         disciplines,disciplineGroups:[...disciplineGroups],
@@ -248,6 +249,7 @@ async function scrapeJudge(id, attempt=1) {
       kennelName:null,bisJudge:false,
       verified:false,claimedBy:null,bio:"",social:{},highlights:[],headline:"",
       source:"FCI",status:"active",
+      hidden: data.badName ? true : false,
       scrapedAt:new Date().toISOString(),lastUpdated:new Date().toISOString(),
     };
   } catch(e) {
