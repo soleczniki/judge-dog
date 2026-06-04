@@ -150,7 +150,7 @@ async function getDisciplineStateIds(action, state) {
       nameRaw:      [cfClean(r.TEXT_PREFIX), cfClean(r.TEXT_NAME_FIRST), cfClean(r.TEXT_NAME_MIDDLE), cfClean(r.TEXT_NAME_LAST_OR_OTHER), cfClean(r.TEXT_SUFFIX)].filter(Boolean).join(" "),
       state:        cfClean(r.CDE_STATE_PROVINCE)||state,
       country:      cfClean(r.CDE_COUNTRY)||"USA",
-      email:        cfClean(r.TEXT_E_MAIL1)||"",
+      email:        cfClean(r.TEXT_E_MAIL1)||cfClean(r.TEXT_E_MAIL2)||cfClean(r.TEXT_E_MAIL3)||"",
     })).filter(j=>j.judgeNumber);
   } catch(e) {
     console.warn(`  ⚠️  ${action}/${state}: ${e.message.slice(0,60)}`);
